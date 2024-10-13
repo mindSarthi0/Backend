@@ -11,12 +11,14 @@ type Question struct {
 
 	TestName string `json:"testName" bson:"testName"` // Name of the test
 	Question string `json:"question" bson:"question"` // The actual question text
+	No       int    `json:"no" bson:"no"`
 }
 
 // NewQuestion creates a new instance of the Question model
-func NewQuestion(testName string, question string) *Question {
+func NewQuestion(testName string, question string, no int) *Question {
 	return &Question{
 		TestName: testName,
 		Question: question,
+		No:       no,
 	}
 }

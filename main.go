@@ -12,7 +12,121 @@ import (
 	"myproject/models"
 	"myproject/response"
 	"net/http"
+	"sort"
 )
+
+// ["neuroticism", "n1", "Anxiety", "1", "2"]
+
+type Subdomain struct {
+	Name  string
+	Score int
+}
+
+type ScoreQuestion struct {
+	UserId     primitive.ObjectID `json:"userId" bson:"userId"`
+	TestId     primitive.ObjectID `json:"testId" bson:"testId"`
+	QuestionId primitive.ObjectID `json:"questionId" bson:"questionId"`
+	RawScore   string             `json:"rawScore" bson:"rawScore"`
+	TestName   string             `json:"testName" bson:"testName"`
+	Question   string             `json:"question" bson:"question"`
+	No         int                `json:"no" bson:"no"`
+}
+
+func getScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error) {
+	// Initialize empty slice to store the final merged data
+	var mergedData []ScoreQuestion
+
+	// Step 1: Find all scores that match the given testId
+	var scores []models.Score
+	err := mgm.Coll(&models.Score{}).SimpleFind(&scores, bson.M{"testId": testId})
+	if err != nil {
+		return nil, fmt.Errorf("failed to find scores for testId %s: %v", testId.Hex(), err)
+	}
+
+	// Step 2: For each score entry, pull the corresponding question data
+	for _, score := range scores {
+		var question models.Question
+
+		// Find the question that matches the questionId in the score
+		err := mgm.Coll(&models.Question{}).FindByID(score.QuestionId.Hex(), &question)
+
+		if err != nil {
+			log.Printf("No question found for questionId: %s", score.QuestionId.Hex())
+			continue
+		} else if err != nil {
+			return nil, fmt.Errorf("failed to find question for questionId %s: %v", score.QuestionId.Hex(), err)
+		}
+
+		// Step 3: Merge the score and question data
+		mergedData = append(mergedData, ScoreQuestion{
+			UserId:     score.UserId,
+			TestId:     score.TestId,
+			QuestionId: score.QuestionId,
+			RawScore:   score.RawStore,
+			TestName:   question.TestName,
+			Question:   question.Question,
+			No:         question.No,
+		})
+	}
+
+	// Step 4: Sort the merged data based on the "No" field in ascending order
+	sort.Slice(mergedData, func(i, j int) bool {
+		return mergedData[i].No < mergedData[j].No
+	})
+
+	return mergedData, nil
+}
+
+// func calculateSubdomainScore(subdomain string, score1 string, flow1 string, score2 string, flow2 stirng) (string, int) {
+
+// 	// calculation
+// 	subdomainScore := 3
+// 	return subdomain, subdomainScore
+// }
+
+// func calculateProccessedScore(scoreQuestion []ScoreQuestion) {
+
+// 	rule := map[string][][]string{
+// 		"neuroticism": {
+// 			{"n1", "Anxiety", "1", "N", "2", "R"},
+// 			{"n2", "ABCD", "4", "N", "6", "R"},
+// 		},
+// 		"domain2": {
+// 			{"n1", "Anxiety", "1", "N", "2", "R"},
+// 			{"n2", "ABCD", "4", "N", "6", "R"},
+// 		},
+// 	}
+
+// 	fmt.Println(scoreQuestion)
+
+// for domain, values := range rule {
+// 	fmt.Println("Domain:", domain)
+
+// 	var pSubdomain []Subdomain
+
+// 	for _, value := range values {
+
+// 		fmt.Println("Subdomain:", value)
+// 		subdomain := value[1]
+// 		no1 := value[2]
+// 		flow1 := value[3]
+
+// 		// Score form db array
+// 		score1 = scoreQuestion[no1+1]
+
+// 		no2 := data[4]
+
+// 		flow2 = datas[5]
+
+// 		score2 = scores[no2+1]
+
+// 		_, subdomainScore := calculateSubdomainScore(subdomain, score1, flow1, score2, flow2)
+
+// 		pSubdomain = append(pSubdomain, Subdomain{subdomain, subdomainScore})
+
+// 		fmt.Println(pSubdomain)
+// 	}
+// }
 
 // TODO A single test should have one Id
 func postSubmit(c *gin.Context) {
@@ -74,6 +188,7 @@ func postSubmit(c *gin.Context) {
 	}
 
 	var docs []interface{}
+
 	for _, score := range scoreDocs {
 		docs = append(docs, score)
 	}
@@ -84,10 +199,49 @@ func postSubmit(c *gin.Context) {
 		log.Fatalf("Failed to insert multiple documents: %v", err)
 	}
 
-	// Create a user
+	for _, item := range submit.Answers {
+		questionId, err := primitive.ObjectIDFromHex(item.Id)
+		if err != nil {
+			log.Fatalf("Failed to convert string to ObjectID: %v", err)
+		}
+		score := models.NewScore(userId, questionId, item.Answer, newTest.ID)
+		scoreDocs = append(scoreDocs, *score)
+	}
+
+	// calculateProccessedScore(scoresAndQuestion)
 
 	log.Printf("Summited sucessfully")
 	c.IndentedJSON(http.StatusOK, err)
+}
+
+func getReport(c *gin.Context) {
+	var report response.Report
+
+	if err := c.ShouldBindJSON(&report); err != nil {
+		// If there is an error, respond with 400 Bad Request
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var testId = report.TestId
+
+	changedTestId, err := primitive.ObjectIDFromHex(testId)
+
+	if err != nil {
+		fmt.Errorf("invalid testId: %v", err)
+	}
+
+	scoresAndQuestion, err := getScoresWithQuestions(primitive.ObjectID(changedTestId))
+
+	if err != nil {
+		log.Fatalf("Failed to get questions and score: %v", err)
+	}
+
+	log.Printf("Scores and Questions: %v", scoresAndQuestion)
+
+	// Return the found questions
+	c.IndentedJSON(http.StatusOK, scoresAndQuestion)
+
 }
 
 func init() {
@@ -115,8 +269,7 @@ func postQuestions(c *gin.Context) {
 	questions := []models.Question{}
 
 	for _, item := range question {
-
-		questionToSave := models.NewQuestion(item.TestName, item.Question)
+		questionToSave := models.NewQuestion(item.TestName, item.Question, item.No)
 		questions = append(questions, *questionToSave)
 	}
 
@@ -167,6 +320,7 @@ func main() {
 	router := gin.Default()
 
 	router.POST("/questions", postQuestions)
+	router.GET("/report", getReport)
 	router.GET("/questions", getQuestions) // For retrieving questions
 	router.POST("/submit", postSubmit)
 
