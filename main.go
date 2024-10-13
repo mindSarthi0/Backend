@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"myproject/lib"
 	"myproject/models"
 	"myproject/response"
 	"net/http"
@@ -17,9 +18,19 @@ import (
 
 // ["neuroticism", "n1", "Anxiety", "1", "2"]
 
+type Domain struct {
+	Name      string
+	Score     int
+	Subdomain []Subdomain
+	UserId    primitive.ObjectID `json:"userId" bson:"userId"`
+	TestId    primitive.ObjectID `json:"testId" bson:"testId"`
+	Intensity string
+}
+
 type Subdomain struct {
-	Name  string
-	Score int
+	Name      string
+	Score     int
+	Intensity string
 }
 
 type ScoreQuestion struct {
@@ -77,56 +88,95 @@ func getScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error) 
 	return mergedData, nil
 }
 
-// func calculateSubdomainScore(subdomain string, score1 string, flow1 string, score2 string, flow2 stirng) (string, int) {
+func calculateSubdomainScore(subdomain string, score1 string, flow1 string, score2 string, flow2 string) (string, int, string) {
 
-// 	// calculation
-// 	subdomainScore := 3
-// 	return subdomain, subdomainScore
-// }
+	// calculation
+	subdomainScore := 3
+	intensity := "low"
+	return subdomain, subdomainScore, intensity
+}
 
-// func calculateProccessedScore(scoreQuestion []ScoreQuestion) {
+func calculateProccessedScore(scoreQuestion []ScoreQuestion) []Domain {
 
-// 	rule := map[string][][]string{
-// 		"neuroticism": {
-// 			{"n1", "Anxiety", "1", "N", "2", "R"},
-// 			{"n2", "ABCD", "4", "N", "6", "R"},
-// 		},
-// 		"domain2": {
-// 			{"n1", "Anxiety", "1", "N", "2", "R"},
-// 			{"n2", "ABCD", "4", "N", "6", "R"},
-// 		},
-// 	}
+	rule := map[string][][]string{
+		"neuroticism": {
+			{"n1", "Anxiety", "1", "N", "2", "R"},
+			{"n2", "Anger", "3", "N", "4", "R"},
+		},
+		"domain2": {
+			{"n1", "Anxiety", "1", "N", "2", "R"},
+			{"n2", "ABCD", "4", "N", "5", "R"},
+		},
+	}
 
-// 	fmt.Println(scoreQuestion)
+	fmt.Println(scoreQuestion)
+	fmt.Println("Score Question length:", len(scoreQuestion))
 
-// for domain, values := range rule {
-// 	fmt.Println("Domain:", domain)
+	var pDomain []Domain
+	for domain, values := range rule {
+		fmt.Println("Domain:", domain)
 
-// 	var pSubdomain []Subdomain
+		var domainScore int = 0
+		var pSubdomain []Subdomain
+		var testId primitive.ObjectID
+		var userId primitive.ObjectID
+		for _, value := range values {
 
-// 	for _, value := range values {
+			fmt.Println("------: Subdomain:", value)
+			subdomain := value[1]
+			no1 := value[2]
+			flow1 := value[3]
 
-// 		fmt.Println("Subdomain:", value)
-// 		subdomain := value[1]
-// 		no1 := value[2]
-// 		flow1 := value[3]
+			// Score form db array
+			cNo1, err1 := lib.ConvertToInt(no1)
 
-// 		// Score form db array
-// 		score1 = scoreQuestion[no1+1]
+			if err1 != nil {
+				log.Fatalf("Internal server error: %v", err1)
+			}
 
-// 		no2 := data[4]
+			fmt.Print("------: scoreQuestion: ", scoreQuestion, cNo1+1)
+			score1 := scoreQuestion[cNo1-1]
 
-// 		flow2 = datas[5]
+			testId = score1.TestId
+			userId = score1.UserId
 
-// 		score2 = scores[no2+1]
+			no2 := value[4]
 
-// 		_, subdomainScore := calculateSubdomainScore(subdomain, score1, flow1, score2, flow2)
+			flow2 := value[5]
 
-// 		pSubdomain = append(pSubdomain, Subdomain{subdomain, subdomainScore})
+			cNo2, err2 := lib.ConvertToInt(no2)
 
-// 		fmt.Println(pSubdomain)
-// 	}
-// }
+			if err2 != nil {
+				log.Fatalf("Internal server error: %v", err2)
+			}
+
+			score2 := scoreQuestion[cNo2-1]
+
+			fmt.Println("")
+			fmt.Printf("------: Subdomain rule : %v, Qn1: %v , RawScore1: %v, flow1: %v , Qno2: %v, RawScore2: %v, flow2: %v ", subdomain, score1.No, score1.RawScore, flow1, score2.No, score2.RawScore, flow2)
+			fmt.Println("")
+
+			_, subdomainScore, intensity := calculateSubdomainScore(subdomain, score1.RawScore, flow1, score2.RawScore, flow2)
+
+			pSubdomain = append(pSubdomain, Subdomain{subdomain, subdomainScore, intensity})
+			domainScore += subdomainScore
+
+			fmt.Println("------: P Subdomain:", pSubdomain)
+		}
+
+		pDomainIntensity := calculateDomainIntensity(domain, domainScore)
+
+		pDomain = append(pDomain, Domain{domain, domainScore, pSubdomain, testId, userId, pDomainIntensity})
+
+	}
+
+	return pDomain
+}
+
+func calculateDomainIntensity(domain string, domainScore int) string {
+
+	return "High"
+}
 
 // TODO A single test should have one Id
 func postSubmit(c *gin.Context) {
@@ -208,8 +258,6 @@ func postSubmit(c *gin.Context) {
 		scoreDocs = append(scoreDocs, *score)
 	}
 
-	// calculateProccessedScore(scoresAndQuestion)
-
 	log.Printf("Summited sucessfully")
 	c.IndentedJSON(http.StatusOK, err)
 }
@@ -239,8 +287,9 @@ func getReport(c *gin.Context) {
 
 	log.Printf("Scores and Questions: %v", scoresAndQuestion)
 
-	// Return the found questions
-	c.IndentedJSON(http.StatusOK, scoresAndQuestion)
+	pDomain := calculateProccessedScore(scoresAndQuestion)
+
+	c.IndentedJSON(http.StatusOK, pDomain)
 
 }
 
