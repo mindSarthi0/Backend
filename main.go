@@ -1,80 +1,174 @@
 package main
 
 import (
-	"net/http"
-
+	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 	"myproject/models"
+	"myproject/response"
+	"net/http"
 )
 
-// Define the album structure
-type album struct {
-	ID     string  `json:"id"`
-	Title  string  `json:"title"`
-	Artist string  `json:"artist"`
-	Price  float64 `json:"price"`
-}
+// TODO A single test should have one Id
+func postSubmit(c *gin.Context) {
 
-// Seed some initial data (stored in memory)
-var albums = []album{
-	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
-	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
-	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+	var submit response.Submit
+
+	if err := c.ShouldBindJSON(&submit); err != nil {
+		// If there is an error, respond with 400 Bad Request
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	fmt.Printf("Received person data: %+v\n", submit.Answers)
+	// Find the user
+	isExistingUsers := []models.User{}
+
+	fmt.Printf("Received person data: %+v\n", isExistingUsers)
+	mgm.Coll(&models.User{}).SimpleFind(&isExistingUsers, bson.M{"email": submit.Email})
+
+	if isExistingUsers == nil || len(isExistingUsers) == 0 {
+		user := models.NewUser(submit.Name, submit.Email, submit.Gender, submit.Age)
+
+		err := mgm.Coll(user).Create(user)
+
+		if err != nil {
+			c.IndentedJSON(http.StatusOK, err)
+			log.Fatalf("Failed to create a new err: %v", err) // Fatal will log and stop the program
+		}
+		isExistingUsers = append(isExistingUsers, *user)
+
+	}
+
+	userId := isExistingUsers[0].ID
+
+	// TODO Generate payment link from razorPay
+
+	// Create a test entry
+	newTest := models.NewTest("BIG_5", userId, "PENDING", "https://google.com")
+
+	newTestError := mgm.Coll(&models.Test{}).Create(newTest)
+
+	if newTestError != nil {
+		c.IndentedJSON(http.StatusOK, newTestError)
+		log.Fatalf("Failed to create a new test: %v", newTestError) // Fatal will log and stop the program
+	}
+
+	// Store Score
+	coll := mgm.Coll(&models.Score{})
+
+	scoreDocs := []models.Score{}
+
+	for _, item := range submit.Answers {
+		questionId, err := primitive.ObjectIDFromHex(item.Id)
+		if err != nil {
+			log.Fatalf("Failed to convert string to ObjectID: %v", err)
+		}
+		score := models.NewScore(userId, questionId, item.Answer, newTest.ID)
+		scoreDocs = append(scoreDocs, *score)
+	}
+
+	var docs []interface{}
+	for _, score := range scoreDocs {
+		docs = append(docs, score)
+	}
+
+	_, err := coll.InsertMany(c, docs)
+
+	if err != nil {
+		log.Fatalf("Failed to insert multiple documents: %v", err)
+	}
+
+	// Create a user
+
+	log.Printf("Summited sucessfully")
+	c.IndentedJSON(http.StatusOK, err)
 }
 
 func init() {
 	// Setup the mgm default config
-	err := mgm.SetDefaultConfig(nil, "mgm_lab", options.Client().ApplyURI("mongodb://root:12345@localhost:27017"))
+	err := mgm.SetDefaultConfig(nil, "cognify", options.Client().ApplyURI("mongodb+srv://cognify:dEQGVwIY24QzdUu6@cluster0.cjyqt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"))
+	// Error handling
+	if err != nil {
+		log.Fatalf("Failed to connect to MongoDB: %v", err) // Fatal will log and stop the program
+	}
+
+	fmt.Println("Successfully connected to MongoDB!")
 }
 
-func getAlbums(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, albums)
-}
+func postQuestions(c *gin.Context) {
+	var question []response.Question
 
-// postAlbums adds an album from JSON received in the request body.
-func postAlbums(c *gin.Context) {
-	var newAlbum album
-
-	// Bind the JSON data in the request to the newAlbum object.
-	if err := c.BindJSON(&newAlbum); err != nil {
+	if err := c.ShouldBindJSON(&question); err != nil {
+		// If there is an error, respond with 400 Bad Request
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Add the new album to the list of albums.
-	albums = append(albums, newAlbum)
-	c.IndentedJSON(http.StatusCreated, newAlbum)
-}
+	coll := mgm.Coll(&models.Question{})
 
-// getAlbumByID locates the album whose ID matches the id parameter sent by the client.
-func getAlbumByID(c *gin.Context) {
-	id := c.Param("id")
+	questions := []models.Question{}
 
-	// Look through the albums slice for an album with a matching ID.
-	for _, a := range albums {
-		if a.ID == id {
-			c.IndentedJSON(http.StatusOK, a)
-			return
-		}
+	for _, item := range question {
+
+		questionToSave := models.NewQuestion(item.TestName, item.Question)
+		questions = append(questions, *questionToSave)
 	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
+
+	var docs []interface{}
+	for _, question := range questions {
+		docs = append(docs, question)
+	}
+
+	_, err := coll.InsertMany(context.TODO(), docs)
+
+	if err != nil {
+		log.Printf("Failed to insert multiple question documents: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert documents"})
+		return
+	}
+
+	log.Printf("Created sucessfully")
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Questions created successfully"})
+
 }
 
 func getQuestions(c *gin.Context) {
-	question := models.NewQuestion("Math Test", "What is 2 + 2?")
-	c.IndentedJSON(http.StatusOK, albums)
+	// Get the MongoDB collection for questions
+	coll := mgm.Coll(&models.Question{})
+
+	// Create a slice to hold the retrieved questions
+	var questions []models.Question
+
+	// Query all documents in the collection
+	err := coll.SimpleFind(&questions, bson.D{})
+	if err != nil {
+		log.Printf("Error retrieving questions: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve questions"})
+		return
+	}
+
+	// Check if no documents are found
+	if len(questions) == 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "No questions found"})
+		return
+	}
+
+	// Return the found questions
+	c.IndentedJSON(http.StatusOK, questions)
 }
+
 func main() {
 	router := gin.Default()
 
-	// Define the endpoints and handlers
-	router.GET("/albums", getAlbums)
-	router.POST("/albums", postAlbums)
-	router.GET("/albums/:id", getAlbumByID)
-
-	router.GET("/questions", getQuestions)
-	// router.POST("/questions", postQuestions)
+	router.POST("/questions", postQuestions)
+	router.GET("/questions", getQuestions) // For retrieving questions
+	router.POST("/submit", postSubmit)
 
 	// Start the server on localhost:8080
 	router.Run("localhost:8080")
