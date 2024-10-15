@@ -1,14 +1,14 @@
 package API
 
-import ("context"
-"fmt"
-"log"
+import (
+	"context"
+	"fmt"
+	"log"
 
-"go.mongodb.org/mongo-driver/mongo"
-"go.mongodb.org/mongo-driver/mongo/options"
-"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
 
 type Subdomain struct {
 	Name  string `bson:"name"`
@@ -35,7 +35,7 @@ func fetchPersonalityData(client *mongo.Client, userID string) ([]Domain, error)
 }
 
 func main() {
-	clientOptions := options.Client().ApplyURI(""mongodb+srv://cognify:dEQGVwIY24QzdUu6@cluster0.cjyqt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"")
+	clientOptions := options.Client().ApplyURI("mongodb+srv://cognify:dEQGVwIY24QzdUu6@cluster0.cjyqt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
