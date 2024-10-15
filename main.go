@@ -374,12 +374,13 @@ func main() {
 	router.GET("/report", getReport)
 	router.GET("/questions", getQuestions) // For retrieving questions
 	router.POST("/submit", postSubmit)
-	router.GET("/testprompt", getprompt)
+	router.GET("/testprompt", getPrompt)
 	// Start the server on localhost:8080
 	router.Run("localhost:8080")
 }
 
-func getprompt(c *gin.Context) {
+func getPrompt(c *gin.Context) {
+	// Create the personality prompt
 	createdprompt := API.CreatePrompt(
 		"36", "7", "4", "6", "5", "8", "6", // Neuroticism Domain (D1) and its subdomains (N1-N6)
 		"42", "8", "7", "6", "8", "7", "6", // Extraversion Domain (D2) and its subdomains (E1-E6)
@@ -387,5 +388,15 @@ func getprompt(c *gin.Context) {
 		"38", "6", "7", "5", "7", "6", "7", // Agreeableness Domain (D4) and its subdomains (A1-A6)
 		"40", "8", "7", "6", "6", "7", "6", // Conscientiousness Domain (D5) and its subdomains (C1-C6)
 	)
-	API.GenerateContentFromText(createdprompt)
+
+	// Call the API to generate content from the created prompt
+	err := API.GenerateContentFromText(createdprompt)
+	if err != nil {
+		// Respond with an error message if content generation failed
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate content", "details": err.Error()})
+		return
+	}
+
+	// Respond with a success message
+	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": createdprompt})
 }
