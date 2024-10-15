@@ -3,17 +3,20 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/kamva/mgm/v3"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"myproject/API"
 	"myproject/lib"
 	"myproject/models"
 	"myproject/response"
 	"net/http"
 	"sort"
+
+	"github.com/gin-gonic/gin"
+	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"google.golang.org/genproto/googleapis/actions/sdk/v2/interactionmodel/prompt"
 )
 
 // ["neuroticism", "n1", "Anxiety", "1", "2"]
@@ -288,7 +291,6 @@ func getReport(c *gin.Context) {
 	log.Printf("Scores and Questions: %v", scoresAndQuestion)
 
 	pDomain := calculateProccessedScore(scoresAndQuestion)
-
 	c.IndentedJSON(http.StatusOK, pDomain)
 
 }
@@ -372,7 +374,18 @@ func main() {
 	router.GET("/report", getReport)
 	router.GET("/questions", getQuestions) // For retrieving questions
 	router.POST("/submit", postSubmit)
-
+	router.GET("/testprompt", getprompt)
 	// Start the server on localhost:8080
 	router.Run("localhost:8080")
+}
+
+func getprompt(c *gin.Context) {
+	createdprompt := API.CreatePrompt(
+		"36", "7", "4", "6", "5", "8", "6", // Neuroticism Domain (D1) and its subdomains (N1-N6)
+		"42", "8", "7", "6", "8", "7", "6", // Extraversion Domain (D2) and its subdomains (E1-E6)
+		"41", "7", "8", "7", "6", "7", "6", // Openness Domain (D3) and its subdomains (O1-O6)
+		"38", "6", "7", "5", "7", "6", "7", // Agreeableness Domain (D4) and its subdomains (A1-A6)
+		"40", "8", "7", "6", "6", "7", "6", // Conscientiousness Domain (D5) and its subdomains (C1-C6)
+	)
+	API.GenerateContentFromText(createdprompt)
 }
