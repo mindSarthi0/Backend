@@ -1,23 +1,35 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"log"
-	"net/http"
-	"sort"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
+	"myproject/API"
 	"myproject/lib"
 	"myproject/models"
 	"myproject/response"
+	"net/http"
+	"sort"
+	//"google.golang.org/genproto/googleapis/actions/sdk/v2/interactionmodel/prompt"
 )
 
-// Helper structures
+func init() {
+	// Load environment variables from .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+}
+
+// ["neuroticism", "n1", "Anxiety", "1", "2"]
+
 type Domain struct {
 	Name      string
 	Score     int
@@ -258,21 +270,85 @@ func handleReportGeneration(c *gin.Context) {
 	}
 
 	reportDbColumn := mgm.Coll(&models.Report{})
+	log.Printf("Summited sucessfully", reportDbColumn)
+	c.IndentedJSON(http.StatusOK, err)
+}
+
+func getReport(c *gin.Context) {
+	var report response.Report
+
+	if err := c.ShouldBindJSON(&report); err != nil {
+		// If there is an error, respond with 400 Bad Request
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var testId = report.TestId
+
+	changedTestId, err := primitive.ObjectIDFromHex(testId)
+
+	if err != nil {
+		fmt.Errorf("invalid testId: %v", err)
+	}
+
+	scoresAndQuestion, err := fetchScoresWithQuestions(primitive.ObjectID(changedTestId))
+
+	if err != nil {
+		log.Fatalf("Failed to get questions and score: %v", err)
+	}
+
+	log.Printf("Scores and Questions: %v", scoresAndQuestion)
+
+	pDomain := calculateProcessedScore(scoresAndQuestion)
+	c.IndentedJSON(http.StatusOK, pDomain)
+
+}
+
+func init() {
+	// Setup the mgm default config
+	err := mgm.SetDefaultConfig(nil, "cognify", options.Client().ApplyURI("mongodb+srv://cognify:dEQGVwIY24QzdUu6@cluster0.cjyqt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"))
+	// Error handling
+	if err != nil {
+		log.Fatalf("Failed to connect to MongoDB: %v", err) // Fatal will log and stop the program
+	}
+
+	fmt.Println("Successfully connected to MongoDB!")
+}
+
+func postQuestions(c *gin.Context) {
+	var question []response.Question
+
+	if err := c.ShouldBindJSON(&question); err != nil {
+		// If there is an error, respond with 400 Bad Request
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	coll := mgm.Coll(&models.Question{})
+
+	questions := []models.Question{}
+
+	for _, item := range question {
+		questionToSave := models.NewQuestion(item.TestName, item.Question, item.No)
+		questions = append(questions, *questionToSave)
+	}
 
 	var docs []interface{}
-
-	for _, report := range newDbReports {
-		docs = append(docs, report)
+	for _, question := range questions {
+		docs = append(docs, question)
 	}
 
-	_, errManyReportInsert := reportDbColumn.InsertMany(c, docs)
+	_, err := coll.InsertMany(context.TODO(), docs)
 
-	if errManyReportInsert != nil {
-		log.Fatalf("Failed to insert multiple documents: %v", errManyReportInsert)
+	if err != nil {
+		log.Printf("Failed to insert multiple question documents: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert documents"})
+		return
 	}
 
-	// Return generated report
-	c.JSON(http.StatusOK, processedScores)
+	log.Printf("Created sucessfully")
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Questions created successfully"})
+
 }
 
 // Fetch all questions
@@ -346,5 +422,29 @@ func main() {
 	router.GET("/report", handleReportGeneration)
 
 	// Start server
+	router.GET("/testprompt", getPrompt)
+	// Start the server on localhost:8080
 	router.Run("localhost:8080")
+}
+
+func getPrompt(c *gin.Context) {
+	// Create the personality prompt
+	createdprompt := API.CreatePrompt(
+		"36", "7", "4", "6", "5", "8", "6", // Neuroticism Domain (D1) and its subdomains (N1-N6)
+		"42", "8", "7", "6", "8", "7", "6", // Extraversion Domain (D2) and its subdomains (E1-E6)
+		"41", "7", "8", "7", "6", "7", "6", // Openness Domain (D3) and its subdomains (O1-O6)
+		"38", "6", "7", "5", "7", "6", "7", // Agreeableness Domain (D4) and its subdomains (A1-A6)
+		"40", "8", "7", "6", "6", "7", "6", // Conscientiousness Domain (D5) and its subdomains (C1-C6)
+	)
+
+	// Call the API to generate content from the created prompt
+	err := API.GenerateContentFromText(createdprompt)
+	if err != nil {
+		// Respond with an error message if content generation failed
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate content", "details": err.Error()})
+		return
+	}
+
+	// Respond with a success message
+	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": createdprompt})
 }
