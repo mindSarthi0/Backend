@@ -1,15 +1,134 @@
 package API
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/joho/godotenv"
+	"io"
+	"log"
+	"net/http"
+	"os"
 
 	"cloud.google.com/go/vertexai/genai"
+	"google.golang.org/api/option"
 )
 
-// ai integration
+func init() {
+	// Load environment variables from .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+}
+
+// Function to make the POST request to Google API (REST-based approach)
+func GenerateContentFromTextGCP(prompt string) error {
+	// Define the URL for the Google API endpoint (generative language model)
+	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+
+	// Prepare the request payload in JSON format with the prompt content
+	requestBody, err := json.Marshal(map[string]interface{}{
+		"contents": []map[string]interface{}{
+			{
+				"parts": []map[string]string{
+					{"text": prompt},
+				},
+			},
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to marshal request body: %v", err)
+	}
+
+	// Retrieve the API key from the environment variable 'API_KEY'
+	// You should set the API key as an environment variable in your system
+	apiKey := os.Getenv("API_KEY")
+	if apiKey == "" {
+		return fmt.Errorf("API key is not set. Please ensure the environment variable 'API_KEY' is set")
+	}
+
+	// Create a new HTTP POST request with the request body and API key
+	req, err := http.NewRequest("POST", url+"?key="+apiKey, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return fmt.Errorf("failed to create request: %v", err)
+	}
+
+	// Set appropriate headers for the request
+	req.Header.Set("Content-Type", "application/json")
+
+	// Send the HTTP request using an HTTP client
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send request: %v", err)
+	}
+	defer resp.Body.Close() // Ensure the response body is closed
+
+	// Read and parse the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response body: %v", err)
+	}
+
+	// Check if the response status is not 200 (OK), and handle the error accordingly
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("non-200 response status: %d, body: %s", resp.StatusCode, string(body))
+	}
+
+	// Print the response for debugging or further processing
+	fmt.Printf("Response: %s\n", string(body))
+
+	return nil
+}
+
+// Function to generate content using Google Cloud's Vertex AI (client library-based approach)
+func GenerateContentFromText(prompt string) error {
+	// Define the model name you want to use from Vertex AI
+	modelName := "gemini-1.5-flash-001" // This is the model to use for content generation
+
+	// Set up the context and initialize the Vertex AI client using the API key
+	ctx := context.Background()
+
+	// Retrieve the API key from the environment variable 'API_KEY'
+	apiKey := os.Getenv("API_KEY")
+	if apiKey == "" {
+		return fmt.Errorf("API key is not set. Please ensure the environment variable 'API_KEY' is set")
+	}
+
+	// Create a new client for Vertex AI Generative models using the API key
+	projectID := "cognify-438322" // Replace with your actual project ID
+	location := "us-central1"     // Replace with your actual location
+
+	client, err := genai.NewClient(ctx, projectID, location, option.WithAPIKey(apiKey))
+	if err != nil {
+		return fmt.Errorf("error creating Vertex AI client: %w", err)
+	}
+
+	// Create the prompt text for the model to generate content
+	gemini := client.GenerativeModel(modelName)
+	generatePrompt := genai.Text(prompt)
+
+	// Generate content using the defined model and prompt
+	resp, err := gemini.GenerateContent(ctx, generatePrompt)
+	if err != nil {
+		return fmt.Errorf("error generating content from Vertex AI: %w", err)
+	}
+
+	// Print the generated content as formatted JSON
+	rb, err := json.MarshalIndent(resp, "", "  ")
+	if err != nil {
+		return fmt.Errorf("json.MarshalIndent: %w", err)
+	}
+	fmt.Println(string(rb))
+
+	return nil
+}
+
+// Function to create a Big 5 personality prompt (can be used as input to the API)
 func CreatePrompt(D1, N1, N2, N3, N4, N5, N6, D2, E1, E2, E3, E4, E5, E6, D3, O1, O2, O3, O4, O5, O6, D4, A1, A2, A3, A4, A5, A6, D5, C1, C2, C3, C4, C5, C6 string) string {
+	// Build the Big 5 Personality prompt with all domain and subdomain scores
 	prompt := "Generate a Big 5 Personality Assessment report based on the following data:\n" +
 		"Domain: Neuroticism: " + D1 + "\n" +
 		"Subdomains:\n" +
@@ -56,34 +175,8 @@ func CreatePrompt(D1, N1, N2, N3, N4, N5, N6, D2, E1, E2, E3, E4, E5, E6, D3, O1
 		"  Self Discipline: " + C5 + "\n" +
 		"  Cautiousness: " + C6 + "\n\n" +
 
-		"Note: Use this interpretation,\n" +
-		"For Domain if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
+		"Note: For Domain if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
 		"For Subdomain if score is <=3, it is low, <=4 is below average, <=6 is average, <=8 is above average, <=10 is high."
 
 	return prompt
-}
-
-func GenerateContentFromText(pormpt string) error {
-	location := "us-central1"
-	modelName := "gemini-1.5-flash-001"
-
-	ctx := context.Background()
-	client, err := genai.NewClient(ctx, "cognify-438322", location)
-	if err != nil {
-		return fmt.Errorf("error creating client: %w", err)
-	}
-	gemini := client.GenerativeModel(modelName)
-	Genaiprompt := genai.Text(pormpt)
-	resp, err := gemini.GenerateContent(ctx, Genaiprompt)
-	if err != nil {
-		return fmt.Errorf("error generating content: %w", err)
-	}
-	// See the JSON response in
-	// https://pkg.go.dev/cloud.google.com/go/vertexai/genai#GenerateContentResponse.
-	rb, err := json.MarshalIndent(resp, "", "  ")
-	if err != nil {
-		return fmt.Errorf("json.MarshalIndent: %w", err)
-	}
-	fmt.Println(string(rb))
-	return nil
 }

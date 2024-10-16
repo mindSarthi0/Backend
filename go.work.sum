@@ -1,6 +1,8 @@
 cel.dev/expr v0.16.0/go.mod h1:TRSuuV7DlVCE/uwv5QbAiW/v8l5O8C4eEPHeu7gf7Sg=
 cloud.google.com/go/accessapproval v1.8.1/go.mod h1:3HAtm2ertsWdwgjSGObyas6fj3ZC/3zwV2WVZXO53sU=
 cloud.google.com/go/accesscontextmanager v1.9.1/go.mod h1:wUVSoz8HmG7m9miQTh6smbyYuNOJrvZukK5g6WxSOp0=
+cloud.google.com/go/ai v0.8.0 h1:rXUEz8Wp2OlrM8r1bfmpF2+VKqc1VJpafE3HgzRnD/w=
+cloud.google.com/go/ai v0.8.0/go.mod h1:t3Dfk4cM61sytiggo2UyGsDVW3RF1qGZaUKDrZFyqkE=
 cloud.google.com/go/analytics v0.25.1/go.mod h1:hrAWcN/7tqyYwF/f60Nph1yz5UE3/PxOPzzFsJgtU+Y=
 cloud.google.com/go/apigateway v1.7.1/go.mod h1:5JBcLrl7GHSGRzuDaISd5u0RKV05DNFiq4dRdfrhCP0=
 cloud.google.com/go/apigeeconnect v1.7.1/go.mod h1:olkn1lOhIA/aorreenFzfEcEXmFN2pyAwkaUFbug9ZY=
@@ -133,6 +135,7 @@ github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/go-pkcs11 v0.3.0/go.mod h1:6eQoGcuNJpa7jnd5pMGdkSaQpNDYvPlXWMcjXXThLlY=
 github.com/google/martian/v3 v3.3.3/go.mod h1:iEPrYcgCF7jA9OtScMFQyAlZZ4YXTKEtJ1E6RWzmBA0=
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3/go.mod h1:o//XUCC/F+yRGJoPO/VU0GSB0f8Nhgmxx0VIRUvaC0w=
 github.com/iancoleman/strcase v0.3.0/go.mod h1:iwCmte+B7n89clKwxIoIXy/HfoL7AsD47ZCWhYzw7ho=

@@ -12,12 +12,21 @@ import (
 	"sort"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	//"google.golang.org/genproto/googleapis/actions/sdk/v2/interactionmodel/prompt"
 )
+
+func init() {
+	// Load environment variables from .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+}
 
 // ["neuroticism", "n1", "Anxiety", "1", "2"]
 
@@ -67,8 +76,6 @@ func getScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error) 
 		if err != nil {
 			log.Printf("No question found for questionId: %s", score.QuestionId.Hex())
 			continue
-		} else if err != nil {
-			return nil, fmt.Errorf("failed to find question for questionId %s: %v", score.QuestionId.Hex(), err)
 		}
 
 		// Step 3: Merge the score and question data
