@@ -1,24 +1,23 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	"log"
+	"net/http"
+	"sort"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
 	"myproject/lib"
 	"myproject/models"
 	"myproject/response"
-	"net/http"
-	"sort"
 )
 
-// ["neuroticism", "n1", "Anxiety", "1", "2"]
-
+// Helper structures
 type Domain struct {
 	Name      string
 	Score     int
@@ -44,32 +43,26 @@ type ScoreQuestion struct {
 	No         int                `json:"no" bson:"no"`
 }
 
-func getScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error) {
-	// Initialize empty slice to store the final merged data
+// Fetch scores and corresponding questions based on testId
+func fetchScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error) {
 	var mergedData []ScoreQuestion
-
-	// Step 1: Find all scores that match the given testId
 	var scores []models.Score
+
+	// Fetch all scores matching the testId
 	err := mgm.Coll(&models.Score{}).SimpleFind(&scores, bson.M{"testId": testId})
 	if err != nil {
 		return nil, fmt.Errorf("failed to find scores for testId %s: %v", testId.Hex(), err)
 	}
 
-	// Step 2: For each score entry, pull the corresponding question data
+	// Merge score and question data
 	for _, score := range scores {
 		var question models.Question
-
-		// Find the question that matches the questionId in the score
 		err := mgm.Coll(&models.Question{}).FindByID(score.QuestionId.Hex(), &question)
-
 		if err != nil {
 			log.Printf("No question found for questionId: %s", score.QuestionId.Hex())
 			continue
-		} else if err != nil {
-			return nil, fmt.Errorf("failed to find question for questionId %s: %v", score.QuestionId.Hex(), err)
 		}
 
-		// Step 3: Merge the score and question data
 		mergedData = append(mergedData, ScoreQuestion{
 			UserId:     score.UserId,
 			TestId:     score.TestId,
@@ -81,7 +74,7 @@ func getScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error) 
 		})
 	}
 
-	// Step 4: Sort the merged data based on the "No" field in ascending order
+	// Sort by question number
 	sort.Slice(mergedData, func(i, j int) bool {
 		return mergedData[i].No < mergedData[j].No
 	})
@@ -89,303 +82,269 @@ func getScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error) 
 	return mergedData, nil
 }
 
-func calculateSubdomainScore(subdomain string, score1 string, flow1 string, score2 string, flow2 string) (string, int, string) {
-
-	// calculation
-	subdomainScore := 3
-	intensity := "low"
+// Calculate subdomain score (placeholder logic)
+func calculateSubdomainScore(subdomain, score1, flow1, score2, flow2 string) (string, int, string) {
+	subdomainScore := 3 // Placeholder score
+	intensity := "low"  // Placeholder intensity
 	return subdomain, subdomainScore, intensity
 }
 
-func calculateProccessedScore(scoreQuestion []ScoreQuestion) []Domain {
-
-	rule := map[string][][]string{
+// Process and calculate score for domains and subdomains
+func calculateProcessedScore(scoreQuestions []ScoreQuestion) []Domain {
+	rules := map[string][][]string{
 		"neuroticism": {
 			{"n1", "Anxiety", "1", "N", "2", "R"},
 			{"n2", "Anger", "3", "N", "4", "R"},
 		},
-		"domain2": {
+		"domain_2": {
 			{"n1", "Anxiety", "1", "N", "2", "R"},
-			{"n2", "ABCD", "4", "N", "5", "R"},
+			{"n2", "Anger", "3", "N", "4", "R"},
 		},
 	}
 
-	fmt.Println(scoreQuestion)
-	fmt.Println("Score Question length:", len(scoreQuestion))
+	var domains []Domain
+	for domainName, subdomains := range rules {
+		var domainScore int
+		var processedSubdomains []Subdomain
+		var testId, userId primitive.ObjectID
 
-	var pDomain []Domain
-	for domain, values := range rule {
-		fmt.Println("Domain:", domain)
-
-		var domainScore int = 0
-		var pSubdomain []Subdomain
-		var testId primitive.ObjectID
-		var userId primitive.ObjectID
-		for _, value := range values {
-
-			fmt.Println("------: Subdomain:", value)
-			subdomain := value[1]
-			no1 := value[2]
-			flow1 := value[3]
-
-			// Score form db array
+		for _, rule := range subdomains {
+			subdomainName := rule[1]
+			no1, flow1 := rule[2], rule[3]
 			cNo1, err1 := lib.ConvertToInt(no1)
-
 			if err1 != nil {
-				log.Fatalf("Internal server error: %v", err1)
+				log.Printf("Error converting question number: %v", err1)
+				continue
 			}
 
-			fmt.Print("------: scoreQuestion: ", scoreQuestion, cNo1+1)
-			score1 := scoreQuestion[cNo1-1]
-
+			score1 := scoreQuestions[cNo1-1]
 			testId = score1.TestId
 			userId = score1.UserId
 
-			no2 := value[4]
-
-			flow2 := value[5]
-
+			no2, flow2 := rule[4], rule[5]
 			cNo2, err2 := lib.ConvertToInt(no2)
-
 			if err2 != nil {
-				log.Fatalf("Internal server error: %v", err2)
+				log.Printf("Error converting question number: %v", err2)
+				continue
 			}
+			score2 := scoreQuestions[cNo2-1]
 
-			score2 := scoreQuestion[cNo2-1]
-
-			fmt.Println("")
-			fmt.Printf("------: Subdomain rule : %v, Qn1: %v , RawScore1: %v, flow1: %v , Qno2: %v, RawScore2: %v, flow2: %v ", subdomain, score1.No, score1.RawScore, flow1, score2.No, score2.RawScore, flow2)
-			fmt.Println("")
-
-			_, subdomainScore, intensity := calculateSubdomainScore(subdomain, score1.RawScore, flow1, score2.RawScore, flow2)
-
-			pSubdomain = append(pSubdomain, Subdomain{subdomain, subdomainScore, intensity})
+			_, subdomainScore, intensity := calculateSubdomainScore(subdomainName, score1.RawScore, flow1, score2.RawScore, flow2)
+			processedSubdomains = append(processedSubdomains, Subdomain{subdomainName, subdomainScore, intensity})
 			domainScore += subdomainScore
-
-			fmt.Println("------: P Subdomain:", pSubdomain)
 		}
 
-		pDomainIntensity := calculateDomainIntensity(domain, domainScore)
-
-		pDomain = append(pDomain, Domain{domain, domainScore, pSubdomain, testId, userId, pDomainIntensity})
-
+		domainIntensity := calculateDomainIntensity(domainName, domainScore)
+		domains = append(domains, Domain{domainName, domainScore, processedSubdomains, testId, userId, domainIntensity})
 	}
 
-	return pDomain
+	return domains
 }
 
-func calculateDomainIntensity(domain string, domainScore int) string {
-
-	return "High"
+// Placeholder for domain intensity calculation
+func calculateDomainIntensity(domain string, score int) string {
+	return "High" // Placeholder logic
 }
 
-// TODO A single test should have one Id
-func postSubmit(c *gin.Context) {
+// Handle test submissions
+func handleTestSubmission(c *gin.Context) {
+	var submission response.Submit
 
-	var submit response.Submit
-
-	if err := c.ShouldBindJSON(&submit); err != nil {
-		// If there is an error, respond with 400 Bad Request
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.ShouldBindJSON(&submission); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid submission format"})
 		return
 	}
 
-	fmt.Printf("Received person data: %+v\n", submit.Answers)
-	// Find the user
-	isExistingUsers := []models.User{}
+	// Find or create the user
+	var existingUsers []models.User
+	mgm.Coll(&models.User{}).SimpleFind(&existingUsers, bson.M{"email": submission.Email})
 
-	fmt.Printf("Received person data: %+v\n", isExistingUsers)
-	mgm.Coll(&models.User{}).SimpleFind(&isExistingUsers, bson.M{"email": submit.Email})
-
-	if isExistingUsers == nil || len(isExistingUsers) == 0 {
-		user := models.NewUser(submit.Name, submit.Email, submit.Gender, submit.Age)
-
-		err := mgm.Coll(user).Create(user)
-
-		if err != nil {
-			c.IndentedJSON(http.StatusOK, err)
-			log.Fatalf("Failed to create a new err: %v", err) // Fatal will log and stop the program
+	if len(existingUsers) == 0 {
+		newUser := models.NewUser(submission.Name, submission.Email, submission.Gender, submission.Age)
+		if err := mgm.Coll(newUser).Create(newUser); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+			return
 		}
-		isExistingUsers = append(isExistingUsers, *user)
-
+		existingUsers = append(existingUsers, *newUser)
 	}
 
-	userId := isExistingUsers[0].ID
+	userId := existingUsers[0].ID
 
-	// TODO Generate payment link from razorPay
-
-	// Create a test entry
+	// Create a new test entry
 	newTest := models.NewTest("BIG_5", userId, "PENDING", "https://google.com")
-
-	newTestError := mgm.Coll(&models.Test{}).Create(newTest)
-
-	if newTestError != nil {
-		c.IndentedJSON(http.StatusOK, newTestError)
-		log.Fatalf("Failed to create a new test: %v", newTestError) // Fatal will log and stop the program
+	if err := mgm.Coll(&models.Test{}).Create(newTest); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create test"})
+		return
 	}
 
-	// Store Score
-	coll := mgm.Coll(&models.Score{})
-
-	scoreDocs := []models.Score{}
-
-	for _, item := range submit.Answers {
-		questionId, err := primitive.ObjectIDFromHex(item.Id)
+	// Store scores
+	var scoreDocs []models.Score
+	for _, answer := range submission.Answers {
+		questionId, err := primitive.ObjectIDFromHex(answer.Id)
 		if err != nil {
-			log.Fatalf("Failed to convert string to ObjectID: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid question ID"})
+			return
 		}
-		score := models.NewScore(userId, questionId, item.Answer, newTest.ID)
-		scoreDocs = append(scoreDocs, *score)
+		scoreDocs = append(scoreDocs, *models.NewScore(userId, questionId, answer.Answer, newTest.ID))
 	}
 
 	var docs []interface{}
-
-	for _, score := range scoreDocs {
-		docs = append(docs, score)
+	for _, q := range scoreDocs {
+		docs = append(docs, q) // Add each question as an interface{}
 	}
 
-	_, err := coll.InsertMany(c, docs)
+	_, err := mgm.Coll(&models.Score{}).InsertMany(c, docs)
 
 	if err != nil {
-		log.Fatalf("Failed to insert multiple documents: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store scores"})
+		return
 	}
 
-	for _, item := range submit.Answers {
-		questionId, err := primitive.ObjectIDFromHex(item.Id)
-		if err != nil {
-			log.Fatalf("Failed to convert string to ObjectID: %v", err)
+	c.JSON(http.StatusOK, gin.H{"message": "Submission successful"})
+}
+
+// Generate report
+func handleReportGeneration(c *gin.Context) {
+	var reportRequest response.Report
+
+	if err := c.ShouldBindJSON(&reportRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid report request"})
+		return
+	}
+
+	testId, err := primitive.ObjectIDFromHex(reportRequest.TestId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid test ID"})
+		return
+	}
+
+	scoresAndQuestions, err := fetchScoresWithQuestions(testId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch scores and questions"})
+		return
+	}
+
+	processedScores := calculateProcessedScore(scoresAndQuestions)
+
+	reportAlreadyGenerated := []models.Test{}
+	mgm.Coll(&models.Test{}).SimpleFind(&reportAlreadyGenerated, bson.M{"testId": testId})
+
+	if reportAlreadyGenerated != nil && len(reportAlreadyGenerated) != 0 {
+		// Report already exit
+
+		// Fetch the existing report using testId
+
+		// Send to gcp to create report
+
+		c.IndentedJSON(http.StatusOK, processedScores)
+		return
+	}
+
+	newDbReports := []models.Report{}
+
+	for domain, value := range processedScores {
+
+		fmt.Println("Domain and Value:", domain, value)
+		newSubdomainReports := []models.Subdomain{}
+
+		for _, value := range value.Subdomain {
+			newDbSubdomain := models.NewSubdomain(value.Name, value.Score, value.Intensity)
+
+			newSubdomainReports = append(newSubdomainReports, *newDbSubdomain)
 		}
-		score := models.NewScore(userId, questionId, item.Answer, newTest.ID)
-		scoreDocs = append(scoreDocs, *score)
+		newDbResport := models.NewReport(value.Name, value.Score, newSubdomainReports, value.UserId, value.TestId)
+
+		newDbReports = append(newDbReports, *newDbResport)
 	}
 
-	log.Printf("Summited sucessfully")
-	c.IndentedJSON(http.StatusOK, err)
-}
-
-func getReport(c *gin.Context) {
-	var report response.Report
-
-	if err := c.ShouldBindJSON(&report); err != nil {
-		// If there is an error, respond with 400 Bad Request
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	var testId = report.TestId
-
-	changedTestId, err := primitive.ObjectIDFromHex(testId)
-
-	if err != nil {
-		fmt.Errorf("invalid testId: %v", err)
-	}
-
-	scoresAndQuestion, err := getScoresWithQuestions(primitive.ObjectID(changedTestId))
-
-	if err != nil {
-		log.Fatalf("Failed to get questions and score: %v", err)
-	}
-
-	log.Printf("Scores and Questions: %v", scoresAndQuestion)
-
-	pDomain := calculateProccessedScore(scoresAndQuestion)
-
-	c.IndentedJSON(http.StatusOK, pDomain)
-
-}
-
-func init() {
-	// Setup the mgm default config
-	err := mgm.SetDefaultConfig(nil, "cognify", options.Client().ApplyURI("mongodb+srv://cognify:dEQGVwIY24QzdUu6@cluster0.cjyqt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"))
-	// Error handling
-	if err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err) // Fatal will log and stop the program
-	}
-
-	fmt.Println("Successfully connected to MongoDB!")
-}
-
-func postQuestions(c *gin.Context) {
-	var question []response.Question
-
-	if err := c.ShouldBindJSON(&question); err != nil {
-		// If there is an error, respond with 400 Bad Request
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	coll := mgm.Coll(&models.Question{})
-
-	questions := []models.Question{}
-
-	for _, item := range question {
-		questionToSave := models.NewQuestion(item.TestName, item.Question, item.No)
-		questions = append(questions, *questionToSave)
-	}
+	reportDbColumn := mgm.Coll(&models.Report{})
 
 	var docs []interface{}
-	for _, question := range questions {
-		docs = append(docs, question)
+
+	for _, report := range newDbReports {
+		docs = append(docs, report)
 	}
 
-	_, err := coll.InsertMany(context.TODO(), docs)
+	_, errManyReportInsert := reportDbColumn.InsertMany(c, docs)
 
-	if err != nil {
-		log.Printf("Failed to insert multiple question documents: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert documents"})
-		return
+	if errManyReportInsert != nil {
+		log.Fatalf("Failed to insert multiple documents: %v", errManyReportInsert)
 	}
 
-	log.Printf("Created sucessfully")
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "Questions created successfully"})
-
+	// Return generated report
+	c.JSON(http.StatusOK, processedScores)
 }
 
-func getQuestions(c *gin.Context) {
-	// Get the MongoDB collection for questions
-	coll := mgm.Coll(&models.Question{})
-
-	// Create a slice to hold the retrieved questions
+// Fetch all questions
+func fetchAllQuestions(c *gin.Context) {
 	var questions []models.Question
-
-	// Query all documents in the collection
-	err := coll.SimpleFind(&questions, bson.D{})
+	err := mgm.Coll(&models.Question{}).SimpleFind(&questions, bson.D{})
 	if err != nil {
-		log.Printf("Error retrieving questions: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve questions"})
 		return
 	}
 
-	// Check if no documents are found
 	if len(questions) == 0 {
 		c.JSON(http.StatusOK, gin.H{"message": "No questions found"})
 		return
 	}
 
-	// Return the found questions
-	c.IndentedJSON(http.StatusOK, questions)
+	c.JSON(http.StatusOK, questions)
+}
+
+// Submit questions
+func submitQuestions(c *gin.Context) {
+	var questions []response.Question
+	if err := c.ShouldBindJSON(&questions); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid question data"})
+		return
+	}
+
+	var questionDocs []models.Question
+	for _, item := range questions {
+		questionDocs = append(questionDocs, *models.NewQuestion(item.TestName, item.Question, item.No))
+	}
+
+	var docs []interface{}
+	for _, q := range questionDocs {
+		docs = append(docs, q) // Add each question as an interface{}
+	}
+
+	_, err := mgm.Coll(&models.Question{}).InsertMany(c, docs)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert questions"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Questions submitted successfully"})
+}
+
+func init() {
+	err := mgm.SetDefaultConfig(nil, "cognify", options.Client().ApplyURI("mongodb://your_mongo_uri"))
+	if err != nil {
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
+	}
+	fmt.Println("Successfully connected to MongoDB!")
 }
 
 func main() {
 	router := gin.Default()
 
+	// Configure CORS
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"PUT", "PATCH"},
-		AllowHeaders:     []string{"Origin"},
-		ExposeHeaders:    []string{"Content-Length"},
+		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
+		ExposeHeaders:    []string{"Content-Length", "Content-Type"},
 		AllowCredentials: true,
-		// AllowOriginFunc: func(origin string) bool {
-		//  return origin == "https://github.com"
-		// },
-		// MaxAge: 12 * time.Hour,
 	}))
 
-	router.POST("/questions", postQuestions)
-	router.GET("/report", getReport)
-	router.GET("/questions", getQuestions) // For retrieving questions
-	router.POST("/submit", postSubmit)
+	// Routes
+	router.POST("/questions", submitQuestions)
+	router.GET("/questions", fetchAllQuestions)
+	router.POST("/submit", handleTestSubmission)
+	router.GET("/report", handleReportGeneration)
 
-	// Start the server on localhost:8080
+	// Start server
 	router.Run("localhost:8080")
 }
