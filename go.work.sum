@@ -2,6 +2,7 @@ cel.dev/expr v0.15.0/go.mod h1:TRSuuV7DlVCE/uwv5QbAiW/v8l5O8C4eEPHeu7gf7Sg=
 cel.dev/expr v0.16.0/go.mod h1:TRSuuV7DlVCE/uwv5QbAiW/v8l5O8C4eEPHeu7gf7Sg=
 cloud.google.com/go/accessapproval v1.8.0/go.mod h1:ycc7qSIXOrH6gGOGQsuBwpRZw3QhZLi0OWeej3rA5Mg=
 cloud.google.com/go/accesscontextmanager v1.9.0/go.mod h1:EmdQRGq5FHLrjGjGTp2X2tlRBvU3LDCUqfnysFYooxQ=
+cloud.google.com/go/ai v0.8.0/go.mod h1:t3Dfk4cM61sytiggo2UyGsDVW3RF1qGZaUKDrZFyqkE=
 cloud.google.com/go/analytics v0.25.0/go.mod h1:LZMfjJnKU1GDkvJV16dKnXm7KJJaMZfvUXx58ujgVLg=
 cloud.google.com/go/apigateway v1.7.0/go.mod h1:miZGNhmrC+SFhxjA7ayjKHk1cA+7vsSINp9K+JxKwZI=
 cloud.google.com/go/apigeeconnect v1.7.0/go.mod h1:fd8NFqzu5aXGEUpxiyeCyb4LBLU7B/xIPztfBQi+1zg=
@@ -142,6 +143,7 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/go-pkcs11 v0.3.0/go.mod h1:6eQoGcuNJpa7jnd5pMGdkSaQpNDYvPlXWMcjXXThLlY=
 github.com/google/martian/v3 v3.3.3/go.mod h1:iEPrYcgCF7jA9OtScMFQyAlZZ4YXTKEtJ1E6RWzmBA0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/googleapis/enterprise-certificate-proxy v0.3.4 h1:XYIDZApgAnrN1c855gTgghdIA6Stxb52D5RnLI1SLyw=
 github.com/googleapis/enterprise-certificate-proxy v0.3.4/go.mod h1:YKe7cfqYXjKGpGvmSg28/fFvhNzinZQm8DGnaburhGA=
 github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10/go.mod h1:t/avpk3KcrXxUnYOhZhMXJlSEyie6gQbtLq5NM3loB8=
