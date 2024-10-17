@@ -123,7 +123,10 @@ func GenerateContentFromTextGCP(prompt string) (string, error) {
 // Function to create a Big 5 personality prompt (can be used as input to the API)
 func CreatePrompt(D1, N1, N2, N3, N4, N5, N6, D2, E1, E2, E3, E4, E5, E6, D3, O1, O2, O3, O4, O5, O6, D4, A1, A2, A3, A4, A5, A6, D5, C1, C2, C3, C4, C5, C6 string) string {
 	// Build the Big 5 Personality prompt with all domain and subdomain scores
-	prompt := "Generate a Big 5 Personality Assessment report based on the following data:\n" +
+	prompt := "Instruction : Write a very personalized 6 page (5 dedicated to each domain and 6th titled unlocking your potential) report as a psychologist, with this BIG5 test score for my client without referring directly to any subdomain score. \n" +
+		"Tone : Warm, empathetic, positive, solution focused, encouraging\n" +
+		"Pronoun : Second-person\n" +
+		"Structure for 5 pages dedicated to each domain : Introduction (80 to 100 words), Career (30 to 40 words), Relationship (Under 30 to 40 words), Strength & Weakness (30 to 40 words)\n\n\n" +
 		"Domain: Neuroticism: " + D1 + "\n" +
 		"Subdomains:\n" +
 		"  Anxiety: " + N1 + "\n" +
@@ -169,8 +172,8 @@ func CreatePrompt(D1, N1, N2, N3, N4, N5, N6, D2, E1, E2, E3, E4, E5, E6, D3, O1
 		"  Self Discipline: " + C5 + "\n" +
 		"  Cautiousness: " + C6 + "\n\n" +
 
-		"Note: For Domain if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
-		"For Subdomain if score is <=3, it is low, <=4 is below average, <=6 is average, <=8 is above average, <=10 is high."
+		"Note: For Domain (0 to 60) if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
+		"For Subdomain (0 to 10) if score is <=3, it is low, <=4 is below average, <=6 is average, <=8 is above average, <=10 is high.\n\n"
 
 	return prompt
 }
