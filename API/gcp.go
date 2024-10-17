@@ -2,7 +2,6 @@ package API
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -10,9 +9,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
-	"cloud.google.com/go/vertexai/genai"
-	"google.golang.org/api/option"
 )
 
 func init() {
@@ -24,7 +20,7 @@ func init() {
 }
 
 // Function to make the POST request to Google API (REST-based approach)
-func GenerateContentFromTextGCP(prompt string) error {
+func GenerateContentFromTextGCP(prompt string) (string, error) {
 	// Define the URL for the Google API endpoint (generative language model)
 	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 
@@ -39,20 +35,19 @@ func GenerateContentFromTextGCP(prompt string) error {
 		},
 	})
 	if err != nil {
-		return fmt.Errorf("failed to marshal request body: %v", err)
+		return "", fmt.Errorf("failed to marshal request body: %v", err)
 	}
 
 	// Retrieve the API key from the environment variable 'API_KEY'
-	// You should set the API key as an environment variable in your system
 	apiKey := os.Getenv("API_KEY")
 	if apiKey == "" {
-		return fmt.Errorf("API key is not set. Please ensure the environment variable 'API_KEY' is set")
+		return "", fmt.Errorf("API key is not set. Please ensure the environment variable 'API_KEY' is set")
 	}
 
 	// Create a new HTTP POST request with the request body and API key
 	req, err := http.NewRequest("POST", url+"?key="+apiKey, bytes.NewBuffer(requestBody))
 	if err != nil {
-		return fmt.Errorf("failed to create request: %v", err)
+		return "", fmt.Errorf("failed to create request: %v", err)
 	}
 
 	// Set appropriate headers for the request
@@ -62,69 +57,68 @@ func GenerateContentFromTextGCP(prompt string) error {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to send request: %v", err)
+		return "", fmt.Errorf("failed to send request: %v", err)
 	}
 	defer resp.Body.Close() // Ensure the response body is closed
 
 	// Read and parse the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("failed to read response body: %v", err)
+		return "", fmt.Errorf("failed to read response body: %v", err)
 	}
 
 	// Check if the response status is not 200 (OK), and handle the error accordingly
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("non-200 response status: %d, body: %s", resp.StatusCode, string(body))
+		return "", fmt.Errorf("non-200 response status: %d, body: %s", resp.StatusCode, string(body))
 	}
 
-	// Print the response for debugging or further processing
-	fmt.Printf("Response: %s\n", string(body))
-
-	return nil
+	// Return the response body as a string
+	return string(body), nil
 }
 
 // Function to generate content using Google Cloud's Vertex AI (client library-based approach)
-func GenerateContentFromText(prompt string) error {
-	// Define the model name you want to use from Vertex AI
-	modelName := "gemini-1.5-flash-001" // This is the model to use for content generation
+// func GenerateContentFromText(prompt string) error {
+// 	// Define the model name you want to use from Vertex AI
+// 	modelName := "gemini-1.5-flash-001" // This is the model to use for content generation
 
-	// Set up the context and initialize the Vertex AI client using the API key
-	ctx := context.Background()
+// 	// Set up the context and initialize the Vertex AI client using the API key
+// 	ctx := context.Background()
 
-	// Retrieve the API key from the environment variable 'API_KEY'
-	apiKey := os.Getenv("API_KEY")
-	if apiKey == "" {
-		return fmt.Errorf("API key is not set. Please ensure the environment variable 'API_KEY' is set")
-	}
+// 	// Retrieve the API key from the environment variable 'API_KEY'
+// 	// apiKey := os.Getenv("API_KEY")
+// 	// if apiKey == "" {
+// 	// 	return fmt.Errorf("API key is not set. Please ensure the environment variable 'API_KEY' is set")
+// 	// }
 
-	// Create a new client for Vertex AI Generative models using the API key
-	projectID := "cognify-438322" // Replace with your actual project ID
-	location := "us-central1"     // Replace with your actual location
+// 	// Create a new client for Vertex AI Generative models using the API key
+// 	projectID := "cognify-438322" // Replace with your actual project ID
+// 	location := "asia-south1"     // Replace with your actual location
 
-	client, err := genai.NewClient(ctx, projectID, location, option.WithAPIKey(apiKey))
-	if err != nil {
-		return fmt.Errorf("error creating Vertex AI client: %w", err)
-	}
+// 	client, err := genai.NewClient(ctx, projectID, location, option.WithCredentialsFile("cognify-438322-90e04392ce12.json"))
+// 	// client, err := genai.NewClient(ctx, projectID, location, option.WithCredentialsFile("cognify-438322-90e04392ce12.json"))
+// 	if err != nil {
+// 		return fmt.Errorf("error creating Vertex AI client: %w", err)
+// 	}
 
-	// Create the prompt text for the model to generate content
-	gemini := client.GenerativeModel(modelName)
-	generatePrompt := genai.Text(prompt)
+// 	// Create the prompt text for the model to generate content
+// 	gemini := client.GenerativeModel(modelName)
+// 	generatePrompt := genai.Text(prompt)
 
-	// Generate content using the defined model and prompt
-	resp, err := gemini.GenerateContent(ctx, generatePrompt)
-	if err != nil {
-		return fmt.Errorf("error generating content from Vertex AI: %w", err)
-	}
+// 	// Generate content using the defined model and prompt
+// 	resp, err := gemini.GenerateContent(ctx, generatePrompt)
+// 	if err != nil {
+// 		return fmt.Errorf("error generating content from Vertex AI: %w", err)
+// 	}
 
-	// Print the generated content as formatted JSON
-	rb, err := json.MarshalIndent(resp, "", "  ")
-	if err != nil {
-		return fmt.Errorf("json.MarshalIndent: %w", err)
-	}
-	fmt.Println(string(rb))
+// 	// Print the generated content as formatted JSON
+// 	rb, err := json.MarshalIndent(resp, "", "  ")
+// 	if err != nil {
+// 		return fmt.Errorf("json.MarshalIndent: %w", err)
+// 	}
+// 	fmt.Println(string(rb))
 
-	return nil
-}
+// 	return nil
+// }
 
 // Function to create a Big 5 personality prompt (can be used as input to the API)
 func CreatePrompt(D1, N1, N2, N3, N4, N5, N6, D2, E1, E2, E3, E4, E5, E6, D3, O1, O2, O3, O4, O5, O6, D4, A1, A2, A3, A4, A5, A6, D5, C1, C2, C3, C4, C5, C6 string) string {

@@ -61,8 +61,10 @@ func fetchScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error
 	var scores []models.Score
 
 	// Fetch all scores matching the testId
+	fmt.Println("Failed to get Score", testId)
 	err := mgm.Coll(&models.Score{}).SimpleFind(&scores, bson.M{"testId": testId})
 	if err != nil {
+		fmt.Println("Failed to get Score", err)
 		return nil, fmt.Errorf("failed to find scores for testId %s: %v", testId.Hex(), err)
 	}
 
@@ -356,6 +358,7 @@ func fetchAllQuestions(c *gin.Context) {
 	var questions []models.Question
 	err := mgm.Coll(&models.Question{}).SimpleFind(&questions, bson.D{})
 	if err != nil {
+		fmt.Println("Failed to retrieve questions:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve questions"})
 		return
 	}
@@ -396,7 +399,7 @@ func submitQuestions(c *gin.Context) {
 }
 
 func init() {
-	err := mgm.SetDefaultConfig(nil, "cognify", options.Client().ApplyURI("mongodb://your_mongo_uri"))
+	err := mgm.SetDefaultConfig(nil, "cognify", options.Client().ApplyURI("mongodb+srv://cognify:dEQGVwIY24QzdUu6@cluster0.cjyqt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"))
 	if err != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
@@ -438,7 +441,7 @@ func getPrompt(c *gin.Context) {
 	)
 
 	// Call the API to generate content from the created prompt
-	err := API.GenerateContentFromText(createdprompt)
+	result, err := API.GenerateContentFromTextGCP(createdprompt)
 	if err != nil {
 		// Respond with an error message if content generation failed
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate content", "details": err.Error()})
@@ -446,5 +449,5 @@ func getPrompt(c *gin.Context) {
 	}
 
 	// Respond with a success message
-	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": createdprompt})
+	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": createdprompt, "Gemini Response": result})
 }
