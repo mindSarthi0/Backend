@@ -431,6 +431,7 @@ func main() {
 }
 
 func getPrompt(c *gin.Context) {
+
 	// Create the personality prompt
 	createdprompt := API.CreatePrompt(
 		"36", "7", "4", "6", "5", "8", "6", // Neuroticism Domain (D1) and its subdomains (N1-N6)
@@ -441,7 +442,7 @@ func getPrompt(c *gin.Context) {
 	)
 
 	// Call the API to generate content from the created prompt
-	result, err := API.GenerateContentFromTextGCP(createdprompt)
+	result, err := API.GenerateContentFromTextGCPJSON(createdprompt)
 	if err != nil {
 		// Respond with an error message if content generation failed
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate content", "details": err.Error()})
