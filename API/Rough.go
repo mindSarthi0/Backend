@@ -20,7 +20,7 @@ func init() {
 }
 
 // Function to make the POST request to Google API (REST-based approach)
-func GenerateContentFromTextGCP(prompt string) (string, error) {
+func GenerateContentFromTextGCPRough(prompt string) (string, error) {
 	// Define the URL for the Google API endpoint (generative language model)
 	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro-latest:generateContent"
 
@@ -121,7 +121,7 @@ func GenerateContentFromTextGCP(prompt string) (string, error) {
 // }
 
 // Function to create a Big 5 personality prompt (can be used as input to the API)
-func CreatePrompt(D1, N1, N2, N3, N4, N5, N6, D2, E1, E2, E3, E4, E5, E6, D3, O1, O2, O3, O4, O5, O6, D4, A1, A2, A3, A4, A5, A6, D5, C1, C2, C3, C4, C5, C6 string) string {
+func CreatePromptRough(D1, N1, N2, N3, N4, N5, N6, D2, E1, E2, E3, E4, E5, E6, D3, O1, O2, O3, O4, O5, O6, D4, A1, A2, A3, A4, A5, A6, D5, C1, C2, C3, C4, C5, C6 string) string {
 	// Build the Big 5 Personality prompt with all domain and subdomain scores
 	prompt := "Instructions - \n" +
 		"1) Write a personalized 6 page (5 dedicated to each domain and 6th titled unlocking your potential) report for my client with this BIG5 test score.\n" +

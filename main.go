@@ -432,23 +432,36 @@ func main() {
 
 func getPrompt(c *gin.Context) {
 
-	// Create the personality prompt
-	createdprompt := API.CreatePrompt(
-		"36", "7", "4", "6", "5", "8", "6", // Neuroticism Domain (D1) and its subdomains (N1-N6)
-		"42", "8", "7", "6", "8", "7", "6", // Extraversion Domain (D2) and its subdomains (E1-E6)
-		"41", "7", "8", "7", "6", "7", "6", // Openness Domain (D3) and its subdomains (O1-O6)
-		"38", "6", "7", "5", "7", "6", "7", // Agreeableness Domain (D4) and its subdomains (A1-A6)
-		"40", "8", "7", "6", "6", "7", "6", // Conscientiousness Domain (D5) and its subdomains (C1-C6)
-	)
+	var values = map[string][]string{"neuroticism": []string{"7", "4", "6", "5", "8", "6", "4"}, "extraversion": []string{"7", "4", "6", "5", "8", "6", "4"}}
 
-	// Call the API to generate content from the created prompt
-	result, err := API.GenerateContentFromTextGCPJSON(createdprompt)
-	if err != nil {
-		// Respond with an error message if content generation failed
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate content", "details": err.Error()})
-		return
+	prompts := []string{}
+
+	for domain, value := range values {
+		promt := API.CreatePrompt(domain, value[0], value[1], value[2], value[3], value[4], value[5], value[6])
+		prompts = append(prompts, promt)
+	}
+
+	channel := make(chan API.ContentResponse)
+
+	for _, prompt := range prompts {
+		go worker(prompt, channel)
+	}
+
+	results := []string{}
+	for range prompts {
+		result := <-channel // Read the result from the channel
+		// TODO add failure case
+		results = append(results, result.Candidates[0].Content.Parts[0].Text)
 	}
 
 	// Respond with a success message
-	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": createdprompt, "Gemini Response": result})
+	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": results})
+}
+
+func worker(prompt string, channel chan API.ContentResponse) {
+	result, err := API.GenerateContentFromTextGCPJSON(prompt)
+	if err != nil {
+		// Respond with an error message if content generation failed
+	}
+	channel <- *result
 }
