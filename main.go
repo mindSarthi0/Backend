@@ -330,6 +330,7 @@ func handleReportGeneration(c *gin.Context) {
 	for range prompts {
 		result := <-channel // Read the result from the channel
 		// TODO add failure case
+		// added generated result to db
 		results = append(results, result.Candidates[0].Content.Parts[0].Text)
 	}
 
