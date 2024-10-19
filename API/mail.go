@@ -4,8 +4,6 @@ import (
 	"log"
 
 	"gopkg.in/mail.v2" // Sending email
-
-	"path/filepath"
 )
 
 func sendEmail(to string, subject string, body string, attachmentPath string) {
@@ -21,7 +19,7 @@ func sendEmail(to string, subject string, body string, attachmentPath string) {
 	m.Attach(attachmentPath)
 
 	// Configure Zoho SMTP settings
-	d := mail.NewDialer("smtp.zoho.com", 587, "care@duinvites.com", "MPNXs2h26cTc") //4thCpH2220XW Qwqw12#
+	d := mail.NewDialer("smtp.zoho.in", 587, "care@duinvites.com", "MPNXs2h26cTc") //4thCpH2220XW Qwqw12#
 
 	if err := d.DialAndSend(m); err != nil {
 		log.Fatal(err)
@@ -32,7 +30,7 @@ func sendEmail(to string, subject string, body string, attachmentPath string) {
 
 func Mail() {
 
-	pdfFile := filepath.Join("Users", "Rishi Raj Ganguly", "cognify-api-gateway", "hello.pdf")
+	pdfFile := "C:\\Users\\Rishi Raj Ganguly\\cognify-api-gateway\\output_with_background.pdf"
 
 	recipientEmail := "nitishprakashb@gmail.com"
 	subject := "Your Report"

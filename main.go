@@ -439,7 +439,7 @@ func testMail(c *gin.Context) {
 }
 
 func creatingPdf(c *gin.Context) {
-	lib.CreatePdf()
+	lib.CreatePdfWithBg()
 }
 
 func getPrompt(c *gin.Context) {
