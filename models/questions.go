@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/kamva/mgm/v3"
+	mgm "github.com/kamva/mgm/v3"
 )
 
 // Question model with fields for MongoDB

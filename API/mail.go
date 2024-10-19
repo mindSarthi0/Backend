@@ -28,7 +28,8 @@ func sendEmail(to string, subject string, body string, attachmentPath string) {
 }
 
 func Mail() {
-	pdfFile := generatePDF()
+	// pdfFile := generatePDF()
+	pdfFile := ""
 
 	recipientEmail := "nitishprakashb@gmail.com"
 	subject := "Your Report"
