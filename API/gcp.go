@@ -125,7 +125,7 @@ func CreatePrompt(D1, N1, N2, N3, N4, N5, N6, D2, E1, E2, E3, E4, E5, E6, D3, O1
 	// Build the Big 5 Personality prompt with all domain and subdomain scores
 	prompt := "Instructions - \n" +
 		"1) Write a personalized 6 page (5 dedicated to each domain and 6th titled unlocking your potential) report for my client with this BIG5 test score.\n" +
-		"2) Do not refer directly to any subdomain score. \n" +
+		"2) Do nwot refer directly to any subdomain score. \n" +
 		"3) Keep the Tone Professional, Encouraging, Warm, empathetic, positive & solution focused\n" +
 		"4) Use Second-person pronoun\n" +
 		"5) Keept the Structure as follows: for 1 to 5 page dedicated to each domain - \n" +
@@ -135,7 +135,7 @@ func CreatePrompt(D1, N1, N2, N3, N4, N5, N6, D2, E1, E2, E3, E4, E5, E6, D3, O1
 		"Strength & Weakness (30 to 40 words) : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n" +
 		"For 6th page: write a 200 word summary giving insight to help the client in thier self development\n\n" +
 		"6) Print the output in JSON for each page and their sub parts\n\n" +
-		"Most Important Instruction : Adhere to word limit mentioned in 5th point of Instructions \n\n\n\n" +
+		"Most Important Instruction : Adhere to ord limit mentioned in 5th point of Instructions \n\n\n\n" +
 
 		"Domain: Neuroticism: " + D1 + "\n" +
 		"Subdomains-\n" +
@@ -184,6 +184,118 @@ func CreatePrompt(D1, N1, N2, N3, N4, N5, N6, D2, E1, E2, E3, E4, E5, E6, D3, O1
 
 		"Note: For Domain (0 to 60) if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
 		"For Subdomain (0 to 10) if score is <=3, it is low, <=4 is below average, <=6 is average, <=8 is above average, <=10 is high.\n\n"
+
+	return prompt
+}
+
+func CreatePromptNeuroticism(D, S1, S2, S3, S4, S5, S6, string) string {
+	prompt := "Create a personalised BIG5 Personlaity Assessment Report for the Domain:" + D + "\n" +
+		"Keept the Structure as follows:\n" +
+		"Introduction (Should be 80 to 100 words) : Explain the trait and its impact on the client's experiences\n" +
+		"Career & Academia (Should be 30 to 40 words) : Impact on clinet's professional & student life\n" +
+		"Relationship (Should be 30 to 40 words) : Impact on Client's Personal Relationships\n" +
+		"Strength & Weakness (30 to 40 words) : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n" +
+		"Domain: Neuroticism: " + D + "\n" +
+		"Subdomains-\n" +
+		"  Anxiety: " + S1 + "\n" +
+		"  Anger: " + S2 + "\n" +
+		"  Depression: " + S3 + "\n" +
+		"  Self-consciousness: " + S4 + "\n" +
+		"  Immoderation: " + S5 + "\n" +
+		"  Vulnerability: " + S6 + "\n\n" +
+
+		"Note: For Domain (0 to 60) if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
+		"For Subdomain (0 to 10) if score is <=3, it is low, <=4 is below average, <=6 is average, <=8 is above average, <=10 is high.\n\n"
+
+	return prompt
+
+}
+
+func CreatePromptExtraversion(D, S1, S2, S3, S4, S5, S6, string) string {
+	prompt := "Create a personalised BIG5 Personlaity Assessment Report for the Domain:" + D + "\n" +
+		"Keept the Structure as follows:\n" +
+		"Introduction (Should be 80 to 100 words) : Explain the trait and its impact on the client's experiences\n" +
+		"Career & Academia (Should be 30 to 40 words) : Impact on clinet's professional & student life\n" +
+		"Relationship (Should be 30 to 40 words) : Impact on Client's Personal Relationships\n" +
+		"Strength & Weakness (30 to 40 words) : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n" +
+		"Domain: Neuroticism: " + D + "\n" +
+		"Subdomains-\n" +
+		"  Anxiety: " + S1 + "\n" +
+		"  Anger: " + S2 + "\n" +
+		"  Depression: " + S3 + "\n" +
+		"  Self-consciousness: " + S4 + "\n" +
+		"  Immoderation: " + S5 + "\n" +
+		"  Vulnerability: " + S6 + "\n\n" +
+
+		"Note: For Domain (0 to 60) if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
+		"For Subdomain (0 to 10) if score is <=3, it is low, <=4 is below average, <=6 is average, <=8 is above average, <=10 is high.\n\n"
+
+	return prompt
+}
+
+func CreatePromptOpenness(D, S1, S2, S3, S4, S5, S6, string) string {
+	prompt := "Create a personalised BIG5 Personlaity Assessment Report for the Domain:" + D + "\n" +
+		"Keept the Structure as follows:\n" +
+		"Introduction (Should be 80 to 100 words) : Explain the trait and its impact on the client's experiences\n" +
+		"Career & Academia (Should be 30 to 40 words) : Impact on clinet's professional & student life\n" +
+		"Relationship (Should be 30 to 40 words) : Impact on Client's Personal Relationships\n" +
+		"Strength & Weakness (30 to 40 words) : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n" +
+		"Domain: Neuroticism: " + D + "\n" +
+		"Subdomains-\n" +
+		"  Anxiety: " + S1 + "\n" +
+		"  Anger: " + S2 + "\n" +
+		"  Depression: " + S3 + "\n" +
+		"  Self-consciousness: " + S4 + "\n" +
+		"  Immoderation: " + S5 + "\n" +
+		"  Vulnerability: " + S6 + "\n\n" +
+
+		"Note: For Domain (0 to 60) if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
+		"For Subdomain (0 to 10) if score is <=3, it is low, <=4 is below average, <=6 is average, <=8 is above average, <=10 is high.\n\n"
+
+	return prompt
+}
+
+func CreatePromptAgreeableness(D, S1, S2, S3, S4, S5, S6, string) string {
+	prompt := "Create a personalised BIG5 Personlaity Assessment Report for the Domain:" + D + "\n" +
+		"Keept the Structure as follows:\n" +
+		"Introduction (Should be 80 to 100 words) : Explain the trait and its impact on the client's experiences\n" +
+		"Career & Academia (Should be 30 to 40 words) : Impact on clinet's professional & student life\n" +
+		"Relationship (Should be 30 to 40 words) : Impact on Client's Personal Relationships\n" +
+		"Strength & Weakness (30 to 40 words) : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n" +
+		"Domain: Neuroticism: " + D + "\n" +
+		"Subdomains-\n" +
+		"  Anxiety: " + S1 + "\n" +
+		"  Anger: " + S2 + "\n" +
+		"  Depression: " + S3 + "\n" +
+		"  Self-consciousness: " + S4 + "\n" +
+		"  Immoderation: " + S5 + "\n" +
+		"  Vulnerability: " + S6 + "\n\n" +
+
+		"Note: For Domain (0 to 60) if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
+		"For Subdomain (0 to 10) if score is <=3, it is low, <=4 is below average, <=6 is average, <=8 is above average, <=10 is high.\n\n"
+
+	return prompt
+}
+
+func CreatePromptConscientiousness(D, S1, S2, S3, S4, S5, S6, string) string {
+	prompt := "Create a personalised BIG5 Personlaity Assessment Report for the Domain:" + D + "\n" +
+		"Keept the Structure as follows:\n" +
+		"Introduction (Should be 80 to 100 words) : Explain the trait and its impact on the client's experiences\n" +
+		"Career & Academia (Should be 30 to 40 words) : Impact on clinet's professional & student life\n" +
+		"Relationship (Should be 30 to 40 words) : Impact on Client's Personal Relationships\n" +
+		"Strength & Weakness (30 to 40 words) : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n" +
+		"Domain: Neuroticism: " + D + "\n" +
+		"Subdomains-\n" +
+		"  Anxiety: " + S1 + "\n" +
+		"  Anger: " + S2 + "\n" +
+		"  Depression: " + S3 + "\n" +
+		"  Self-consciousness: " + S4 + "\n" +
+		"  Immoderation: " + S5 + "\n" +
+		"  Vulnerability: " + S6 + "\n\n" +
+
+		"Note: For Domain (0 to 60) if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
+		"For Subdomain (0 to 10) if score is <=3, it is low, <=4 is below average, <=6 is average, <=8 is above average, <=10 is high.\n\n" +
+		"Print the output in JSON for each page and their sub parts"
 
 	return prompt
 }
