@@ -4,7 +4,7 @@ import (
 	"github.com/jung-kurt/gofpdf/v2"
 )
 
-func main() {
+func newPdf() {
 	// Create a new PDF instance
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
