@@ -4,9 +4,11 @@ import (
 // "github.com/jung-kurt/gofpdf/v2"
 )
 
-// // Create a new PDF instance
-// pdf := gofpdf.New("P", "mm", "A4", "")
-// pdf.AddPage()
+func newPdf() {
+	// Create a new PDF instance
+	// pdf := gofpdf.New("P", "mm", "A4", "")
+	// pdf.AddPage()
+}
 
 // // Set font for the header (Extraversion)
 // pdf.SetFont("Arial", "B", 40)

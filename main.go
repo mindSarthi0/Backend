@@ -3,13 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"github.com/kamva/mgm/v3"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"myproject/API"
 	"myproject/lib"
@@ -17,6 +10,14 @@ import (
 	"myproject/response"
 	"net/http"
 	"sort"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	//"google.golang.org/genproto/googleapis/actions/sdk/v2/interactionmodel/prompt"
 )
 
@@ -423,11 +424,17 @@ func main() {
 	router.GET("/questions", fetchAllQuestions)
 	router.POST("/submit", handleTestSubmission)
 	router.GET("/report", handleReportGeneration)
+	//Pdf test route
+	router.POST("/pdf", creatingPdf)
 
 	// Start server
 	router.GET("/testprompt", getPrompt)
 	// Start the server on localhost:8080
 	router.Run("localhost:8080")
+}
+
+func creatingPdf(c *gin.Context) {
+	lib.CreatePdf()
 }
 
 func getPrompt(c *gin.Context) {
