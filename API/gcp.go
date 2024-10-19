@@ -370,7 +370,7 @@ func CreatePromptExtraversion(d string, ds string, s1 string, s2 string, s3 stri
 		"Career & Academia (Should be 30 to 40 words) : Impact on clinet's professional & student life\n" +
 		"Relationship (Should be 30 to 40 words) : Impact on Client's Personal Relationships\n" +
 		"Strength & Weakness (30 to 40 words) : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n" +
-		"Domain: Neuroticism: " + d + "\n" +
+		"Domain: Extraversion: " + d + "\n" +
 		"Subdomains-\n" +
 		"  Anxiety: " + s1 + "\n" +
 		"  Anger: " + s2 + "\n" +
@@ -456,4 +456,12 @@ func CreatePromptSummary(string) string {
 	prompt := ""
 
 	return prompt
+}
+
+func WorkerGCPGemini(prompt string, channel chan ContentResponse) {
+	result, err := GenerateContentFromTextGCPJSON(prompt)
+	if err != nil {
+		// Respond with an error message if content generation failed
+	}
+	channel <- *result
 }
