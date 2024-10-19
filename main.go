@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"myproject/API"
@@ -10,6 +9,7 @@ import (
 	"myproject/response"
 	"net/http"
 	"sort"
+	"strconv"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -110,10 +110,42 @@ func calculateProcessedScore(scoreQuestions []ScoreQuestion) []Domain {
 		"neuroticism": {
 			{"n1", "Anxiety", "1", "N", "2", "R"},
 			{"n2", "Anger", "3", "N", "4", "R"},
+			{"n3", "Anxiety", "1", "N", "2", "R"},
+			{"n4", "Anger", "3", "N", "4", "R"},
+			{"n5", "Anger", "3", "N", "4", "R"},
+			{"n6", "Anger", "3", "N", "4", "R"},
 		},
-		"domain_2": {
-			{"n1", "Anxiety", "1", "N", "2", "R"},
-			{"n2", "Anger", "3", "N", "4", "R"},
+		"extraversion": {
+			{"e1", "Anxiety", "1", "N", "2", "R"},
+			{"e2", "Anger", "3", "N", "4", "R"},
+			{"e3", "Anxiety", "1", "N", "2", "R"},
+			{"e4", "Anger", "3", "N", "4", "R"},
+			{"e5", "Anger", "3", "N", "4", "R"},
+			{"e6", "Anger", "3", "N", "4", "R"},
+		},
+		"openness": {
+			{"o1", "Anxiety", "1", "N", "2", "R"},
+			{"o2", "Anger", "3", "N", "4", "R"},
+			{"o3", "Anxiety", "1", "N", "2", "R"},
+			{"o4", "Anger", "3", "N", "4", "R"},
+			{"o5", "Anger", "3", "N", "4", "R"},
+			{"o6", "Anger", "3", "N", "4", "R"},
+		},
+		"agreeableness": {
+			{"a1", "Anxiety", "1", "N", "2", "R"},
+			{"a2", "Anger", "3", "N", "4", "R"},
+			{"a3", "Anxiety", "1", "N", "2", "R"},
+			{"a4", "Anger", "3", "N", "4", "R"},
+			{"a5", "Anger", "3", "N", "4", "R"},
+			{"a6", "Anger", "3", "N", "4", "R"},
+		},
+		"conscientiousness": {
+			{"c1", "Anxiety", "1", "N", "2", "R"},
+			{"c2", "Anger", "3", "N", "4", "R"},
+			{"c3", "Anger", "3", "N", "4", "R"},
+			{"c4", "Anger", "3", "N", "4", "R"},
+			{"c5", "Anger", "3", "N", "4", "R"},
+			{"c6", "Anger", "3", "N", "4", "R"},
 		},
 	}
 
@@ -246,65 +278,67 @@ func handleReportGeneration(c *gin.Context) {
 
 	if reportAlreadyGenerated != nil && len(reportAlreadyGenerated) != 0 {
 		// Report already exit
-
 		// Fetch the existing report using testId
-
 		// Send to gcp to create report
-
 		c.IndentedJSON(http.StatusOK, processedScores)
 		return
 	}
 
 	newDbReports := []models.Report{}
 
+	prompts := []string{}
+
 	for domain, value := range processedScores {
 
 		fmt.Println("Domain and Value:", domain, value)
 		newSubdomainReports := []models.Subdomain{}
+		_d := value.Name
+		_dscore := value.Score
 
 		for _, value := range value.Subdomain {
 			newDbSubdomain := models.NewSubdomain(value.Name, value.Score, value.Intensity)
-
 			newSubdomainReports = append(newSubdomainReports, *newDbSubdomain)
 		}
+
+		// TODO do error handling
+		s1 := strconv.Itoa(newSubdomainReports[0].Score)
+		s2 := strconv.Itoa(newSubdomainReports[1].Score)
+		s3 := strconv.Itoa(newSubdomainReports[2].Score)
+		s4 := strconv.Itoa(newSubdomainReports[3].Score)
+		s5 := strconv.Itoa(newSubdomainReports[4].Score)
+		s6 := strconv.Itoa(newSubdomainReports[5].Score)
+
+		// TODO create a better interface here
+		prompt := API.CreatePrompt(_d, strconv.Itoa(_dscore), s1, s2, s3, s4, s5, s6)
+
+		prompts = append(prompts, prompt)
+
 		newDbResport := models.NewReport(value.Name, value.Score, newSubdomainReports, value.UserId, value.TestId)
 
 		newDbReports = append(newDbReports, *newDbResport)
 	}
 
-	reportDbColumn := mgm.Coll(&models.Report{})
-	log.Printf("Summited sucessfully", reportDbColumn)
-	c.IndentedJSON(http.StatusOK, err)
-}
+	// Now prompt generation starts
+	channel := make(chan API.ContentResponse)
 
-func getReport(c *gin.Context) {
-	var report response.Report
-
-	if err := c.ShouldBindJSON(&report); err != nil {
-		// If there is an error, respond with 400 Bad Request
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	for _, prompt := range prompts {
+		go API.WorkerGCPGemini(prompt, channel)
 	}
 
-	var testId = report.TestId
+	results := []string{}
 
-	changedTestId, err := primitive.ObjectIDFromHex(testId)
-
-	if err != nil {
-		fmt.Errorf("invalid testId: %v", err)
+	for range prompts {
+		result := <-channel // Read the result from the channel
+		// TODO add failure case
+		// TODO added generated result to db
+		results = append(results, result.Candidates[0].Content.Parts[0].Text)
 	}
 
-	scoresAndQuestion, err := fetchScoresWithQuestions(primitive.ObjectID(changedTestId))
-
-	if err != nil {
-		log.Fatalf("Failed to get questions and score: %v", err)
-	}
-
-	log.Printf("Scores and Questions: %v", scoresAndQuestion)
-
-	pDomain := calculateProcessedScore(scoresAndQuestion)
-	c.IndentedJSON(http.StatusOK, pDomain)
-
+	// TODO save to db, MAKE SURE YOU ARE CHECKING THE DOMAIN NAME CORRECTLY
+	// TODO generate content from from GCP
+	// reportDbColumn := mgm.Coll(&models.Report{})
+	log.Println("Summited sucessfully", newDbReports)
+	c.IndentedJSON(http.StatusOK, results)
 }
 
 func init() {
@@ -316,42 +350,6 @@ func init() {
 	}
 
 	fmt.Println("Successfully connected to MongoDB!")
-}
-
-func postQuestions(c *gin.Context) {
-	var question []response.Question
-
-	if err := c.ShouldBindJSON(&question); err != nil {
-		// If there is an error, respond with 400 Bad Request
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	coll := mgm.Coll(&models.Question{})
-
-	questions := []models.Question{}
-
-	for _, item := range question {
-		questionToSave := models.NewQuestion(item.TestName, item.Question, item.No)
-		questions = append(questions, *questionToSave)
-	}
-
-	var docs []interface{}
-	for _, question := range questions {
-		docs = append(docs, question)
-	}
-
-	_, err := coll.InsertMany(context.TODO(), docs)
-
-	if err != nil {
-		log.Printf("Failed to insert multiple question documents: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert documents"})
-		return
-	}
-
-	log.Printf("Created sucessfully")
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "Questions created successfully"})
-
 }
 
 // Fetch all questions
@@ -456,10 +454,11 @@ func getPrompt(c *gin.Context) {
 	channel := make(chan API.ContentResponse)
 
 	for _, prompt := range prompts {
-		go worker(prompt, channel)
+		go API.WorkerGCPGemini(prompt, channel)
 	}
 
 	results := []string{}
+
 	for range prompts {
 		result := <-channel // Read the result from the channel
 		// TODO add failure case
@@ -468,12 +467,4 @@ func getPrompt(c *gin.Context) {
 
 	// Respond with a success message
 	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": results})
-}
-
-func worker(prompt string, channel chan API.ContentResponse) {
-	result, err := API.GenerateContentFromTextGCPJSON(prompt)
-	if err != nil {
-		// Respond with an error message if content generation failed
-	}
-	channel <- *result
 }
