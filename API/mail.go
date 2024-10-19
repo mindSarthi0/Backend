@@ -9,8 +9,8 @@ func sendEmail(to string, subject string, body string, attachmentPath string) {
 	m := mail.NewMessage()
 
 	// Set email sender, receiver, subject, and body
-	m.SetHeader("From", "care@duinvites.como") // Change this to your Zoho email
-	m.SetHeader("To", to)                      // Recipient's email address
+	m.SetHeader("From", "care@duinvites.com") // Change this to your Zoho email
+	m.SetHeader("To", to)                     // Recipient's email address
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/plain", body)
 
