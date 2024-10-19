@@ -338,7 +338,7 @@ func handleReportGeneration(c *gin.Context) {
 	// TODO generate content from from GCP
 	// reportDbColumn := mgm.Coll(&models.Report{})
 	log.Println("Summited sucessfully", newDbReports)
-	c.IndentedJSON(http.StatusOK, results)
+	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": results})
 }
 
 func init() {
