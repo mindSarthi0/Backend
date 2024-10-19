@@ -457,3 +457,11 @@ func CreatePromptSummary(string) string {
 
 	return prompt
 }
+
+func WorkerGCPGemini(prompt string, channel chan ContentResponse) {
+	result, err := GenerateContentFromTextGCPJSON(prompt)
+	if err != nil {
+		// Respond with an error message if content generation failed
+	}
+	channel <- *result
+}
