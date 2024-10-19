@@ -1,37 +1,33 @@
 package API
 
 import (
-	"github.com/jung-kurt/gofpdf"
-	"log"
+	"github.com/jung-kurt/gofpdf/v2"
 )
 
-func generateBig5Report(data []Domain, narrative map[string]string, outputPath string) error {
+func main() {
+	// Create a new PDF instance
 	pdf := gofpdf.New("P", "mm", "A4", "")
-	pdf.SetTitle("Big 5 Personality Assessment Report", false)
+	pdf.AddPage()
 
-	for _, domain := range data {
-		pdf.AddPage()
-		pdf.SetFont("Arial", "B", 16)
-		pdf.Cell(0, 10, domain.Name+" Assessment")
-		pdf.Ln(12)
+	// Set font for the header (Extraversion)
+	pdf.SetFont("Arial", "B", 40)
+	pdf.SetTextColor(50, 50, 50)
+	pdf.Cell(0, 20, "EXTRAVERSION")
+	pdf.Ln(20)
 
-		// Print subdomains
-		pdf.SetFont("Arial", "", 12)
-		for _, sub := range domain.Subdomains {
-			pdf.Cell(0, 10, sub.Name+": "+sub.Score)
-			pdf.Ln(8)
-		}
+	// Insert the logo in the top right corner
+	pdf.ImageOptions("2.png", 160, 10, 40, 40, false, gofpdf.ImageOptions{ImageType: "PNG", ReadDpi: true}, 0, "")
 
-		// Add the narrative content
-		pdf.Ln(12)
-		pdf.MultiCell(0, 10, narrative[domain.Name], "", "", false)
-	}
+	// Set footer font and text
+	pdf.SetY(-15)
+	pdf.SetFont("Arial", "I", 8)
+	pdf.SetTextColor(0, 153, 204)
+	footerText := "CONFIDENTIALITY NOTICE: This report contains sensitive personal information and is intended solely for the use of the individual named above. Unauthorized disclosure or reproduction of this document is strictly prohibited."
+	pdf.MultiCell(0, 10, footerText, "", "C", false)
 
-	err := pdf.OutputFileAndClose(outputPath)
+	// Save the PDF to a file
+	err := pdf.OutputFileAndClose("extraversion_report.pdf")
 	if err != nil {
-		return err
+		panic(err)
 	}
-
-	log.Printf("PDF successfully generated at: %s", outputPath)
-	return nil
 }
