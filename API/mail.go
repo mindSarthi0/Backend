@@ -21,7 +21,7 @@ func sendEmail(to string, subject string, body string, attachmentPath string) {
 	m.Attach(attachmentPath)
 
 	// Configure Zoho SMTP settings
-	d := mail.NewDialer("smtp.zoho.com", 587, "care@duinvites.com", "MPNXs2h26cTc") //4thCpH2220XW Qwqw12#
+	d := mail.NewDialer("smtp.zoho.in", 587, "care@duinvites.com", "MPNXs2h26cTc") //4thCpH2220XW Qwqw12#  MPNXs2h26cTc
 
 	if err := d.DialAndSend(m); err != nil {
 		log.Fatal(err)
