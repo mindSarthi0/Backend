@@ -426,11 +426,16 @@ func main() {
 	router.GET("/report", handleReportGeneration)
 	//Pdf test route
 	router.POST("/pdf", creatingPdf)
+	router.POST("/mail", testMail)
 
 	// Start server
 	router.GET("/testprompt", getPrompt)
 	// Start the server on localhost:8080
 	router.Run("localhost:8080")
+}
+
+func testMail(c *gin.Context) {
+	API.Mail()
 }
 
 func creatingPdf(c *gin.Context) {
