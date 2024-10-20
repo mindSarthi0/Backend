@@ -110,42 +110,42 @@ func calculateProcessedScore(scoreQuestions []ScoreQuestion) []Domain {
 		"neuroticism": {
 			{"n1", "Anxiety", "1", "N", "2", "R"},
 			{"n2", "Anger", "3", "N", "4", "R"},
-			{"n3", "Anxiety", "1", "N", "2", "R"},
-			{"n4", "Anger", "3", "N", "4", "R"},
-			{"n5", "Anger", "3", "N", "4", "R"},
-			{"n6", "Anger", "3", "N", "4", "R"},
+			{"n3", "Depression", "1", "N", "2", "R"},
+			{"n4", "Self-consciousness", "3", "N", "4", "R"},
+			{"n5", "Immoderation", "3", "N", "4", "R"},
+			{"n6", "Vulnerability", "3", "N", "4", "R"},
 		},
 		"extraversion": {
-			{"e1", "Anxiety", "1", "N", "2", "R"},
-			{"e2", "Anger", "3", "N", "4", "R"},
-			{"e3", "Anxiety", "1", "N", "2", "R"},
-			{"e4", "Anger", "3", "N", "4", "R"},
-			{"e5", "Anger", "3", "N", "4", "R"},
-			{"e6", "Anger", "3", "N", "4", "R"},
+			{"e1", "Friendliness", "1", "N", "2", "R"},
+			{"e2", "Gregariousness", "3", "N", "4", "R"},
+			{"e3", "Assertiveness", "1", "N", "2", "R"},
+			{"e4", "Activity Level", "3", "N", "4", "R"},
+			{"e5", "Excitement Seeking", "3", "N", "4", "R"},
+			{"e6", "Cheerfulness", "3", "N", "4", "R"},
 		},
 		"openness": {
-			{"o1", "Anxiety", "1", "N", "2", "R"},
-			{"o2", "Anger", "3", "N", "4", "R"},
-			{"o3", "Anxiety", "1", "N", "2", "R"},
-			{"o4", "Anger", "3", "N", "4", "R"},
-			{"o5", "Anger", "3", "N", "4", "R"},
-			{"o6", "Anger", "3", "N", "4", "R"},
+			{"o1", "Imagination", "1", "N", "2", "R"},
+			{"o2", "Artistic Interests", "3", "N", "4", "R"},
+			{"o3", "Emotionality", "1", "N", "2", "R"},
+			{"o4", "Adventurousness", "3", "N", "4", "R"},
+			{"o5", "Intellect", "3", "N", "4", "R"},
+			{"o6", "Liberalism", "3", "N", "4", "R"},
 		},
 		"agreeableness": {
-			{"a1", "Anxiety", "1", "N", "2", "R"},
-			{"a2", "Anger", "3", "N", "4", "R"},
-			{"a3", "Anxiety", "1", "N", "2", "R"},
-			{"a4", "Anger", "3", "N", "4", "R"},
-			{"a5", "Anger", "3", "N", "4", "R"},
-			{"a6", "Anger", "3", "N", "4", "R"},
+			{"a1", "Trust", "1", "N", "2", "R"},
+			{"a2", "Morality", "3", "N", "4", "R"},
+			{"a3", "Altruism", "1", "N", "2", "R"},
+			{"a4", "Cooperation", "3", "N", "4", "R"},
+			{"a5", "Modesty", "3", "N", "4", "R"},
+			{"a6", "Sympathy", "3", "N", "4", "R"},
 		},
 		"conscientiousness": {
-			{"c1", "Anxiety", "1", "N", "2", "R"},
-			{"c2", "Anger", "3", "N", "4", "R"},
-			{"c3", "Anger", "3", "N", "4", "R"},
-			{"c4", "Anger", "3", "N", "4", "R"},
-			{"c5", "Anger", "3", "N", "4", "R"},
-			{"c6", "Anger", "3", "N", "4", "R"},
+			{"c1", "Self Efficacy", "1", "N", "2", "R"},
+			{"c2", "Orderliness", "3", "N", "4", "R"},
+			{"c3", "Dutifulness", "3", "N", "4", "R"},
+			{"c4", "Achievement Striving", "3", "N", "4", "R"},
+			{"c5", "Self Discipline", "3", "N", "4", "R"},
+			{"c6", "Cautiousness", "3", "N", "4", "R"},
 		},
 	}
 
@@ -442,7 +442,7 @@ func creatingPdf(c *gin.Context) {
 
 func getPrompt(c *gin.Context) {
 
-	var values = map[string][]string{"neuroticism": []string{"7", "4", "6", "5", "8", "6", "4"}, "extraversion": []string{"3", "5", "2", "6", "6", "2", "3"}}
+	var values = map[string][]string{"neuroticism": []string{"7", "4", "6", "5", "8", "6", "4"}, "extraversion": []string{"3", "5", "2", "6", "6", "2", "3"}, "openness": []string{"7", "4", "6", "5", "8", "6", "4"}, "agreeableness": []string{"7", "4", "6", "5", "8", "6", "4"}, "conscientiousness": []string{"7", "4", "6", "5", "8", "6", "4"}}
 
 	prompts := []string{}
 
