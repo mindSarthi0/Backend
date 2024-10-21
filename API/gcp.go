@@ -279,7 +279,7 @@ func CreatePromptOpenness(d string, ds string, s1 string, s2 string, s3 string, 
 		"Career & Academia (Should be 30 to 40 words) : Impact on clinet's professional & student life\n" +
 		"Relationship (Should be 30 to 40 words) : Impact on Client's Personal Relationships\n" +
 		"Strength & Weakness (30 to 40 words) : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n" +
-		"Domain: Openness: " + d + "\n" +
+		"Domain: Openness: " + ds + "\n" +
 		"Subdomains-\n" +
 		"  Imagination: " + s1 + "\n" +
 		"  Artistic Interests: " + s2 + "\n" +
