@@ -1,33 +1,118 @@
 package API
 
 import (
-// "github.com/jung-kurt/gofpdf/v2"
+	"github.com/jung-kurt/gofpdf"
+	"log"
 )
 
-func newPdf() {
-	// Create a new PDF instance
-	// pdf := gofpdf.New("P", "mm", "A4", "")
-	// pdf.AddPage()
+// Struct to hold the AI output for each domain
+type DomainContent struct {
+	Introduction     string
+	CareerAcademia   string
+	Relationship     string
+	StrengthWeakness string
 }
 
-// // Set font for the header (Extraversion)
-// pdf.SetFont("Arial", "B", 40)
-// pdf.SetTextColor(50, 50, 50)
-// pdf.Cell(0, 20, "EXTRAVERSION")
-// pdf.Ln(20)
+// Function to generate the PDF with 5 pages for Big Five domains
+func generateBigFivePDF(contents map[string]DomainContent) error {
+	// Initialize a new PDF
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.SetFont("Arial", "", 14)
 
-// // Insert the logo in the top right corner
-// pdf.ImageOptions("2.png", 160, 10, 40, 40, false, gofpdf.ImageOptions{ImageType: "PNG", ReadDpi: true}, 0, "")
+	// Define domain order
+	domains := []string{"Neuroticism", "Extraversion", "Openness", "Agreeableness", "Conscientiousness"}
 
-// // Set footer font and text
-// pdf.SetY(-15)
-// pdf.SetFont("Arial", "I", 8)
-// pdf.SetTextColor(0, 153, 204)
-// footerText := "CONFIDENTIALITY NOTICE: This report contains sensitive personal information and is intended solely for the use of the individual named above. Unauthorized disclosure or reproduction of this document is strictly prohibited."
-// pdf.MultiCell(0, 10, footerText, "", "C", false)
+	// Loop through the domains and add each one to a new page
+	for _, domain := range domains {
+		// Add a new page for each domain
+		pdf.AddPage()
 
-// // Save the PDF to a file
-// err := pdf.OutputFileAndClose("extraversion_report.pdf")
-// if err != nil {
-// 	panic(err)
-// }
+		// Get the content for the current domain
+		content := contents[domain]
+
+		// Add title (domain name)
+		pdf.SetFont("Arial", "B", 16)
+		pdf.Cell(40, 10, domain)
+		pdf.Ln(12)
+
+		// Add the Introduction section
+		pdf.SetFont("Arial", "B", 14)
+		pdf.Cell(40, 10, "Introduction:")
+		pdf.Ln(8)
+		pdf.SetFont("Arial", "", 12)
+		pdf.MultiCell(190, 10, content.Introduction, "", "", false)
+		pdf.Ln(5)
+
+		// Add the Career & Academia section
+		pdf.SetFont("Arial", "B", 14)
+		pdf.Cell(40, 10, "Career & Academia:")
+		pdf.Ln(8)
+		pdf.SetFont("Arial", "", 12)
+		pdf.MultiCell(190, 10, content.CareerAcademia, "", "", false)
+		pdf.Ln(5)
+
+		// Add the Relationship section
+		pdf.SetFont("Arial", "B", 14)
+		pdf.Cell(40, 10, "Relationship:")
+		pdf.Ln(8)
+		pdf.SetFont("Arial", "", 12)
+		pdf.MultiCell(190, 10, content.Relationship, "", "", false)
+		pdf.Ln(5)
+
+		// Add the Strength & Weakness section
+		pdf.SetFont("Arial", "B", 14)
+		pdf.Cell(40, 10, "Strength & Weakness:")
+		pdf.Ln(8)
+		pdf.SetFont("Arial", "", 12)
+		pdf.MultiCell(190, 10, content.StrengthWeakness, "", "", false)
+	}
+
+	// Save the PDF to a file
+	err := pdf.OutputFileAndClose("big_five_personality_report.pdf")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CreatePDF() {
+	// Example content for each domain (this will be replaced by AI output in real use)
+	contents := map[string]DomainContent{
+		"Neuroticism": {
+			Introduction:     "Neuroticism reflects emotional stability and degree of negative emotions...",
+			CareerAcademia:   "In a professional setting, high neuroticism may lead to stress under pressure...",
+			Relationship:     "Those with high neuroticism may experience emotional turbulence in relationships...",
+			StrengthWeakness: "Strength: Sensitive to emotional cues. Weakness: Prone to anxiety and mood swings.",
+		},
+		"Extraversion": {
+			Introduction:     "Extraversion is characterized by assertiveness, social enthusiasm, and talkativeness...",
+			CareerAcademia:   "Highly extroverted individuals thrive in team environments and leadership roles...",
+			Relationship:     "Extroverts often have a large social circle and seek social interactions...",
+			StrengthWeakness: "Strength: Strong social presence. Weakness: May dominate conversations.",
+		},
+		"Openness": {
+			Introduction:     "Openness involves creativity, imagination, and openness to new experiences...",
+			CareerAcademia:   "High openness fosters innovation and adaptability in the workplace...",
+			Relationship:     "Openness can lead to deep, meaningful connections in relationships...",
+			StrengthWeakness: "Strength: Creativity and curiosity. Weakness: May be perceived as unpredictable.",
+		},
+		"Agreeableness": {
+			Introduction:     "Agreeableness reflects altruism, trust, and prosocial behavior...",
+			CareerAcademia:   "Highly agreeable individuals work well in collaborative environments...",
+			Relationship:     "Agreeable individuals tend to be empathetic and maintain harmonious relationships...",
+			StrengthWeakness: "Strength: Strong empathy and cooperation. Weakness: May avoid conflict at personal cost.",
+		},
+		"Conscientiousness": {
+			Introduction:     "Conscientiousness is defined by organization, dependability, and a sense of duty...",
+			CareerAcademia:   "In a professional setting, conscientious individuals are reliable and goal-oriented...",
+			Relationship:     "Conscientiousness leads to responsible and committed relationships...",
+			StrengthWeakness: "Strength: High self-discipline. Weakness: Can be overly rigid or perfectionistic.",
+		},
+	}
+
+	// Generate the PDF
+	err := generateBigFivePDF(contents)
+	if err != nil {
+		log.Fatalf("Failed to generate PDF: %v", err)
+	}
+}
