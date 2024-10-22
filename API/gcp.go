@@ -272,14 +272,14 @@ func CreatePrompt(d string, ds string, s1 string, s2 string, s3 string, s4 strin
 }
 
 func CreatePromptNeuroticism(d string, ds string, s1 string, s2 string, s3 string, s4 string, s5 string, s6 string) string {
-	prompt := fmt.Sprintf(`Domain: Neuroticism: %s/60
+	prompt := fmt.Sprintf(`Domain: Neuroticism: %s
 	Subdomains-
-	  Anxiety: %s/10
-	  Anger: %s/10
-	  Depression: %s/10
-	  Self-consciousness: %s/10
-	  Immoderation: %s/10
-	  Vulnerability: %s/10
+	  Anxiety: %s
+	  Anger: %s
+	  Depression: %s
+	  Self-consciousness: %s
+	  Immoderation: %s
+	  Vulnerability: %s
 	
 	Create a personalised BIG5 Personality Assessment Report. Just give JSON format as given in 'OUTPUT FORMAT' for the Domain: %s, while taking insight from subdomain score.
 	Keep the Structure as follows:
