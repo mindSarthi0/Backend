@@ -522,7 +522,7 @@ func creatingPdf(c *gin.Context) {
 
 // func getPrompt(c *gin.Context) {
 
-var values = map[string][]string{"neuroticism": {"7", "4", "6", "5", "8", "6", "4"}, "extraversion": {"3", "5", "2", "6", "6", "2", "3"}, "openness": {"7", "4", "6", "5", "8", "6", "4"}, "agreeableness": {"7", "4", "6", "5", "8", "6", "4"}, "conscientiousness": {"7", "4", "6", "5", "8", "6", "4"}}
+// var values = map[string][]string{"neuroticism": {"7", "4", "6", "5", "8", "6", "4"}, "extraversion": {"3", "5", "2", "6", "6", "2", "3"}, "openness": {"7", "4", "6", "5", "8", "6", "4"}, "agreeableness": {"7", "4", "6", "5", "8", "6", "4"}, "conscientiousness": {"7", "4", "6", "5", "8", "6", "4"}}
 
 // 	prompts := []string{}
 
