@@ -98,9 +98,50 @@ func fetchScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error
 }
 
 // Calculate subdomain score (placeholder logic)
+
 func calculateSubdomainScore(subdomain, score1, flow1, score2, flow2 string) (string, int, string) {
-	subdomainScore := 3 // Placeholder score
-	intensity := "low"  // Placeholder intensity
+
+	if flow1 == "R" {
+		score1Int, err := strconv.Atoi(score1)
+		if err != nil {
+			log.Printf("Error converting score1 to int: %v", err)
+			return subdomain, 0, "Error"
+		}
+		score1Int = 6 - score1Int
+		score1 = strconv.Itoa(score1Int)
+	}
+
+	// Adjust score2 based on flow2
+	if flow2 == "R" {
+		score2Int, err := strconv.Atoi(score2)
+		if err != nil {
+			log.Printf("Error converting score2 to int: %v", err)
+			return subdomain, 0, "Error"
+		}
+		score2Int = 6 - score2Int
+		score2 = strconv.Itoa(score2Int)
+	}
+
+	// Calculate the average subdomain score
+	score1Int, _ := strconv.Atoi(score1)
+	score2Int, _ := strconv.Atoi(score2)
+	subdomainScore := score1Int + score2Int
+
+	// Determine the intensity based on subdomain score
+	var intensity string
+
+	if subdomainScore > 8 {
+		intensity = "High"
+	} else if subdomainScore > 6 {
+		intensity = "Above Average"
+	} else if subdomainScore > 4 {
+		intensity = "Average"
+	} else if subdomainScore > 3 {
+		intensity = "Below Average"
+	} else {
+		intensity = "Low"
+	}
+
 	return subdomain, subdomainScore, intensity
 }
 
@@ -108,44 +149,44 @@ func calculateSubdomainScore(subdomain, score1, flow1, score2, flow2 string) (st
 func calculateProcessedScore(scoreQuestions []ScoreQuestion) []Domain {
 	rules := map[string][][]string{
 		"neuroticism": {
-			{"n1", "Anxiety", "1", "N", "2", "R"},
-			{"n2", "Anger", "3", "N", "4", "R"},
-			{"n3", "Anxiety", "1", "N", "2", "R"},
-			{"n4", "Anger", "3", "N", "4", "R"},
-			{"n5", "Anger", "3", "N", "4", "R"},
-			{"n6", "Anger", "3", "N", "4", "R"},
+			{"n1", "Anxiety", "1", "N", "2", "N"},
+			{"n2", "Anger", "3", "N", "4", "N"},
+			{"n3", "Depression", "5", "N", "6", "N"},
+			{"n4", "Self-consciousness", "7", "N", "8", "N"},
+			{"n5", "Immoderation", "9", "R", "10", "R"},
+			{"n6", "Vulnerability", "11", "R", "12", "R"},
 		},
 		"extraversion": {
-			{"e1", "Anxiety", "1", "N", "2", "R"},
-			{"e2", "Anger", "3", "N", "4", "R"},
-			{"e3", "Anxiety", "1", "N", "2", "R"},
-			{"e4", "Anger", "3", "N", "4", "R"},
-			{"e5", "Anger", "3", "N", "4", "R"},
-			{"e6", "Anger", "3", "N", "4", "R"},
+			{"e1", "Friendliness", "13", "N", "14", "N"},
+			{"e2", "Gregariousness", "15", "N", "16", "R"},
+			{"e3", "Assertiveness", "17", "N", "18", "N"},
+			{"e4", "Activity Level", "19", "N", "20", "N"},
+			{"e5", "Excitement Seeking", "21", "N", "22", "N"},
+			{"e6", "Cheerfulness", "23", "N", "24", "N"},
 		},
 		"openness": {
-			{"o1", "Anxiety", "1", "N", "2", "R"},
-			{"o2", "Anger", "3", "N", "4", "R"},
-			{"o3", "Anxiety", "1", "N", "2", "R"},
-			{"o4", "Anger", "3", "N", "4", "R"},
-			{"o5", "Anger", "3", "N", "4", "R"},
-			{"o6", "Anger", "3", "N", "4", "R"},
+			{"o1", "Imagination", "25", "N", "26", "N"},
+			{"o2", "Artistic Interests", "27", "N", "28", "R"},
+			{"o3", "Emotionality", "29", "N", "30", "R"},
+			{"o4", "Adventurousness", "31", "R", "32", "R"},
+			{"o5", "Intellect", "33", "R", "34", "R"},
+			{"o6", "Liberalism", "35", "N", "36", "R"},
 		},
 		"agreeableness": {
-			{"a1", "Anxiety", "1", "N", "2", "R"},
-			{"a2", "Anger", "3", "N", "4", "R"},
-			{"a3", "Anxiety", "1", "N", "2", "R"},
-			{"a4", "Anger", "3", "N", "4", "R"},
-			{"a5", "Anger", "3", "N", "4", "R"},
-			{"a6", "Anger", "3", "N", "4", "R"},
+			{"a1", "Trust", "37", "N", "38", "N"},
+			{"a2", "Morality", "39", "R", "40", "R"},
+			{"a3", "Altruism", "41", "N", "42", "N"},
+			{"a4", "Cooperation", "43", "R", "44", "R"},
+			{"a5", "Modesty", "45", "R", "46", "R"},
+			{"a6", "Sympathy", "47", "N", "48", "N"},
 		},
 		"conscientiousness": {
-			{"c1", "Anxiety", "1", "N", "2", "R"},
-			{"c2", "Anger", "3", "N", "4", "R"},
-			{"c3", "Anger", "3", "N", "4", "R"},
-			{"c4", "Anger", "3", "N", "4", "R"},
-			{"c5", "Anger", "3", "N", "4", "R"},
-			{"c6", "Anger", "3", "N", "4", "R"},
+			{"c1", "Self Efficacy", "49", "N", "50", "N"},
+			{"c2", "Orderliness", "51", "N", "52", "R"},
+			{"c3", "Dutifulness", "53", "N", "54", "R"},
+			{"c4", "Achievement Striving", "55", "N", "56", "N"},
+			{"c5", "Self Discipline", "57", "N", "58", "R"},
+			{"c6", "Cautiousness", "59", "R", "60", "R"},
 		},
 	}
 
@@ -181,7 +222,7 @@ func calculateProcessedScore(scoreQuestions []ScoreQuestion) []Domain {
 			domainScore += subdomainScore
 		}
 
-		domainIntensity := calculateDomainIntensity(domainName, domainScore)
+		domainIntensity := calculateDomainIntensity(domainScore)
 		domains = append(domains, Domain{domainName, domainScore, processedSubdomains, testId, userId, domainIntensity})
 	}
 
@@ -189,8 +230,20 @@ func calculateProcessedScore(scoreQuestions []ScoreQuestion) []Domain {
 }
 
 // Placeholder for domain intensity calculation
-func calculateDomainIntensity(domain string, score int) string {
-	return "High" // Placeholder logic
+func calculateDomainIntensity(domainscore int) string {
+	var domainIntensity string
+	if domainscore >= 50 {
+		domainIntensity = "High"
+	} else if domainscore >= 40 {
+		domainIntensity = "Above Average"
+	} else if domainscore >= 30 {
+		domainIntensity = "Average"
+	} else if domainscore >= 20 {
+		domainIntensity = "Below Average"
+	} else if domainscore >= 10 {
+		domainIntensity = "Low"
+	}
+	return domainIntensity
 }
 
 // Handle test submissions
@@ -276,7 +329,7 @@ func handleReportGeneration(c *gin.Context) {
 	reportAlreadyGenerated := []models.Test{}
 	mgm.Coll(&models.Test{}).SimpleFind(&reportAlreadyGenerated, bson.M{"testId": testId})
 
-	if reportAlreadyGenerated != nil && len(reportAlreadyGenerated) != 0 {
+	if len(reportAlreadyGenerated) != 0 {
 		// Report already exit
 		// Fetch the existing report using testId
 		// Send to gcp to create report
@@ -469,7 +522,7 @@ func creatingPdf(c *gin.Context) {
 
 // func getPrompt(c *gin.Context) {
 
-// 	var values = map[string][]string{"neuroticism": []string{"7", "4", "6", "5", "8", "6", "4"}, "extraversion": []string{"3", "5", "2", "6", "6", "2", "3"}}
+var values = map[string][]string{"neuroticism": {"7", "4", "6", "5", "8", "6", "4"}, "extraversion": {"3", "5", "2", "6", "6", "2", "3"}, "openness": {"7", "4", "6", "5", "8", "6", "4"}, "agreeableness": {"7", "4", "6", "5", "8", "6", "4"}, "conscientiousness": {"7", "4", "6", "5", "8", "6", "4"}}
 
 // 	prompts := []string{}
 
