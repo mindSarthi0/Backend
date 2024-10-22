@@ -14,7 +14,8 @@ type DomainContent struct {
 }
 
 // Function to generate the PDF with 5 pages for Big Five domains
-func generateBigFivePDF(contents map[string]DomainContent) error {
+// Modify to accept filename as a parameter
+func generateBigFivePDF(contents map[string]DomainContent, filename string) error {
 	// Initialize a new PDF
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.SetFont("Arial", "", 14)
@@ -35,7 +36,7 @@ func generateBigFivePDF(contents map[string]DomainContent) error {
 		pdf.Cell(40, 10, domain)
 		pdf.Ln(12)
 
-		// Add the Introduction section
+		// Add the sections for Introduction, Career & Academia, etc.
 		pdf.SetFont("Arial", "B", 14)
 		pdf.Cell(40, 10, "Introduction:")
 		pdf.Ln(8)
@@ -43,7 +44,7 @@ func generateBigFivePDF(contents map[string]DomainContent) error {
 		pdf.MultiCell(190, 10, content.Introduction, "", "", false)
 		pdf.Ln(5)
 
-		// Add the Career & Academia section
+		// Career & Academia
 		pdf.SetFont("Arial", "B", 14)
 		pdf.Cell(40, 10, "Career & Academia:")
 		pdf.Ln(8)
@@ -51,7 +52,7 @@ func generateBigFivePDF(contents map[string]DomainContent) error {
 		pdf.MultiCell(190, 10, content.CareerAcademia, "", "", false)
 		pdf.Ln(5)
 
-		// Add the Relationship section
+		// Relationship
 		pdf.SetFont("Arial", "B", 14)
 		pdf.Cell(40, 10, "Relationship:")
 		pdf.Ln(8)
@@ -59,16 +60,19 @@ func generateBigFivePDF(contents map[string]DomainContent) error {
 		pdf.MultiCell(190, 10, content.Relationship, "", "", false)
 		pdf.Ln(5)
 
-		// Add the Strength & Weakness section
+		// Strength & Weakness
 		pdf.SetFont("Arial", "B", 14)
 		pdf.Cell(40, 10, "Strength & Weakness:")
 		pdf.Ln(8)
 		pdf.SetFont("Arial", "", 12)
 		pdf.MultiCell(190, 10, content.StrengthWeakness, "", "", false)
+		pdf.Ln(5)
+
 	}
 
-	// Save the PDF to a file
-	err := pdf.OutputFileAndClose("big_five_personality_report.pdf")
+	// Use TestId as the PDF filename
+	pdfFilename := filename + ".pdf"
+	err := pdf.OutputFileAndClose(pdfFilename)
 	if err != nil {
 		return err
 	}
@@ -110,8 +114,11 @@ func CreatePDF() {
 		},
 	}
 
-	// Generate the PDF
-	err := generateBigFivePDF(contents)
+	// Provide a filename for the generated PDF
+	filename := "BigFiveReport"
+
+	// Generate the PDF with the filename passed as a second argument
+	err := generateBigFivePDF(contents, filename)
 	if err != nil {
 		log.Fatalf("Failed to generate PDF: %v", err)
 	}

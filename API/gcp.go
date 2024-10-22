@@ -239,14 +239,14 @@ func CreatePromptNeuroticism(d string, ds string, s1 string, s2 string, s3 strin
 			"  Self-consciousness: " + s4 + "/10" + "\n" +
 			"  Immoderation: " + s5 + "/10" + "\n" +
 			"  Vulnerability: " + s6 + "/10" + "\n\n" +
-
 			"Create a personalised BIG5 Personlaity Assessment Report in JSON format for the Domain:" + d + ", while taking insight from subdomain score\n" +
 			"Keept the Structure as follows:\n" +
-			"Introduction in 100 words : Explain the trait and its impact on the client's experiences\n" +
-			"Career & Academia in 40 words : Impact on clinet's professional & student life\n" +
-			"Relationship in 40 words : Impact on Client's Personal Relationships\n" +
-			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n"
+			"Introduction in 100 words : Explain the trait and its impact on the client's experiences:::\n" +
+			"Career & Academia in 40 words : Impact on clinet's professional & student life:::\n" +
+			"Relationship in 40 words : Impact on Client's Personal Relationships:::\n" +
+			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n" +
 
+			"Use ::: to separate the sections\n"
 	return prompt
 }
 
@@ -261,14 +261,14 @@ func CreatePromptExtraversion(d string, ds string, s1 string, s2 string, s3 stri
 			"  Activity Level: " + s4 + "\n" +
 			"  Excitement Seeking: " + s5 + "\n" +
 			"  Cheerfulness: " + s6 + "\n\n" +
-
 			"Create a personalised BIG5 Personlaity Assessment Report in JSON format for the Domain:" + d + ", while taking insight from subdomain score\n" +
 			"Keept the Structure as follows:\n" +
-			"Introduction in 100 words : Explain the trait and its impact on the client's experiences\n" +
-			"Career & Academia in 40 words : Impact on clinet's professional & student life\n" +
-			"Relationship in 40 words : Impact on Client's Personal Relationships\n" +
-			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n"
+			"Introduction in 100 words : Explain the trait and its impact on the client's experiences:::\n" +
+			"Career & Academia in 40 words : Impact on clinet's professional & student life:::\n" +
+			"Relationship in 40 words : Impact on Client's Personal Relationships:::\n" +
+			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n" +
 
+			"Use ::: to separate the sections\n"
 		//"Note: For Domain (0 to 60) if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
 		//"For Subdomain (0 to 10) if score is <=3, it is low, <=4 is below average, <=6 is average, <=8 is above average, <=10 is high.\n\n"
 
@@ -286,14 +286,14 @@ func CreatePromptOpenness(d string, ds string, s1 string, s2 string, s3 string, 
 			"  Adventurousness: " + s4 + "\n" +
 			"  Intellect: " + s5 + "\n" +
 			"  Liberalism: " + s6 + "\n\n" +
-
 			"Create a personalised BIG5 Personlaity Assessment Report in JSON format for the Domain:" + d + ", while taking insight from subdomain score\n" +
 			"Keept the Structure as follows:\n" +
-			"Introduction in 100 words : Explain the trait and its impact on the client's experiences\n" +
-			"Career & Academia in 40 words : Impact on clinet's professional & student life\n" +
-			"Relationship in 40 words : Impact on Client's Personal Relationships\n" +
-			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n"
+			"Introduction in 100 words : Explain the trait and its impact on the client's experiences:::\n" +
+			"Career & Academia in 40 words : Impact on clinet's professional & student life:::\n" +
+			"Relationship in 40 words : Impact on Client's Personal Relationships:::\n" +
+			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n" +
 
+			"Use ::: to separate the sections\n"
 	return prompt
 }
 
@@ -311,11 +311,12 @@ func CreatePromptAgreeableness(d string, ds string, s1 string, s2 string, s3 str
 
 			"Create a personalised BIG5 Personlaity Assessment Report in JSON format for the Domain:" + d + ", while taking insight from subdomain score\n" +
 			"Keept the Structure as follows:\n" +
-			"Introduction in 100 words : Explain the trait and its impact on the client's experiences\n" +
-			"Career & Academia in 40 words : Impact on clinet's professional & student life\n" +
-			"Relationship in 40 words : Impact on Client's Personal Relationships\n" +
-			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n"
+			"Introduction in 100 words : Explain the trait and its impact on the client's experiences:::\n" +
+			"Career & Academia in 40 words : Impact on clinet's professional & student life:::\n" +
+			"Relationship in 40 words : Impact on Client's Personal Relationships:::\n" +
+			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n" +
 
+			"Use ::: to separate the sections\n"
 	return prompt
 }
 
@@ -333,10 +334,12 @@ func CreatePromptConscientiousness(d string, ds string, s1 string, s2 string, s3
 
 			"Create a personalised BIG5 Personlaity Assessment Report in JSON format for the Domain:" + d + ", while taking insight from subdomain score\n" +
 			"Keept the Structure as follows:\n" +
-			"Introduction in 100 words : Explain the trait and its impact on the client's experiences\n" +
-			"Career & Academia in 40 words : Impact on clinet's professional & student life\n" +
-			"Relationship in 40 words : Impact on Client's Personal Relationships\n" +
-			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential.\n\n"
+			"Introduction in 100 words : Explain the trait and its impact on the client's experiences:::\n" +
+			"Career & Academia in 40 words : Impact on clinet's professional & student life:::\n" +
+			"Relationship in 40 words : Impact on Client's Personal Relationships:::\n" +
+			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n" +
+
+			"Use ::: to separate the sections\n"
 	return prompt
 }
 
