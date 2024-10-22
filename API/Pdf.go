@@ -15,9 +15,10 @@ type DomainContent struct {
 
 // Function to generate the PDF with 5 pages for Big Five domains
 // Modify to accept filename as a parameter
-func generateBigFivePDF(contents map[string]DomainContent, filename string) error {
-	// Initialize a new PDF
+func GenerateBigFivePDF(contents map[string]DomainContent, filename string) error {
+
 	pdf := gofpdf.New("P", "mm", "A4", "")
+
 	pdf.SetFont("Arial", "", 14)
 
 	// Define domain order
@@ -118,7 +119,7 @@ func CreatePDF() {
 	filename := "BigFiveReport"
 
 	// Generate the PDF with the filename passed as a second argument
-	err := generateBigFivePDF(contents, filename)
+	err := GenerateBigFivePDF(contents, filename)
 	if err != nil {
 		log.Fatalf("Failed to generate PDF: %v", err)
 	}

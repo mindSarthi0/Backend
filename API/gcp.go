@@ -244,9 +244,8 @@ func CreatePromptNeuroticism(d string, ds string, s1 string, s2 string, s3 strin
 			"Introduction in 100 words : Explain the trait and its impact on the client's experiences:::\n" +
 			"Career & Academia in 40 words : Impact on clinet's professional & student life:::\n" +
 			"Relationship in 40 words : Impact on Client's Personal Relationships:::\n" +
-			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n" +
+			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n"
 
-			"Use ::: to separate the sections\n"
 	return prompt
 }
 
@@ -266,9 +265,8 @@ func CreatePromptExtraversion(d string, ds string, s1 string, s2 string, s3 stri
 			"Introduction in 100 words : Explain the trait and its impact on the client's experiences:::\n" +
 			"Career & Academia in 40 words : Impact on clinet's professional & student life:::\n" +
 			"Relationship in 40 words : Impact on Client's Personal Relationships:::\n" +
-			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n" +
+			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n"
 
-			"Use ::: to separate the sections\n"
 		//"Note: For Domain (0 to 60) if score is <=20, it is low, <=30 is below average, <40 is average, <50 is above average, <=60 is high.\n" +
 		//"For Subdomain (0 to 10) if score is <=3, it is low, <=4 is below average, <=6 is average, <=8 is above average, <=10 is high.\n\n"
 
@@ -291,9 +289,8 @@ func CreatePromptOpenness(d string, ds string, s1 string, s2 string, s3 string, 
 			"Introduction in 100 words : Explain the trait and its impact on the client's experiences:::\n" +
 			"Career & Academia in 40 words : Impact on clinet's professional & student life:::\n" +
 			"Relationship in 40 words : Impact on Client's Personal Relationships:::\n" +
-			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n" +
+			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n"
 
-			"Use ::: to separate the sections\n"
 	return prompt
 }
 
@@ -314,9 +311,7 @@ func CreatePromptAgreeableness(d string, ds string, s1 string, s2 string, s3 str
 			"Introduction in 100 words : Explain the trait and its impact on the client's experiences:::\n" +
 			"Career & Academia in 40 words : Impact on clinet's professional & student life:::\n" +
 			"Relationship in 40 words : Impact on Client's Personal Relationships:::\n" +
-			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n" +
-
-			"Use ::: to separate the sections\n"
+			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n"
 	return prompt
 }
 
@@ -337,9 +332,7 @@ func CreatePromptConscientiousness(d string, ds string, s1 string, s2 string, s3
 			"Introduction in 100 words : Explain the trait and its impact on the client's experiences:::\n" +
 			"Career & Academia in 40 words : Impact on clinet's professional & student life:::\n" +
 			"Relationship in 40 words : Impact on Client's Personal Relationships:::\n" +
-			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n" +
-
-			"Use ::: to separate the sections\n"
+			"Strength & Weakness in 40 words : Highlight the client's strengths and areas for growth, focusing on positivity and potential:::\n\n"
 	return prompt
 }
 
