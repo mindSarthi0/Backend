@@ -1,0 +1,11 @@
+@backend_url = "http://[::1]:8080"
+
+GET {{{backend_url}}/report HTTP/1.1
+
+{
+    "testId":"670bd45fa3193a40f763877e"
+}
+
+###
+
+GET https://google.com

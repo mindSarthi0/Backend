@@ -284,16 +284,18 @@ func handleReportGeneration(c *gin.Context) {
 		return
 	}
 
-	newDbReports := []models.Report{}
+	newDbReports := map[string]models.Report{}
 
-	prompts := []string{}
+	prompts := map[string]string{}
 
 	for domain, value := range processedScores {
 
 		fmt.Println("Domain and Value:", domain, value)
 		newSubdomainReports := []models.Subdomain{}
-		_d := value.Name
-		_dscore := value.Score
+
+		_domainName := value.Name
+		_domainScore := value.Score
+		_domainIntensity := value.Intensity
 
 		for _, value := range value.Subdomain {
 			newDbSubdomain := models.NewSubdomain(value.Name, value.Score, value.Intensity)
@@ -309,36 +311,61 @@ func handleReportGeneration(c *gin.Context) {
 		s6 := strconv.Itoa(newSubdomainReports[5].Score)
 
 		// TODO create a better interface here
-		prompt := API.CreatePrompt(_d, strconv.Itoa(_dscore), s1, s2, s3, s4, s5, s6)
+		prompt := API.CreatePrompt(_domainName, strconv.Itoa(_domainScore), s1, s2, s3, s4, s5, s6)
 
-		prompts = append(prompts, prompt)
+		prompts[_domainName] = prompt
 
-		newDbResport := models.NewReport(value.Name, value.Score, newSubdomainReports, value.UserId, value.TestId)
-
-		newDbReports = append(newDbReports, *newDbResport)
+		newDbReport := models.NewReport(value.Name, value.Score, newSubdomainReports, value.UserId, value.TestId, _domainIntensity, "")
+		newDbReports[_domainName] = *newDbReport
 	}
 
 	// Now prompt generation starts
-	channel := make(chan API.ContentResponse)
+	channel := make(chan API.GeminiPromptRequest)
 
-	for _, prompt := range prompts {
-		go API.WorkerGCPGemini(prompt, channel)
+	for domain, prompt := range prompts {
+		go API.WorkerGCPGemini(domain, prompt, channel)
 	}
 
-	results := []string{}
+	results := map[string]string{}
 
-	for range prompts {
+	for range newDbReports {
 		result := <-channel // Read the result from the channel
 		// TODO add failure case
 		// TODO added generated result to db
-		results = append(results, result.Candidates[0].Content.Parts[0].Text)
+		// results[result] = result.Candidates[0].Content.Parts[0].Text
+		results[result.Id] = result.Response.Candidates[0].Content.Parts[0].Text
+	}
+
+	combinedDBReports := map[string]models.Report{}
+
+	for domain, value := range newDbReports {
+
+		// TODO add failure case
+		// TODO added generated result to db
+		// results[result] = result.Candidates[0].Content.Parts[0].Text
+		combinedDBReport := models.NewReport(value.Name, value.Score, value.Subdomain, value.UserId, value.TestId, value.Intensity, results[domain])
+		combinedDBReports[domain] = *combinedDBReport
 	}
 
 	// TODO save to db, MAKE SURE YOU ARE CHECKING THE DOMAIN NAME CORRECTLY
 	// TODO generate content from from GCP
 	// reportDbColumn := mgm.Coll(&models.Report{})
-	log.Println("Summited sucessfully", newDbReports)
-	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": results})
+
+	log.Println("Summited sucessfully", combinedDBReports)
+
+	var docs []interface{}
+	for _, q := range combinedDBReports {
+		docs = append(docs, q) // Add each question as an interface{}
+	}
+
+	responseDb, err := mgm.Coll(&models.Report{}).InsertMany(c, docs)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert questions"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": responseDb})
 }
 
 func init() {
@@ -427,7 +454,7 @@ func main() {
 	router.POST("/mail", testMail)
 
 	// Start server
-	router.GET("/testprompt", getPrompt)
+	// router.GET("/testprompt", getPrompt)
 	// Start the server on localhost:8080
 	router.Run("localhost:8080")
 }
@@ -440,31 +467,31 @@ func creatingPdf(c *gin.Context) {
 	lib.CreatePdfWithBg()
 }
 
-func getPrompt(c *gin.Context) {
+// func getPrompt(c *gin.Context) {
 
-	var values = map[string][]string{"neuroticism": []string{"7", "4", "6", "5", "8", "6", "4"}, "extraversion": []string{"3", "5", "2", "6", "6", "2", "3"}}
+// 	var values = map[string][]string{"neuroticism": []string{"7", "4", "6", "5", "8", "6", "4"}, "extraversion": []string{"3", "5", "2", "6", "6", "2", "3"}}
 
-	prompts := []string{}
+// 	prompts := []string{}
 
-	for domain, value := range values {
-		promt := API.CreatePrompt(domain, value[0], value[1], value[2], value[3], value[4], value[5], value[6])
-		prompts = append(prompts, promt)
-	}
+// 	for domain, value := range values {
+// 		promt := API.CreatePrompt(domain, value[0], value[1], value[2], value[3], value[4], value[5], value[6])
+// 		prompts = append(prompts, promt)
+// 	}
 
-	channel := make(chan API.ContentResponse)
+// 	channel := make(chan API.ContentResponse)
 
-	for _, prompt := range prompts {
-		go API.WorkerGCPGemini(prompt, channel)
-	}
+// 	for _, prompt := range prompts {
+// 		go API.WorkerGCPGemini(prompt, channel)
+// 	}
 
-	results := []string{}
+// 	results := []string{}
 
-	for range prompts {
-		result := <-channel // Read the result from the channel
-		// TODO add failure case
-		results = append(results, result.Candidates[0].Content.Parts[0].Text)
-	}
+// 	for range prompts {
+// 		result := <-channel // Read the result from the channel
+// 		// TODO add failure case
+// 		results = append(results, result.Candidates[0].Content.Parts[0].Text)
+// 	}
 
-	// Respond with a success message
-	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": results})
-}
+// 	// Respond with a success message
+// 	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": results})
+// }

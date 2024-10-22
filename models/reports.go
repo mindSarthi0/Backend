@@ -15,20 +15,24 @@ type Report struct {
 	// DefaultModel includes the MongoDB ID (_id), createdAt, and updatedAt fields.
 	mgm.DefaultModel `bson:",inline"`
 
-	Name      string             `json:"name" bson:"name"`
-	Score     int                `json:"score" bson:"score"`
-	Subdomain []Subdomain        `json:"subdomain" bson:"subdomain"`
-	UserId    primitive.ObjectID `json:"userId" bson:"userId"`
-	TestId    primitive.ObjectID `json:"testId" bson:"testId"`
+	Name          string             `json:"name" bson:"name"`
+	Score         int                `json:"score" bson:"score"`
+	Subdomain     []Subdomain        `json:"subdomain" bson:"subdomain"`
+	UserId        primitive.ObjectID `json:"userId" bson:"userId"`
+	TestId        primitive.ObjectID `json:"testId" bson:"testId"`
+	Intensity     string             `json:"intensity" bson:"intensity"`
+	DomainSummary string             `json:"domainSummary" bson:"domainSummary"`
 }
 
-func NewReport(name string, score int, subdomain []Subdomain, userId primitive.ObjectID, testId primitive.ObjectID) *Report {
+func NewReport(name string, score int, subdomain []Subdomain, userId primitive.ObjectID, testId primitive.ObjectID, intensity string, domainSummary string) *Report {
 	return &Report{
-		Name:      name,
-		Score:     score,
-		Subdomain: subdomain,
-		TestId:    testId,
-		UserId:    userId,
+		Name:          name,
+		Score:         score,
+		Subdomain:     subdomain,
+		TestId:        testId,
+		UserId:        userId,
+		Intensity:     intensity,
+		DomainSummary: domainSummary,
 	}
 }
 

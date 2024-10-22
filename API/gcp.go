@@ -14,6 +14,11 @@ import (
 	"os"
 )
 
+type GeminiPromptRequest struct {
+	Id       string
+	Response ContentResponse
+}
+
 type ContentResponse struct {
 	Candidates []struct {
 		Content struct {
@@ -458,10 +463,12 @@ func CreatePromptSummary(string) string {
 	return prompt
 }
 
-func WorkerGCPGemini(prompt string, channel chan ContentResponse) {
+func WorkerGCPGemini(id string, prompt string, channel chan GeminiPromptRequest) {
 	result, err := GenerateContentFromTextGCPJSON(prompt)
 	if err != nil {
 		// Respond with an error message if content generation failed
 	}
-	channel <- *result
+
+	resultWithId := GeminiPromptRequest{id, *result}
+	channel <- resultWithId
 }
