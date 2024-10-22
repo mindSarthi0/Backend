@@ -1,28 +1,26 @@
 package API
 
 import (
-	"github.com/jung-kurt/gofpdf"
+	"fmt"
 	"log"
+
+	"github.com/jung-kurt/gofpdf"
 )
 
 // Struct to hold the AI output for each domain
-type DomainContent struct {
-	Introduction     string
-	CareerAcademia   string
-	Relationship     string
-	StrengthWeakness string
-}
 
 // Function to generate the PDF with 5 pages for Big Five domains
 // Modify to accept filename as a parameter
-func GenerateBigFivePDF(contents map[string]DomainContent, filename string) error {
+func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) error {
 
 	pdf := gofpdf.New("P", "mm", "A4", "")
 
 	pdf.SetFont("Arial", "", 14)
 
+	fmt.Println(":::::::::Contents:::::::::", contents)
+
 	// Define domain order
-	domains := []string{"Neuroticism", "Extraversion", "Openness", "Agreeableness", "Conscientiousness"}
+	domains := []string{"neuroticism", "extraversion", "openness", "agreeableness", "conscientiousness"}
 
 	// Loop through the domains and add each one to a new page
 	for _, domain := range domains {
@@ -31,6 +29,8 @@ func GenerateBigFivePDF(contents map[string]DomainContent, filename string) erro
 
 		// Get the content for the current domain
 		content := contents[domain]
+
+		log.Println(content)
 
 		// Add title (domain name)
 		pdf.SetFont("Arial", "B", 16)
@@ -82,7 +82,7 @@ func GenerateBigFivePDF(contents map[string]DomainContent, filename string) erro
 
 func CreatePDF() {
 	// Example content for each domain (this will be replaced by AI output in real use)
-	contents := map[string]DomainContent{
+	contents := map[string]JSONOutputFormat{
 		"Neuroticism": {
 			Introduction:     "Neuroticism reflects emotional stability and degree of negative emotions...",
 			CareerAcademia:   "In a professional setting, high neuroticism may lead to stress under pressure...",

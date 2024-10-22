@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Question model with fields for MongoDB
@@ -23,4 +24,15 @@ func NewUser(name string, email string, gender string, age int) *User {
 		Gender: gender,
 		Age:    age,
 	}
+}
+
+func FetchUserUsingId(id primitive.ObjectID) User {
+	collRef := mgm.Coll(&User{})
+
+	var user User
+
+	collRef.FindByID(id.Hex(), &user)
+
+	return user
+
 }

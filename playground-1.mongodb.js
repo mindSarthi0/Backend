@@ -10,13 +10,16 @@
 // https://www.mongodb.com/docs/mongodb-vscode/playgrounds/
 
 // Select the database to use.
+
 use("cognify");
 // Insert a few documents into the sales collection.
-const tests = db
-  .getCollection("tests")
-  .find({})
-  .sort({ createdAt: -1 })
-  .limit(5);
+
+const tests = db.getCollection("reports").deleteMany({});
+
+// const questionsCount = db
+//   .getCollection("questions")
+//   .find({ _id: ObjectId("670b7ae6fcb08e6439a1c064") })
+//   .count();
 
 // Run a find command to view items sold on April 4th, 2014.
 // const salesOnApril4th = db.getCollection('sales').find({
@@ -24,11 +27,7 @@ const tests = db
 // }).count();
 
 // Print a message to the output window.
-console.log(`${tests}`);
-tests.array.forEach((element) => {
-  console.log(`${JSON.stringify(element, null, "")}`);
-});
-
+// console.log("Questions count: ", questionsCount);
 // Here we run an aggregation and open a cursor to the results.
 // Use '.toArray()' to exhaust the cursor to return the whole result set.
 // You can use '.hasNext()/.next()' to iterate through the cursor page by page.

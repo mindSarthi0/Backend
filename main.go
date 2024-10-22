@@ -62,7 +62,6 @@ func fetchScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error
 	var scores []models.Score
 
 	// Fetch all scores matching the testId
-	fmt.Println("Failed to get Score", testId)
 	err := mgm.Coll(&models.Score{}).SimpleFind(&scores, bson.M{"testId": testId})
 	if err != nil {
 		fmt.Println("Failed to get Score", err)
@@ -318,6 +317,24 @@ func handleReportGeneration(c *gin.Context) {
 		return
 	}
 
+	test := models.Test{}
+	// Get test
+	mgm.Coll(&models.Test{}).FindByID(testId, &test)
+
+	if test == (models.Test{}) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to get test for test id"})
+		return
+	}
+
+	// Get user
+	// TODO remove this once the middleware is implemented
+	user := models.FetchUserUsingId(test.UserId)
+
+	if user == (models.User{}) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to get user for test id"})
+		return
+	}
+
 	scoresAndQuestions, err := fetchScoresWithQuestions(testId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch scores and questions"})
@@ -327,7 +344,6 @@ func handleReportGeneration(c *gin.Context) {
 	processedScores := calculateProcessedScore(scoresAndQuestions)
 
 	reportAlreadyGenerated := []models.Test{}
-	mgm.Coll(&models.Test{}).SimpleFind(&reportAlreadyGenerated, bson.M{"testId": testId})
 
 	if len(reportAlreadyGenerated) != 0 {
 		// Report already exit
@@ -391,18 +407,43 @@ func handleReportGeneration(c *gin.Context) {
 
 	combinedDBReports := map[string]models.Report{}
 
+	pdfGenerationContent := map[string]API.JSONOutputFormat{}
+
 	for domain, value := range newDbReports {
 
 		// TODO add failure case
 		// TODO added generated result to db
 		// results[result] = result.Candidates[0].Content.Parts[0].Text
-		combinedDBReport := models.NewReport(value.Name, value.Score, value.Subdomain, value.UserId, value.TestId, value.Intensity, results[domain])
+
+		generatedResponseString := results[domain]
+
+		combinedDBReport := models.NewReport(value.Name, value.Score, value.Subdomain, value.UserId, value.TestId, value.Intensity, generatedResponseString)
+
+		formatedJson, err := API.ParseMarkdownCode(generatedResponseString)
+
+		if err != nil {
+			// Respond with an error message if content generation failed
+		}
+
+		log.Println("Formated JSON", formatedJson.Introduction)
+		pdfGenerationContent[domain] = formatedJson
+
 		combinedDBReports[domain] = *combinedDBReport
 	}
 
 	// TODO save to db, MAKE SURE YOU ARE CHECKING THE DOMAIN NAME CORRECTLY
 	// TODO generate content from from GCP
 	// reportDbColumn := mgm.Coll(&models.Report{})
+
+	log.Println("Generating PDF")
+
+	reportPdfFilename := "report_" + reportRequest.TestId
+	API.GenerateBigFivePDF(pdfGenerationContent, reportPdfFilename)
+	// TODO handle error
+
+	log.Println("Sending Report via Email to user")
+	API.SendBIG5Report(user.Email, "./"+reportPdfFilename+".pdf")
+	// TODO handle error
 
 	log.Println("Summited sucessfully", combinedDBReports)
 
@@ -505,11 +546,49 @@ func main() {
 	//Pdf test route
 	router.POST("/pdf", creatingPdf)
 	router.POST("/mail", testMail)
+	router.POST("/generatepdf", generatepdf)
 
 	// Start server
-	// router.GET("/testprompt", getPrompt)
+	router.GET("/testprompt", getPrompt)
 	// Start the server on localhost:8080
 	router.Run("localhost:8080")
+}
+
+func generatepdf(c *gin.Context) {
+	testContent := map[string]API.JSONOutputFormat{
+		"neuroticism": {
+			Introduction:     "This is intro to BIG 5",
+			CareerAcademia:   "Please check with career councellor",
+			Relationship:     "Good with relationship",
+			StrengthWeakness: "Good with undertanding Black and White thinking",
+		},
+		"extraversion": {
+			Introduction:     "This is intro to BIG 5",
+			CareerAcademia:   "Please check with career councellor",
+			Relationship:     "Good with relationship",
+			StrengthWeakness: "Good with undertanding Black and White thinking",
+		},
+		"openness": {
+			Introduction:     "This is intro to BIG 5",
+			CareerAcademia:   "Please check with career councellor",
+			Relationship:     "Good with relationship",
+			StrengthWeakness: "Good with undertanding Black and White thinking",
+		},
+		"agreeableness": {
+			Introduction:     "This is intro to BIG 5",
+			CareerAcademia:   "Please check with career councellor",
+			Relationship:     "Good with relationship",
+			StrengthWeakness: "Good with undertanding Black and White thinking",
+		},
+		"conscientiousness": {
+			Introduction:     "This is intro to BIG 5",
+			CareerAcademia:   "Please check with career councellor",
+			Relationship:     "Good with relationship",
+			StrengthWeakness: "Good with undertanding Black and White thinking",
+		},
+	}
+
+	API.GenerateBigFivePDF(testContent, "report")
 }
 
 func testMail(c *gin.Context) {
@@ -520,31 +599,39 @@ func creatingPdf(c *gin.Context) {
 	lib.CreatePdfWithBg()
 }
 
-// func getPrompt(c *gin.Context) {
+func getPrompt(c *gin.Context) {
 
-// var values = map[string][]string{"neuroticism": {"7", "4", "6", "5", "8", "6", "4"}, "extraversion": {"3", "5", "2", "6", "6", "2", "3"}, "openness": {"7", "4", "6", "5", "8", "6", "4"}, "agreeableness": {"7", "4", "6", "5", "8", "6", "4"}, "conscientiousness": {"7", "4", "6", "5", "8", "6", "4"}}
+	var values = map[string][]string{"neuroticism": {"7", "4", "6", "5", "8", "6", "4"}, "extraversion": {"3", "5", "2", "6", "6", "2", "3"}, "openness": {"7", "4", "6", "5", "8", "6", "4"}, "agreeableness": {"7", "4", "6", "5", "8", "6", "4"}, "conscientiousness": {"7", "4", "6", "5", "8", "6", "4"}}
 
-// 	prompts := []string{}
+	prompts := map[string]string{}
 
-// 	for domain, value := range values {
-// 		promt := API.CreatePrompt(domain, value[0], value[1], value[2], value[3], value[4], value[5], value[6])
-// 		prompts = append(prompts, promt)
-// 	}
+	for domain, value := range values {
+		promt := API.CreatePrompt(domain, value[0], value[1], value[2], value[3], value[4], value[5], value[6])
+		prompts[domain] = promt
+	}
 
-// 	channel := make(chan API.ContentResponse)
+	channel := make(chan API.GeminiPromptRequest)
 
-// 	for _, prompt := range prompts {
-// 		go API.WorkerGCPGemini(prompt, channel)
-// 	}
+	for domain, prompt := range prompts {
+		go API.WorkerGCPGemini(domain, prompt, channel)
+	}
 
-// 	results := []string{}
+	results := map[string]string{}
 
-// 	for range prompts {
-// 		result := <-channel // Read the result from the channel
-// 		// TODO add failure case
-// 		results = append(results, result.Candidates[0].Content.Parts[0].Text)
-// 	}
+	for range prompts {
+		result := <-channel // Read the result from the channel
+		// TODO add failure case
+		generatedResponseString := result.Response.Candidates[0].Content.Parts[0].Text
+		formatedJson, err := API.ParseMarkdownCode(generatedResponseString)
 
-// 	// Respond with a success message
-// 	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": results})
-// }
+		if err != nil {
+			// Respond with an error message if content generation failed
+		}
+
+		log.Println("Formated JSON", formatedJson.Introduction)
+		results[result.Id] = generatedResponseString
+	}
+
+	// Respond with a success message
+	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": results})
+}
