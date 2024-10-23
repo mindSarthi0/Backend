@@ -20,6 +20,7 @@ FROM alpine:latest
 # Set environment variable to run Gin in production mode
 ENV GIN_MODE=release
 
+
 # Set the working directory inside the container
 WORKDIR /app
 

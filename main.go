@@ -423,8 +423,13 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // fallback to port 8080 if not set
+	}
+
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + port,
 		Handler: router,
 	}
 
