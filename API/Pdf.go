@@ -1,6 +1,7 @@
 package API
 
 import (
+	"fmt"
 	"github.com/jung-kurt/gofpdf"
 	"log"
 )
@@ -13,65 +14,81 @@ type DomainContent struct {
 	StrengthWeakness string
 }
 
-// Function to generate the PDF with 5 pages for Big Five domains
-// Modify to accept filename as a parameter
+// Function to generate the PDF with a cover page and 5 pages for Big Five domains
 func GenerateBigFivePDF(contents map[string]DomainContent, filename string) error {
 
+	// Create a new PDF instance
 	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.SetMargins(10, 10, 10) // Set margins
 
-	pdf.SetFont("Arial", "", 14)
+	// Add the cover page
+	pdf.AddPage()
 
-	// Define domain order
-	domains := []string{"Neuroticism", "Extraversion", "Openness", "Agreeableness", "Conscientiousness"}
+	// Path to the cover image
+	coverImgPath := "E:/Projects/Psychological Assessment/Code/cognify-api-gateway/Reports/Template/cover.png"
+
+	// Define image options for cover
+	coverOpt := gofpdf.ImageOptions{
+		ImageType: "PNG",
+		ReadDpi:   true,
+	}
+
+	// Insert cover image to fit the entire page
+	width, height := 210.0, 297.0 // A4 dimensions
+	pdf.ImageOptions(coverImgPath, 0, 0, width, height, false, coverOpt, 0, "")
+
+	// Optional: Add text on the cover page (e.g., Report Title)
+	pdf.SetY(150) // Adjust as needed
+	pdf.SetFont("Arial", "B", 24)
+	pdf.Cell(0, 10, "Big Five Personality Report")
+	pdf.Ln(12)
+
+	pdf.SetFont("Arial", "I", 16)
+	pdf.Cell(0, 10, "Powered by Cognify AI")
+	pdf.Ln(10)
+
+	// Define the domain order for the next pages
+	domains := []string{"Extraversion", "Openness", "Neuroticism", "Agreeableness", "Conscientiousness"}
 
 	// Loop through the domains and add each one to a new page
 	for _, domain := range domains {
 		// Add a new page for each domain
 		pdf.AddPage()
 
+		// Construct the correct image path (use forward slashes for Go)
+		imgPath := fmt.Sprintf("E:/Projects/Psychological Assessment/Code/cognify-api-gateway/Reports/Template/%s.png", domain)
+
+		// Define image options (e.g., scaling and positioning)
+		opt := gofpdf.ImageOptions{
+			ImageType: "PNG",
+			ReadDpi:   true,
+		}
+
+		// Insert the image; for the whole page, set width to 210mm (A4 width) and height to 297mm (A4 height)
+		pdf.ImageOptions(imgPath, 0, 0, width, height, false, opt, 0, "")
+
 		// Get the content for the current domain
-		content := contents[domain]
+		content, ok := contents[domain]
+		if !ok {
+			continue // If the domain doesn't exist in the content map, skip it
+		}
+
+		// Set some Y offset after the image to start the text content
+		pdf.SetY(50) // Adjust based on your needs
 
 		// Add title (domain name)
 		pdf.SetFont("Arial", "B", 16)
-		pdf.Cell(40, 10, domain)
+		pdf.Cell(0, 10, domain)
 		pdf.Ln(12)
 
 		// Add the sections for Introduction, Career & Academia, etc.
-		pdf.SetFont("Arial", "B", 14)
-		pdf.Cell(40, 10, "Introduction:")
-		pdf.Ln(8)
-		pdf.SetFont("Arial", "", 12)
-		pdf.MultiCell(190, 10, content.Introduction, "", "", false)
-		pdf.Ln(5)
-
-		// Career & Academia
-		pdf.SetFont("Arial", "B", 14)
-		pdf.Cell(40, 10, "Career & Academia:")
-		pdf.Ln(8)
-		pdf.SetFont("Arial", "", 12)
-		pdf.MultiCell(190, 10, content.CareerAcademia, "", "", false)
-		pdf.Ln(5)
-
-		// Relationship
-		pdf.SetFont("Arial", "B", 14)
-		pdf.Cell(40, 10, "Relationship:")
-		pdf.Ln(8)
-		pdf.SetFont("Arial", "", 12)
-		pdf.MultiCell(190, 10, content.Relationship, "", "", false)
-		pdf.Ln(5)
-
-		// Strength & Weakness
-		pdf.SetFont("Arial", "B", 14)
-		pdf.Cell(40, 10, "Strength & Weakness:")
-		pdf.Ln(8)
-		pdf.SetFont("Arial", "", 12)
-		pdf.MultiCell(190, 10, content.StrengthWeakness, "", "", false)
-		pdf.Ln(5)
-
+		addContentSection(pdf, "Introduction", content.Introduction)
+		addContentSection(pdf, "Career & Academia", content.CareerAcademia)
+		addContentSection(pdf, "Relationship", content.Relationship)
+		addContentSection(pdf, "Strength & Weakness", content.StrengthWeakness)
 	}
 
-	// Use TestId as the PDF filename
+	// Save the PDF to a file
 	pdfFilename := filename + ".pdf"
 	err := pdf.OutputFileAndClose(pdfFilename)
 	if err != nil {
@@ -80,6 +97,17 @@ func GenerateBigFivePDF(contents map[string]DomainContent, filename string) erro
 	return nil
 }
 
+// Helper function to add content sections to the PDF
+func addContentSection(pdf *gofpdf.Fpdf, title, content string) {
+	pdf.SetFont("Arial", "B", 14)
+	pdf.Cell(40, 10, title+":")
+	pdf.Ln(8)
+	pdf.SetFont("Arial", "", 12)
+	pdf.MultiCell(190, 10, content, "", "", false)
+	pdf.Ln(5)
+}
+
+// Function to create the PDF
 func CreatePDF() {
 	// Example content for each domain (this will be replaced by AI output in real use)
 	contents := map[string]DomainContent{
