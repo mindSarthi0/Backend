@@ -16,6 +16,11 @@ use("cognify");
 
 const tests = db.getCollection("reports").deleteMany({});
 
+// const count = db
+//   .getCollection("reports")
+//   .countDocuments({ testId: "671481b339875ba22511466b" });
+
+// console.log("Count:::", count);
 // const questionsCount = db
 //   .getCollection("questions")
 //   .find({ _id: ObjectId("670b7ae6fcb08e6439a1c064") })

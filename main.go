@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"myproject/API"
@@ -111,6 +112,23 @@ func handleReportGeneration(c *gin.Context) {
 		return
 	}
 
+	// Checking if report already generated
+
+	filter := bson.D{{Key: "testId", Value: testId}}
+
+	count, err := mgm.Coll(&models.Report{}).CountDocuments(context.TODO(), filter)
+
+	println("::::::::::::::count::::::::::::", count, testId.String())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get count of already generated reports"})
+		return
+	}
+
+	if count != 0 {
+		c.IndentedJSON(http.StatusAlreadyReported, gin.H{"message": "report is already generated for test id"})
+		return
+	}
+
 	scoresAndQuestions, err := controller.FetchScoresWithQuestions(testId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch scores and questions"})
@@ -118,16 +136,6 @@ func handleReportGeneration(c *gin.Context) {
 	}
 
 	processedScores := controller.CalculateProcessedScore(scoresAndQuestions)
-
-	reportAlreadyGenerated := []models.Test{}
-
-	if len(reportAlreadyGenerated) != 0 {
-		// Report already exit
-		// Fetch the existing report using testId
-		// Send to gcp to create report
-		c.IndentedJSON(http.StatusOK, processedScores)
-		return
-	}
 
 	newDbReports := map[string]models.Report{}
 
