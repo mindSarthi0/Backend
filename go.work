@@ -6,4 +6,5 @@ use (
 	./API
 	./response
 	./lib
+	./controller
 )
