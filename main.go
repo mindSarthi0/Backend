@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"myproject/API"
@@ -18,6 +19,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"os"
+	"os/signal"
+	"time"
 	//"google.golang.org/genproto/googleapis/actions/sdk/v2/interactionmodel/prompt"
 )
 
@@ -111,6 +115,23 @@ func handleReportGeneration(c *gin.Context) {
 		return
 	}
 
+	// Checking if report already generated
+
+	filter := bson.D{{Key: "testId", Value: testId}}
+
+	count, err := mgm.Coll(&models.Report{}).CountDocuments(context.TODO(), filter)
+
+	println("::::::::::::::count::::::::::::", count, testId.String())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get count of already generated reports"})
+		return
+	}
+
+	if count != 0 {
+		c.IndentedJSON(http.StatusAlreadyReported, gin.H{"message": "report is already generated for test id"})
+		return
+	}
+
 	scoresAndQuestions, err := controller.FetchScoresWithQuestions(testId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch scores and questions"})
@@ -118,16 +139,6 @@ func handleReportGeneration(c *gin.Context) {
 	}
 
 	processedScores := controller.CalculateProcessedScore(scoresAndQuestions)
-
-	reportAlreadyGenerated := []models.Test{}
-
-	if len(reportAlreadyGenerated) != 0 {
-		// Report already exit
-		// Fetch the existing report using testId
-		// Send to gcp to create report
-		c.IndentedJSON(http.StatusOK, processedScores)
-		return
-	}
 
 	newDbReports := map[string]models.Report{}
 
@@ -221,7 +232,7 @@ func handleReportGeneration(c *gin.Context) {
 	API.SendBIG5Report(user.Email, "./"+reportPdfFilename+".pdf")
 	// TODO handle error
 
-	log.Println("Summited sucessfully", combinedDBReports)
+	log.Println("Submmited sucessfully", combinedDBReports)
 
 	var docs []interface{}
 	for _, q := range combinedDBReports {
@@ -405,6 +416,44 @@ func main() {
 
 	// Start server
 	router.GET("/testprompt", getPrompt)
-	// Start the server on localhost:8080
-	router.Run("localhost:8080")
+	// Health check route
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "healthy"})
+	})
+
+	gin.SetMode(gin.ReleaseMode)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // fallback to port 8080 if not set
+	}
+
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
+	}
+
+	// Start server in a goroutine
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+
+	log.Println("Shutting down server...")
+
+	// Timeout for graceful shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown:", err)
+	}
+
+	log.Println("Server exiting")
 }

@@ -154,7 +154,7 @@ func CalculateProcessedScore(scoreQuestions []ScoreQuestion) []Domain {
 		}
 
 		domainIntensity := calculateDomainIntensity(domainScore)
-		domains = append(domains, Domain{domainName, domainScore, processedSubdomains, testId, userId, domainIntensity})
+		domains = append(domains, Domain{domainName, domainScore, processedSubdomains, userId, testId, domainIntensity})
 	}
 
 	return domains
