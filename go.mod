@@ -1,6 +1,6 @@
 module myproject
 
-go 1.23.2
+go 1.23
 
 require (
 	cloud.google.com/go v0.116.0 // indirect
