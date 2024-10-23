@@ -77,11 +77,6 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) e
 
 		log.Println(content)
 
-		// Add title (domain name)
-		pdf.SetFont("Arial", "B", 16)
-		pdf.Cell(0, 10, domain)
-		pdf.Ln(12)
-
 		// Add the sections for Introduction, Career & Academia, etc.
 		addContentSection(pdf, "Introduction", content.Introduction)
 		addContentSection(pdf, "Career & Academia", content.CareerAcademia)
