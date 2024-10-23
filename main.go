@@ -127,10 +127,10 @@ func handleReportGeneration(c *gin.Context) {
 		return
 	}
 
-	if count != 0 {
-		c.IndentedJSON(http.StatusAlreadyReported, gin.H{"message": "report is already generated for test id"})
-		return
-	}
+	//if count != 0 {
+	//	c.IndentedJSON(http.StatusAlreadyReported, gin.H{"message": "report is already generated for test id"})
+	//	return
+	//}
 
 	scoresAndQuestions, err := controller.FetchScoresWithQuestions(testId)
 	if err != nil {

@@ -34,10 +34,10 @@ func SendBIG5Report(to string, attachmentPath string) {
 
 func Mail() {
 
-	pdfFile := "C:\\Users\\Rishi Raj Ganguly\\cognify-api-gateway\\output_with_background.pdf"
+	pdfFile := "report.pdf"
 
 	recipientEmail := "blah@gmail.com"
 	subject := "Your Report"
-	body := "Please find attached your Extraversion report."
+	body := "Hey, here's your report!"
 	sendEmail(recipientEmail, subject, body, pdfFile)
 }

@@ -34,16 +34,6 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) e
 	width, height := 210.0, 297.0 // A4 dimensions
 	pdf.ImageOptions(coverImgPath, 0, 0, width, height, false, coverOpt, 0, "")
 
-	// Optional: Add text on the cover page (e.g., Report Title)
-	pdf.SetY(150) // Adjust as needed
-	pdf.SetFont("Arial", "B", 24)
-	pdf.Cell(0, 10, "")
-	pdf.Ln(12)
-
-	pdf.SetFont("Arial", "I", 16)
-	pdf.Cell(0, 10, "")
-	pdf.Ln(10)
-
 	// Define the domain order for the next pages
 	domains := []string{"extraversion", "neuroticism", "openness", "agreeableness", "conscientiousness"}
 
@@ -95,13 +85,14 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) e
 // Adds the title in small caps, with specific heading and body fonts
 func addContentSection(pdf *gofpdf.Fpdf, title, content string, fontSize int) {
 	// Set the heading font to Calibri bold, small caps
-	pdf.SetFont("Calibri", "B", float64(fontSize))
-	pdf.SetTextColor(0, 0, 0)
+	pdf.SetFont("Arial", "B", float64(fontSize))
+	pdf.SetTextColor(17, 45, 78)
 	pdf.Cell(40, 10, title+":") // Heading in small caps
 	pdf.Ln(8)
 
 	// Set the body font to Calibri 16 pt and add space before the content
-	pdf.SetFont("Calibri", "", 16)
+	pdf.SetFont("Arial", "", 12)
+	pdf.SetTextColor(17, 45, 78)
 	pdf.MultiCell(190, 10, content, "", "", false)
 	pdf.Ln(10) // Additional gap after the body text
 }
