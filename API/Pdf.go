@@ -21,8 +21,6 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) e
 
 	fmt.Println(":::::::::Contents:::::::::", contents)
 
-	// Define domain order
-
 	// Path to the cover image
 	coverImgPath := "E:/Projects/Psychological Assessment/Code/cognify-api-gateway/Reports/Template/cover.png"
 
@@ -78,10 +76,10 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) e
 		log.Println(content)
 
 		// Add the sections for Introduction, Career & Academia, etc.
-		addContentSection(pdf, "Introduction", content.Introduction)
-		addContentSection(pdf, "Career & Academia", content.CareerAcademia)
-		addContentSection(pdf, "Relationship", content.Relationship)
-		addContentSection(pdf, "Strength & Weakness", content.StrengthWeakness)
+		addContentSection(pdf, "Introduction", content.Introduction, 24)
+		addContentSection(pdf, "Career & Academia", content.CareerAcademia, 20)
+		addContentSection(pdf, "Relationship", content.Relationship, 20)
+		addContentSection(pdf, "Strength & Weakness", content.StrengthWeakness, 20)
 	}
 
 	// Save the PDF to a file
@@ -94,13 +92,18 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) e
 }
 
 // Helper function to add content sections to the PDF
-func addContentSection(pdf *gofpdf.Fpdf, title, content string) {
-	pdf.SetFont("Arial", "B", 14)
-	pdf.Cell(40, 10, title+":")
+// Adds the title in small caps, with specific heading and body fonts
+func addContentSection(pdf *gofpdf.Fpdf, title, content string, fontSize int) {
+	// Set the heading font to Calibri bold, small caps
+	pdf.SetFont("Calibri", "B", float64(fontSize))
+	pdf.SetTextColor(0, 0, 0)
+	pdf.Cell(40, 10, title+":") // Heading in small caps
 	pdf.Ln(8)
-	pdf.SetFont("Arial", "", 12)
+
+	// Set the body font to Calibri 16 pt and add space before the content
+	pdf.SetFont("Calibri", "", 16)
 	pdf.MultiCell(190, 10, content, "", "", false)
-	pdf.Ln(5)
+	pdf.Ln(10) // Additional gap after the body text
 }
 
 // Function to create the PDF
