@@ -19,6 +19,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"os"
+	"os/signal"
+	"time"
 	//"google.golang.org/genproto/googleapis/actions/sdk/v2/interactionmodel/prompt"
 )
 
@@ -229,7 +232,7 @@ func handleReportGeneration(c *gin.Context) {
 	API.SendBIG5Report(user.Email, "./"+reportPdfFilename+".pdf")
 	// TODO handle error
 
-	log.Println("Summited sucessfully", combinedDBReports)
+	log.Println("Submmited sucessfully", combinedDBReports)
 
 	var docs []interface{}
 	for _, q := range combinedDBReports {
@@ -413,6 +416,39 @@ func main() {
 
 	// Start server
 	router.GET("/testprompt", getPrompt)
-	// Start the server on localhost:8080
-	router.Run("localhost:8080")
+	// Health check route
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "healthy"})
+	})
+
+	gin.SetMode(gin.ReleaseMode)
+
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+
+	// Start server in a goroutine
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+
+	log.Println("Shutting down server...")
+
+	// Timeout for graceful shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown:", err)
+	}
+
+	log.Println("Server exiting")
 }
