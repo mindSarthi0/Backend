@@ -39,15 +39,15 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) e
 	// Optional: Add text on the cover page (e.g., Report Title)
 	pdf.SetY(150) // Adjust as needed
 	pdf.SetFont("Arial", "B", 24)
-	pdf.Cell(0, 10, "Big Five Personality Report")
+	pdf.Cell(0, 10, "")
 	pdf.Ln(12)
 
 	pdf.SetFont("Arial", "I", 16)
-	pdf.Cell(0, 10, "Powered by Cognify AI")
+	pdf.Cell(0, 10, "")
 	pdf.Ln(10)
 
 	// Define the domain order for the next pages
-	domains := []string{"neuroticism", "extraversion", "openness", "agreeableness", "conscientiousness"}
+	domains := []string{"extraversion", "neuroticism", "openness", "agreeableness", "conscientiousness"}
 
 	// Loop through the domains and add each one to a new page
 	for _, domain := range domains {
