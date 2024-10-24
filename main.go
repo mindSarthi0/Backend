@@ -16,7 +16,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -270,10 +270,6 @@ func getPrompt(c *gin.Context) {
 }
 
 func init() {
-	errLoadingEnv := godotenv.Load()
-	if errLoadingEnv != nil {
-		log.Fatalf("Error loading .env file")
-	}
 
 	// Setup the mgm default config
 	err := mgm.SetDefaultConfig(nil, "cognify", options.Client().ApplyURI("mongodb+srv://cognify:dEQGVwIY24QzdUu6@cluster0.cjyqt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"))
