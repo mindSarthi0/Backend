@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/generative-ai-go/genai"
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 	"google.golang.org/api/option"
 	"io"
 	"log"
@@ -77,14 +77,6 @@ func ParseMarkdownCode(markdown string) (JSONOutputFormat, error) {
 	}
 
 	return report, nil
-}
-
-func init() {
-	// Load environment variables from .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
 }
 
 // Function to make the POST request to Google API (REST-based approach)
