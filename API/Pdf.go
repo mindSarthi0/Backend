@@ -10,7 +10,7 @@ import (
 
 // Function to generate the PDF with 5 pages for Big Five domains
 // Modify to accept filename as a parameter
-func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) error {
+func GenerateBigFivePDF(contents map[string]JSONOutputFormat, name string, filename string) error {
 
 	// Create a new PDF instance
 	pdf := gofpdf.New("P", "mm", "A4", "")
@@ -19,10 +19,10 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) e
 	// Add the cover page
 	pdf.AddPage()
 
-	fmt.Println(":::::::::Contents:::::::::", contents)
+	// fmt.Println(":::::::::Contents:::::::::", contents)
 
 	// Path to the cover image
-	coverImgPath := "E:/Projects/Psychological Assessment/Code/cognify-api-gateway/Reports/Template/cover.png"
+	coverImgPath := "./Reports/Template/cover.png"
 
 	// Define image options for cover
 	coverOpt := gofpdf.ImageOptions{
@@ -43,7 +43,7 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) e
 		pdf.AddPage()
 
 		// Construct the correct image path (use forward slashes for Go)
-		imgPath := fmt.Sprintf("E:/Projects/Psychological Assessment/Code/cognify-api-gateway/Reports/Template/%s.png", domain)
+		imgPath := fmt.Sprintf("./Reports/Template/%s.png", domain)
 
 		// Define image options (e.g., scaling and positioning)
 		opt := gofpdf.ImageOptions{
@@ -63,7 +63,7 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) e
 		// Set some Y offset after the image to start the text content
 		pdf.SetY(50) // Adjust based on your needs
 
-		log.Println(content)
+		// log.Println(content)
 
 		// Add the sections for Introduction, Career & Academia, etc.
 		addContentSection(pdf, "Introduction", content.Introduction, 24)
@@ -75,6 +75,7 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, filename string) e
 	// Save the PDF to a file
 	pdfFilename := filename + ".pdf"
 	err := pdf.OutputFileAndClose(pdfFilename)
+	println("PDF generation error", err)
 	if err != nil {
 		return err
 	}
@@ -137,7 +138,7 @@ func CreatePDF() {
 	filename := "BigFiveReport"
 
 	// Generate the PDF with the filename passed as a second argument
-	err := GenerateBigFivePDF(contents, filename)
+	err := GenerateBigFivePDF(contents, "User name", filename)
 	if err != nil {
 		log.Fatalf("Failed to generate PDF: %v", err)
 	}

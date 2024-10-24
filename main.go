@@ -10,7 +10,9 @@ import (
 	"myproject/models"
 	"myproject/response"
 	"net/http"
-	"strconv"
+	"os"
+	"os/signal"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -19,14 +21,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"os/signal"
-	"time"
-	//"google.golang.org/genproto/googleapis/actions/sdk/v2/interactionmodel/prompt"
 )
 
 // Handle test submissions
-func handleTestSubmission(c *gin.Context) {
+func handleSubmission(c *gin.Context) {
 	var submission response.Submit
 
 	if err := c.ShouldBindJSON(&submission); err != nil {
@@ -47,10 +45,10 @@ func handleTestSubmission(c *gin.Context) {
 		existingUsers = append(existingUsers, *newUser)
 	}
 
-	userId := existingUsers[0].ID
+	user := existingUsers[0]
 
 	// Create a new test entry
-	newTest := models.NewTest("BIG_5", userId, "PENDING", "https://google.com")
+	newTest := models.NewTest("BIG_5", user.ID, "PENDING", "https://google.com")
 	if err := mgm.Coll(&models.Test{}).Create(newTest); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create test"})
 		return
@@ -64,7 +62,7 @@ func handleTestSubmission(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid question ID"})
 			return
 		}
-		scoreDocs = append(scoreDocs, *models.NewScore(userId, questionId, answer.Answer, newTest.ID))
+		scoreDocs = append(scoreDocs, *models.NewScore(user.ID, questionId, answer.Answer, newTest.ID))
 	}
 
 	var docs []interface{}
@@ -78,6 +76,9 @@ func handleTestSubmission(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store scores"})
 		return
 	}
+
+	// TODO add logger
+	go controller.GenerateNewReport(c, newTest.ID.Hex(), user)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Submission successful"})
 }
@@ -121,132 +122,24 @@ func handleReportGeneration(c *gin.Context) {
 
 	count, err := mgm.Coll(&models.Report{}).CountDocuments(context.TODO(), filter)
 
-	println("::::::::::::::count::::::::::::", count, testId.String())
 	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
+
+	if count != 0 {
+		c.IndentedJSON(http.StatusAlreadyReported, gin.H{"message": "report is already generated for test id"})
+		return
+	}
+
+	errFromRequest := controller.GenerateNewReport(c, test.ID.String(), user)
+
+	if errFromRequest != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get count of already generated reports"})
 		return
 	}
 
-	//if count != 0 {
-	//	c.IndentedJSON(http.StatusAlreadyReported, gin.H{"message": "report is already generated for test id"})
-	//	return
-	//}
-
-	scoresAndQuestions, err := controller.FetchScoresWithQuestions(testId)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch scores and questions"})
-		return
-	}
-
-	processedScores := controller.CalculateProcessedScore(scoresAndQuestions)
-
-	newDbReports := map[string]models.Report{}
-
-	prompts := map[string]string{}
-
-	for domain, value := range processedScores {
-
-		fmt.Println("Domain and Value:", domain, value)
-		newSubdomainReports := []models.Subdomain{}
-
-		_domainName := value.Name
-		_domainScore := value.Score
-		_domainIntensity := value.Intensity
-
-		for _, value := range value.Subdomain {
-			newDbSubdomain := models.NewSubdomain(value.Name, value.Score, value.Intensity)
-			newSubdomainReports = append(newSubdomainReports, *newDbSubdomain)
-		}
-
-		// TODO do error handling
-		s1 := strconv.Itoa(newSubdomainReports[0].Score)
-		s2 := strconv.Itoa(newSubdomainReports[1].Score)
-		s3 := strconv.Itoa(newSubdomainReports[2].Score)
-		s4 := strconv.Itoa(newSubdomainReports[3].Score)
-		s5 := strconv.Itoa(newSubdomainReports[4].Score)
-		s6 := strconv.Itoa(newSubdomainReports[5].Score)
-
-		// TODO create a better interface here
-		prompt := API.CreatePrompt(_domainName, strconv.Itoa(_domainScore), s1, s2, s3, s4, s5, s6)
-
-		prompts[_domainName] = prompt
-
-		newDbReport := models.NewReport(value.Name, value.Score, newSubdomainReports, value.UserId, value.TestId, _domainIntensity, "")
-		newDbReports[_domainName] = *newDbReport
-	}
-
-	// Now prompt generation starts
-	channel := make(chan API.GeminiPromptRequest)
-
-	for domain, prompt := range prompts {
-		go API.WorkerGCPGemini(domain, prompt, channel)
-	}
-
-	results := map[string]string{}
-
-	for range newDbReports {
-		result := <-channel // Read the result from the channel
-		// TODO add failure case
-		// TODO added generated result to db
-		// results[result] = result.Candidates[0].Content.Parts[0].Text
-		results[result.Id] = result.Response.Candidates[0].Content.Parts[0].Text
-	}
-
-	combinedDBReports := map[string]models.Report{}
-
-	pdfGenerationContent := map[string]API.JSONOutputFormat{}
-
-	for domain, value := range newDbReports {
-
-		// TODO add failure case
-		// TODO added generated result to db
-		// results[result] = result.Candidates[0].Content.Parts[0].Text
-
-		generatedResponseString := results[domain]
-
-		combinedDBReport := models.NewReport(value.Name, value.Score, value.Subdomain, value.UserId, value.TestId, value.Intensity, generatedResponseString)
-
-		formatedJson, err := API.ParseMarkdownCode(generatedResponseString)
-
-		if err != nil {
-			// Respond with an error message if content generation failed
-		}
-
-		log.Println("Formated JSON", formatedJson.Introduction)
-		pdfGenerationContent[domain] = formatedJson
-
-		combinedDBReports[domain] = *combinedDBReport
-	}
-
-	// TODO save to db, MAKE SURE YOU ARE CHECKING THE DOMAIN NAME CORRECTLY
-	// TODO generate content from from GCP
-	// reportDbColumn := mgm.Coll(&models.Report{})
-
-	log.Println("Generating PDF")
-
-	reportPdfFilename := "report_" + reportRequest.TestId
-	API.GenerateBigFivePDF(pdfGenerationContent, reportPdfFilename)
-	// TODO handle error
-
-	log.Println("Sending Report via Email to user")
-	API.SendBIG5Report(user.Email, "./"+reportPdfFilename+".pdf")
-	// TODO handle error
-
-	log.Println("Submmited sucessfully", combinedDBReports)
-
-	var docs []interface{}
-	for _, q := range combinedDBReports {
-		docs = append(docs, q) // Add each question as an interface{}
-	}
-
-	responseDb, err := mgm.Coll(&models.Report{}).InsertMany(c, docs)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert questions"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": responseDb})
+	c.JSON(http.StatusOK, gin.H{"message": "Report generated successfully"})
 }
 
 // Fetch all questions
@@ -328,7 +221,7 @@ func generatepdf(c *gin.Context) {
 		},
 	}
 
-	API.GenerateBigFivePDF(testContent, "report")
+	API.GenerateBigFivePDF(testContent, "User name", "report")
 }
 
 func testMail(c *gin.Context) {
@@ -407,7 +300,7 @@ func main() {
 	// Routes
 	router.POST("/questions", submitQuestions)
 	router.GET("/questions", fetchAllQuestions)
-	router.POST("/submit", handleTestSubmission)
+	router.POST("/submit", handleSubmission)
 	router.GET("/report", handleReportGeneration)
 	//Pdf test route
 	router.POST("/pdf", creatingPdf)
