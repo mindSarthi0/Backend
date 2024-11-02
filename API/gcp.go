@@ -419,6 +419,8 @@ func WorkerGCPGemini(id string, prompt string, channel chan GeminiPromptRequest)
 	result, err := GenerateContentFromTextGCPJSON(prompt)
 	if err != nil {
 		// Respond with an error message if content generation failed
+		log.Println("Error on generating content from GCP", err)
+
 	}
 
 	resultWithId := GeminiPromptRequest{id, *result}

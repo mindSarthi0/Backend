@@ -3,19 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"log"
 	"myproject/API"
 	"myproject/controller"
-	"myproject/lib"
 	"myproject/models"
 	"myproject/response"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
-
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	// "github.com/joho/godotenv"
 	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
@@ -229,7 +227,7 @@ func testMail(c *gin.Context) {
 }
 
 func creatingPdf(c *gin.Context) {
-	lib.CreatePdfWithBg()
+	API.CreatePDF()
 }
 
 func getPrompt(c *gin.Context) {

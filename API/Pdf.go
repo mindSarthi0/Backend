@@ -22,7 +22,7 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, name string, filen
 	// fmt.Println(":::::::::Contents:::::::::", contents)
 
 	// Path to the cover image
-	coverImgPath := "./Reports/Template/cover.png"
+	coverImgPath := "./Reports/Template/cover_1.png"
 
 	// Define image options for cover
 	coverOpt := gofpdf.ImageOptions{
@@ -43,7 +43,7 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, name string, filen
 		pdf.AddPage()
 
 		// Construct the correct image path (use forward slashes for Go)
-		imgPath := fmt.Sprintf("./Reports/Template/%s.png", domain)
+		imgPath := fmt.Sprintf("./Reports/Template/%s_1.png", domain)
 
 		// Define image options (e.g., scaling and positioning)
 		opt := gofpdf.ImageOptions{
@@ -75,8 +75,9 @@ func GenerateBigFivePDF(contents map[string]JSONOutputFormat, name string, filen
 	// Save the PDF to a file
 	pdfFilename := filename + ".pdf"
 	err := pdf.OutputFileAndClose(pdfFilename)
-	println("PDF generation error", err)
+
 	if err != nil {
+		println("PDF generation error", err)
 		return err
 	}
 	return nil

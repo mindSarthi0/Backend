@@ -27,6 +27,8 @@ WORKDIR /app
 # Copy the Go binary from the builder stage
 COPY --from=builder /app/main .
 
+COPY --from=builder /app/Reports ./Reports
+
 # Expose the application port (optional, but not required for Cloud Run)
 EXPOSE 8080
 
