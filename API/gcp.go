@@ -55,17 +55,17 @@ func ParseMarkdownCode(markdown string) (JSONOutputFormat, error) {
 	// Define the struct to store the parsed data
 	var report JSONOutputFormat
 
-	// // Extract the JSON part (between the "```json" block)
-	// start := strings.Index(markdown, "```json")
-	// end := strings.LastIndex(markdown, "```")
+	// Extract the JSON part (between the "```json" block)
+	start := strings.Index(markdown, "```json")
+	end := strings.LastIndex(markdown, "```")
 
-	// if start == -1 || end == -1 {
-	// 	return report, fmt.Errorf("invalid markdown format")
-	// }
+	if start == -1 || end == -1 {
+		return report, fmt.Errorf("invalid markdown format")
+	}
 
 	// // Extract the JSON part and trim spaces
-	// jsonPart := markdown[start+len("```json") : end]
-	jsonPart := strings.TrimSpace(markdown)
+	jsonPart := markdown[start+len("```json") : end]
+	// jsonPart := strings.TrimSpace(markdown)
 
 	// Remove all newlines
 	jsonPart = strings.ReplaceAll(jsonPart, "\n", "")
@@ -301,7 +301,7 @@ func CreatePromptExtraversion(d string, ds string, s1 string, s2 string, s3 stri
 	  Excitement Seeking: %s
 	  Cheerfulness: %s
 	
-	Create a personalised BIG5 Personality Assessment Report. Just give JSON format as given in 'OUTPUT FORMAT' for the Domain: %s, while taking insight from subdomain score.
+	Create a personalised BIG5 Personality Assessment Report. Just give JSON format as given in 'OUTPUT FORMAT', NO MARKDOWN, for the Domain: %s, while taking insight from subdomain score.
 	Keep the Structure as follows:
 	Introduction in 100 words: Explain the trait and its impact on the client's experiences:::
 	Career & Academia in 40 words: Impact on client's professional & student life:::
@@ -332,7 +332,7 @@ func CreatePromptOpenness(d string, ds string, s1 string, s2 string, s3 string, 
 	  Intellect: %s
 	  Liberalism: %s
 	
-	Create a personalised BIG5 Personality Assessment Report in JSON format for the Domain: %s, while taking insight from subdomain score.
+	Create a personalised BIG5 Personality Assessment Report. Just give JSON format as given in 'OUTPUT FORMAT', NO MARKDOWN, the Domain: %s, while taking insight from subdomain score.
 	Keep the Structure as follows:
 	Introduction in 100 words: Explain the trait and its impact on the client's experiences:::
 	Career & Academia in 40 words: Impact on client's professional & student life:::
@@ -361,7 +361,7 @@ func CreatePromptAgreeableness(d string, ds string, s1 string, s2 string, s3 str
 	  Modesty: %s
 	  Sympathy: %s
 	
-	Create a personalised BIG5 Personality Assessment Report in JSON format for the Domain: %s, while taking insight from subdomain score.
+	Create a personalised BIG5 Personality Assessment Report. Just give JSON format as given in 'OUTPUT FORMAT', NO MARKDOWN, for the Domain: %s, while taking insight from subdomain score.
 	Keep the Structure as follows:
 	Introduction in 100 words: Explain the trait and its impact on the client's experiences:::
 	Career & Academia in 40 words: Impact on client's professional & student life:::
@@ -390,7 +390,7 @@ func CreatePromptConscientiousness(d string, ds string, s1 string, s2 string, s3
 	  Self Discipline: %s
 	  Cautiousness: %s
 	
-	Create a personalised BIG5 Personality Assessment Report in JSON format for the Domain: %s, while taking insight from subdomain score.
+	Create a personalised BIG5 Personality Assessment Report. Just give JSON format as given in 'OUTPUT FORMAT', NO MARKDOWN,for the Domain: %s, while taking insight from subdomain score.
 	Keep the Structure as follows:
 	Introduction in 100 words: Explain the trait and its impact on the client's experiences:::
 	Career & Academia in 40 words: Impact on client's professional & student life:::

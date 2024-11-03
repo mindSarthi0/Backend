@@ -130,7 +130,7 @@ func handleReportGeneration(c *gin.Context) {
 		return
 	}
 
-	errFromRequest := controller.GenerateNewReport(c, test.ID.String(), user)
+	errFromRequest := controller.GenerateNewReport(c, testId.Hex(), user)
 
 	if errFromRequest != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get count of already generated reports"})

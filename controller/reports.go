@@ -22,7 +22,6 @@ func GenerateNewReport(c *gin.Context, testIdString string, user models.User) *M
 
 	testId, err := primitive.ObjectIDFromHex(testIdString)
 
-	log.Println("Test Id String:", testIdString)
 	startTime := time.Second
 	scoresAndQuestions, err := FetchScoresWithQuestions(testId)
 
