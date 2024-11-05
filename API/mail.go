@@ -12,7 +12,7 @@ func sendEmail(to string, subject string, body string, attachmentPath string) {
 	m := mail.NewMessage()
 
 	// Set email sender, receiver, subject, and body
-	m.SetHeader("From", "cognify@duinvites.com") // Change this to your Zoho email
+	m.SetHeader("From", "nitish@mindsarthi.com") // Change this to your Zoho email
 	m.SetHeader("To", to)                        // Recipient's email address
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", body)
@@ -21,7 +21,7 @@ func sendEmail(to string, subject string, body string, attachmentPath string) {
 	m.Attach(attachmentPath)
 
 	// Configure Zoho SMTP settings
-	d := mail.NewDialer("smtp.zoho.in", 587, "cognify@duinvites.com", "duM7zATwBkKd") //
+	d := mail.NewDialer("smtp.zoho.in", 587, "nitish@mindsarthi.com", "hRBT5EUUq9ei") //
 
 	sendEmailWithRetry(m, 3, d)
 
@@ -70,7 +70,7 @@ func SendBIG5Report(to string, name string, attachmentPath string) {
         <li>Practical tips for personal growth and development</li>
       </ul>
       <p style="color: black;">By understanding your personality, you can gain valuable insights that can enhance your personal and professional life.</p>
-      <p style="color: black;">Thank you for choosing <strong>COGNIFY</strong>. We wish you the best in your journey of self-discovery!</p>
+      <p style="color: black;">Thank you for choosing <strong>Mind Sarthi</strong>. We wish you the best in your journey of self-discovery!</p>
       <p style="color: black;">Best regards,<br>Nitish</p>
     `, name)
 
