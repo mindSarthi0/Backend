@@ -46,7 +46,7 @@ func handleSubmission(c *gin.Context) {
 	user := existingUsers[0]
 
 	// Create a new test entry
-	newTest := models.NewTest(submission.Name, submission.Age, "BIG_5", user.ID, "PENDING", "https://google.com")
+	newTest := models.NewTest(submission.Name, submission.Age, submission.Gender, "BIG_5", user.ID, "PENDING", "https://google.com")
 	if err := mgm.Coll(&models.Test{}).Create(newTest); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create test"})
 		return
