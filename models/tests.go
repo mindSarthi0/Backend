@@ -10,18 +10,22 @@ type Test struct {
 	// DefaultModel includes the MongoDB ID (_id), createdAt, and updatedAt fields.
 	mgm.DefaultModel `bson:",inline"`
 
-	TestName    string             `json:"testName" bson:"testName"` // Name of the test
-	UserId      primitive.ObjectID `json:"userId" bson:"userId"`     // The actual question text
-	Paid        string             `json:"paid" bson:"paid"`
-	PaymentLink string             `json:"paymentLink" bson:"paymentLink"`
+	TestGiver    string             `json:"testGiven" bson:"testGiven"`
+	TestGiverAge int                `json:"testGiverAge" bson:"testGiverAge"`
+	TestName     string             `json:"testName" bson:"testName"` // Name of the test
+	UserId       primitive.ObjectID `json:"userId" bson:"userId"`     // The actual question text
+	Paid         string             `json:"paid" bson:"paid"`
+	PaymentLink  string             `json:"paymentLink" bson:"paymentLink"`
 }
 
 // NewQuestion creates a new instance of the Question model
-func NewTest(testName string, userId primitive.ObjectID, paid string, paymentLink string) *Test {
+func NewTest(testGiver string, testGiverAge int, testName string, userId primitive.ObjectID, paid string, paymentLink string) *Test {
 	return &Test{
-		TestName:    testName,
-		UserId:      userId,
-		Paid:        paid,
-		PaymentLink: paymentLink,
+		TestGiverAge: testGiverAge,
+		TestGiver:    testGiver,
+		TestName:     testName,
+		UserId:       userId,
+		Paid:         paid,
+		PaymentLink:  paymentLink,
 	}
 }

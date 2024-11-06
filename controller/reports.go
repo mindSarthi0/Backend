@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kamva/mgm/v3"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"myproject/API"
 	"myproject/models"
@@ -18,12 +17,10 @@ type MyError struct {
 	Message string
 }
 
-func GenerateNewReport(c *gin.Context, testIdString string, user models.User) *MyError {
-
-	testId, err := primitive.ObjectIDFromHex(testIdString)
+func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyError {
 
 	startTime := time.Second
-	scoresAndQuestions, err := FetchScoresWithQuestions(testId)
+	scoresAndQuestions, err := FetchScoresWithQuestions(test.ID)
 
 	if err != nil {
 		return &MyError{
@@ -122,7 +119,7 @@ func GenerateNewReport(c *gin.Context, testIdString string, user models.User) *M
 	log.Println("Generating PDF")
 
 	startTime = time.Second
-	reportPdfFilename := "report_" + testIdString
+	reportPdfFilename := "report_" + test.ID.Hex()
 	errInPdfGeneration := API.GenerateBigFivePDF(pdfGenerationContent, user.Name, reportPdfFilename)
 
 	if errInPdfGeneration != nil {
@@ -137,7 +134,7 @@ func GenerateNewReport(c *gin.Context, testIdString string, user models.User) *M
 
 	startTime = time.Second
 	log.Println("Sending Report via Email to user")
-	API.SendBIG5Report(user.Email, user.Name, "./"+reportPdfFilename+".pdf")
+	API.SendBIG5Report(user.Email, test.TestGiver, "./"+reportPdfFilename+".pdf")
 
 	fmt.Println("Time taken to send email", time.Second-startTime)
 
