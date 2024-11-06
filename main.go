@@ -46,7 +46,7 @@ func handleSubmission(c *gin.Context) {
 	user := existingUsers[0]
 
 	// Create a new test entry
-	newTest := models.NewTest("BIG_5", user.ID, "PENDING", "https://google.com")
+	newTest := models.NewTest(submission.Name, submission.Age, submission.Gender, "BIG_5", user.ID, "PENDING", "https://google.com")
 	if err := mgm.Coll(&models.Test{}).Create(newTest); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create test"})
 		return
@@ -76,7 +76,8 @@ func handleSubmission(c *gin.Context) {
 	}
 
 	// TODO add logger
-	go controller.GenerateNewReport(c, newTest.ID.Hex(), user)
+	// TODO Make this generic enouch so that it can generate Report for muliple Report
+	go controller.GenerateNewReport(c, *newTest, user)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Submission successful"})
 }
@@ -130,7 +131,7 @@ func handleReportGeneration(c *gin.Context) {
 		return
 	}
 
-	errFromRequest := controller.GenerateNewReport(c, testId.Hex(), user)
+	errFromRequest := controller.GenerateNewReport(c, test, user)
 
 	if errFromRequest != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get count of already generated reports"})
