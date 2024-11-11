@@ -42,18 +42,10 @@ type ContentResponse struct {
 	} `json:"usageMetadata"`
 }
 
-// Struct to match the JSON structure
-type JSONOutputFormat struct {
-	Introduction     string `json:"Introduction"`
-	CareerAcademia   string `json:"CareerAcademia"`
-	Relationship     string `json:"Relationship"`
-	StrengthWeakness string `json:"StrengthWeakness"`
-}
-
 // Function to parse markdown code and extract JSON
-func ParseMarkdownCode(markdown string) (JSONOutputFormat, error) {
+func ParseMarkdownCode(markdown string) (string, error) {
 	// Define the struct to store the parsed data
-	var report JSONOutputFormat
+	var report string
 
 	// Extract the JSON part (between the "```json" block)
 	start := strings.Index(markdown, "```json")
@@ -247,20 +239,142 @@ func GenerateContentFromTextGCPJSON(prompt string) (*ContentResponse, error) {
 	return &contentResponse, nil
 }
 
-func CreatePrompt(d string, ds string, s1 string, s2 string, s3 string, s4 string, s5 string, s6 string) string {
-	switch d {
-	case "neuroticism":
-		return CreatePromptNeuroticism(d, ds, s1, s2, s3, s4, s5, s6)
-	case "extraversion":
-		return CreatePromptExtraversion(d, ds, s1, s2, s3, s4, s5, s6)
-	case "openness":
-		return CreatePromptOpenness(d, ds, s1, s2, s3, s4, s5, s6)
-	case "agreeableness":
-		return CreatePromptAgreeableness(d, ds, s1, s2, s3, s4, s5, s6)
-	case "conscientiousness":
-		return CreatePromptConscientiousness(d, ds, s1, s2, s3, s4, s5, s6)
+// func CreatePrompt(d string, ds string, s1 string, s2 string, s3 string, s4 string, s5 string, s6 string) string {
+// 	switch d {
+// 	case "neuroticism":
+// 		return CreatePromptNeuroticism(d, ds, s1, s2, s3, s4, s5, s6)
+// 	case "extraversion":
+// 		return CreatePromptExtraversion(d, ds, s1, s2, s3, s4, s5, s6)
+// 	case "openness":
+// 		return CreatePromptOpenness(d, ds, s1, s2, s3, s4, s5, s6)
+// 	case "agreeableness":
+// 		return CreatePromptAgreeableness(d, ds, s1, s2, s3, s4, s5, s6)
+// 	case "conscientiousness":
+// 		return CreatePromptConscientiousness(d, ds, s1, s2, s3, s4, s5, s6)
+// 	}
+// 	return ""
+// }
+
+func CreatePrompt(page string, score []Domain) string {
+	switch page {
+	case "result":
+		return CreatePromptResult(score)
+	case "relationship":
+		return CreatePromptRelationship(score)
+	case "career_academic":
+		return CreatePromptCareerAcademic(score)
+	case "strength_weakness":
+		return CreatePromptStrengthWeakness(score)
 	}
+
 	return ""
+}
+
+func CreatePromptResult(score []Domain) string {
+	prompt := fmt.Sprintf(`Domain: Neuroticism: 
+	Subdomains-
+	  Anxiety: 3
+	  Anger: 5
+	  Depression: 3
+	  Self-consciousness:1 
+	  Immoderation: 2
+	  Vulnerability:2
+	
+	Create a personalised BIG5 Personality Assessment Report. Just give JSON format as given in 'OUTPUT FORMAT' for the Domain, while taking insight from subdomain score.
+	Keep the Structure as follows:
+	Introduction in 100 words: Explain the trait and its impact on the client's experiences:::
+	Career & Academia in 40 words: Impact on client's professional & student life:::
+	Relationship in 40 words: Impact on Client's Personal Relationships:::
+	Strength & Weakness in 40 words: Highlight the client's strengths and areas for growth, focusing on positivity and potential:::
+	OUTPUT FORMAT: {
+	Introduction":"<content>",
+	CareerAcademia":"<content>",
+	Relationship":"<content>",
+	StrengthWeakness":"<content>"
+	}`)
+
+	return prompt
+}
+
+func CreatePromptRelationship(score []Domain) string {
+
+	prompt := fmt.Sprintf(`Domain: Neuroticism: 
+	Subdomains-
+	  Anxiety: 3
+	  Anger: 5
+	  Depression: 3
+	  Self-consciousness:1 
+	  Immoderation: 2
+	  Vulnerability:2
+	
+	Create a personalised BIG5 Personality Assessment Report. Just give JSON format as given in 'OUTPUT FORMAT' for the Domain, while taking insight from subdomain score.
+	Keep the Structure as follows:
+	Introduction in 100 words: Explain the trait and its impact on the client's experiences:::
+	Career & Academia in 40 words: Impact on client's professional & student life:::
+	Relationship in 40 words: Impact on Client's Personal Relationships:::
+	Strength & Weakness in 40 words: Highlight the client's strengths and areas for growth, focusing on positivity and potential:::
+	OUTPUT FORMAT: {
+	Introduction":"<content>",
+	CareerAcademia":"<content>",
+	Relationship":"<content>",
+	StrengthWeakness":"<content>"
+	}`)
+
+	return prompt
+}
+
+func CreatePromptCareerAcademic(score []Domain) string {
+
+	prompt := fmt.Sprintf(`Domain: Neuroticism: 
+	Subdomains-
+	  Anxiety: 3
+	  Anger: 5
+	  Depression: 3
+	  Self-consciousness:1 
+	  Immoderation: 2
+	  Vulnerability:2
+	
+	Create a personalised BIG5 Personality Assessment Report. Just give JSON format as given in 'OUTPUT FORMAT' for the Domain, while taking insight from subdomain score.
+	Keep the Structure as follows:
+	Introduction in 100 words: Explain the trait and its impact on the client's experiences:::
+	Career & Academia in 40 words: Impact on client's professional & student life:::
+	Relationship in 40 words: Impact on Client's Personal Relationships:::
+	Strength & Weakness in 40 words: Highlight the client's strengths and areas for growth, focusing on positivity and potential:::
+	OUTPUT FORMAT: {
+	Introduction":"<content>",
+	CareerAcademia":"<content>",
+	Relationship":"<content>",
+	StrengthWeakness":"<content>"
+	}`)
+
+	return prompt
+}
+
+func CreatePromptStrengthWeakness(score []Domain) string {
+
+	prompt := fmt.Sprintf(`Domain: Neuroticism: 
+	Subdomains-
+	  Anxiety: 3
+	  Anger: 5
+	  Depression: 3
+	  Self-consciousness:1 
+	  Immoderation: 2
+	  Vulnerability:2
+	
+	Create a personalised BIG5 Personality Assessment Report. Just give JSON format as given in 'OUTPUT FORMAT' for the Domain, while taking insight from subdomain score.
+	Keep the Structure as follows:
+	Introduction in 100 words: Explain the trait and its impact on the client's experiences:::
+	Career & Academia in 40 words: Impact on client's professional & student life:::
+	Relationship in 40 words: Impact on Client's Personal Relationships:::
+	Strength & Weakness in 40 words: Highlight the client's strengths and areas for growth, focusing on positivity and potential:::
+	OUTPUT FORMAT: {
+	Introduction":"<content>",
+	CareerAcademia":"<content>",
+	Relationship":"<content>",
+	StrengthWeakness":"<content>"
+	}`)
+
+	return prompt
 }
 
 func CreatePromptNeuroticism(d string, ds string, s1 string, s2 string, s3 string, s4 string, s5 string, s6 string) string {

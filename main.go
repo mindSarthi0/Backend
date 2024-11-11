@@ -187,40 +187,14 @@ func submitQuestions(c *gin.Context) {
 }
 
 func generatepdf(c *gin.Context) {
-	testContent := map[string]API.JSONOutputFormat{
-		"neuroticism": {
-			Introduction:     "This is intro to BIG 5",
-			CareerAcademia:   "Please check with career councellor",
-			Relationship:     "Good with relationship",
-			StrengthWeakness: "Good with undertanding Black and White thinking",
-		},
-		"extraversion": {
-			Introduction:     "This is intro to BIG 5",
-			CareerAcademia:   "Please check with career councellor",
-			Relationship:     "Good with relationship",
-			StrengthWeakness: "Good with undertanding Black and White thinking",
-		},
-		"openness": {
-			Introduction:     "This is intro to BIG 5",
-			CareerAcademia:   "Please check with career councellor",
-			Relationship:     "Good with relationship",
-			StrengthWeakness: "Good with undertanding Black and White thinking",
-		},
-		"agreeableness": {
-			Introduction:     "This is intro to BIG 5",
-			CareerAcademia:   "Please check with career councellor",
-			Relationship:     "Good with relationship",
-			StrengthWeakness: "Good with undertanding Black and White thinking",
-		},
-		"conscientiousness": {
-			Introduction:     "This is intro to BIG 5",
-			CareerAcademia:   "Please check with career councellor",
-			Relationship:     "Good with relationship",
-			StrengthWeakness: "Good with undertanding Black and White thinking",
-		},
+	testContent := map[string]string{
+		"strength_weakness": "Abcd efgh",
+		"result":            "result vsdc sdsdcs csdcdsc svd",
+		"relationship":      "relationship adsad cdacsa",
+		"career_academic":   "career_academic vdfv dfvdfv",
 	}
 
-	API.GenerateBigFivePDF(testContent, "User name", "report")
+	API.GenerateBigFivePDF(testContent, "user_name_ppp", "report")
 }
 
 func testMail(c *gin.Context) {
@@ -232,40 +206,46 @@ func creatingPdf(c *gin.Context) {
 }
 
 func getPrompt(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully"})
+	// var values = map[string][]string{
+	// 	"neuroticism": {"7", "4", "6", "5", "8", "6", "4"},
+	// 	"extraversion": {"3", "5", "2", "6", "6", "2", "3"},
+	// 	"openness": {"7", "4", "6", "5", "8", "6", "4"},
+	// 	"agreeableness": {"7", "4", "6", "5", "8", "6", "4"},
+	// 	"conscientiousness": {"7", "4", "6", "5", "8", "6", "4"}
+	// }
 
-	var values = map[string][]string{"neuroticism": {"7", "4", "6", "5", "8", "6", "4"}, "extraversion": {"3", "5", "2", "6", "6", "2", "3"}, "openness": {"7", "4", "6", "5", "8", "6", "4"}, "agreeableness": {"7", "4", "6", "5", "8", "6", "4"}, "conscientiousness": {"7", "4", "6", "5", "8", "6", "4"}}
+	// prompts := map[string]string{}
 
-	prompts := map[string]string{}
+	// for domain, value := range values {
+	// 	prompt := API.CreatePrompt(domain, value[0], value[1], value[2], value[3], value[4], value[5], value[6])
+	// 	prompts[domain] = prompt
+	// }
 
-	for domain, value := range values {
-		promt := API.CreatePrompt(domain, value[0], value[1], value[2], value[3], value[4], value[5], value[6])
-		prompts[domain] = promt
-	}
+	// channel := make(chan API.GeminiPromptRequest)
 
-	channel := make(chan API.GeminiPromptRequest)
+	// for domain, prompt := range prompts {
+	// 	go API.WorkerGCPGemini(domain, prompt, channel)
+	// }
 
-	for domain, prompt := range prompts {
-		go API.WorkerGCPGemini(domain, prompt, channel)
-	}
+	// results := map[string]string{}
 
-	results := map[string]string{}
+	// for range prompts {
+	// 	result := <-channel // Read the result from the channel
+	// 	// TODO add failure case
+	// 	generatedResponseString := result.Response.Candidates[0].Content.Parts[0].Text
+	// 	formatedJson, err := API.ParseMarkdownCode(generatedResponseString)
 
-	for range prompts {
-		result := <-channel // Read the result from the channel
-		// TODO add failure case
-		generatedResponseString := result.Response.Candidates[0].Content.Parts[0].Text
-		formatedJson, err := API.ParseMarkdownCode(generatedResponseString)
+	// 	if err != nil {
+	// 		// Respond with an error message if content generation failed
+	// 	}
 
-		if err != nil {
-			// Respond with an error message if content generation failed
-		}
+	// 	log.Println("Formated JSON", formatedJson.Introduction)
+	// 	results[result.Id] = generatedResponseString
+	// }
 
-		log.Println("Formated JSON", formatedJson.Introduction)
-		results[result.Id] = generatedResponseString
-	}
-
-	// Respond with a success message
-	c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": results})
+	// // Respond with a success message
+	// c.JSON(http.StatusOK, gin.H{"message": "Prompt generated successfully", "prompt": prompts, "Gemini Response": results})
 }
 
 func init() {

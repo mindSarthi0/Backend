@@ -5,10 +5,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kamva/mgm/v3"
 	"log"
-	"myproject/API"
 	"myproject/models"
 	"net/http"
-	"strconv"
+	// "strconv"
+	"myproject/API"
+	"myproject/constants"
 	"time"
 )
 
@@ -17,9 +18,11 @@ type MyError struct {
 	Message string
 }
 
+// var OutputPageMap = []string{"result", "relationship", "career_academic", "strength_weakness"}
+
 func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyError {
 
-	startTime := time.Second
+	startTime := time.Millisecond
 	scoresAndQuestions, err := FetchScoresWithQuestions(test.ID)
 
 	if err != nil {
@@ -29,7 +32,7 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 		}
 	}
 
-	fmt.Println("Time taken by Fetch Scores with Questions API calls", time.Second-startTime)
+	fmt.Println("Time taken by Fetch Scores with Questions API calls", time.Millisecond-startTime)
 	processedScores := CalculateProcessedScore(scoresAndQuestions)
 
 	newDbReports := map[string]models.Report{}
@@ -42,7 +45,7 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 		newSubdomainReports := []models.Subdomain{}
 
 		_domainName := value.Name
-		_domainScore := value.Score
+		// _domainScore := value.Score
 		_domainIntensity := value.Intensity
 
 		for _, value := range value.Subdomain {
@@ -50,34 +53,40 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 			newSubdomainReports = append(newSubdomainReports, *newDbSubdomain)
 		}
 
-		// TODO do error handling
-		s1 := strconv.Itoa(newSubdomainReports[0].Score)
-		s2 := strconv.Itoa(newSubdomainReports[1].Score)
-		s3 := strconv.Itoa(newSubdomainReports[2].Score)
-		s4 := strconv.Itoa(newSubdomainReports[3].Score)
-		s5 := strconv.Itoa(newSubdomainReports[4].Score)
-		s6 := strconv.Itoa(newSubdomainReports[5].Score)
-
-		// TODO create a better interface here
-		prompt := API.CreatePrompt(_domainName, strconv.Itoa(_domainScore), s1, s2, s3, s4, s5, s6)
-
-		prompts[_domainName] = prompt
-
 		newDbReport := models.NewReport(value.Name, value.Score, newSubdomainReports, value.UserId, value.TestId, _domainIntensity, "")
 		newDbReports[_domainName] = *newDbReport
 	}
 
-	startTime = time.Second
+	for page := range constants.BIG_5_Report {
+
+		prompt := API.CreatePrompt(constants.BIG_5_Report[page], processedScores)
+
+		prompts[constants.BIG_5_Report[page]] = prompt
+
+	}
+
+	/**
+
+	{
+		"result": promptResult,
+		"relationship": promptRelationship,
+		"career_academic" : promptCareerAcademic,
+		"strength_weakness" : promptStrengthWeakness
+	}
+
+	**/
+
+	startTime = time.Millisecond
 	// Now prompt generation starts
 	channel := make(chan API.GeminiPromptRequest)
 
-	for domain, prompt := range prompts {
-		go API.WorkerGCPGemini(domain, prompt, channel)
+	for page, prompt := range prompts {
+		go API.WorkerGCPGemini(page, prompt, channel)
 	}
 
 	results := map[string]string{}
 
-	for range newDbReports {
+	for range prompts {
 		result := <-channel // Read the result from the channel
 		// TODO add failure case
 		// TODO added generated result to db
@@ -85,31 +94,22 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 		results[result.Id] = result.Response.Candidates[0].Content.Parts[0].Text
 	}
 
-	fmt.Println("Time taken by GCP Worker to generate response from gemini", time.Second-startTime)
+	fmt.Println("Time taken by GCP Worker to generate response from gemini", time.Millisecond-startTime)
 
 	combinedDBReports := map[string]models.Report{}
 
-	pdfGenerationContent := map[string]API.JSONOutputFormat{}
+	pdfGenerationContent := map[string]string{}
 
-	for domain, value := range newDbReports {
-
-		// TODO add failure case
-		// TODO added generated result to db
-		// results[result] = result.Candidates[0].Content.Parts[0].Text
-
-		generatedResponseString := results[domain]
-
-		combinedDBReport := models.NewReport(value.Name, value.Score, value.Subdomain, value.UserId, value.TestId, value.Intensity, generatedResponseString)
-
-		formatedJson, err := API.ParseMarkdownCode(generatedResponseString)
+	for page, _ := range prompts {
+		generatedResponseString := results[page]
+		generatedContent, err := API.ParseMarkdownCode(generatedResponseString)
 
 		if err != nil {
 			// Respond with an error message if content generation failed
 		}
 
-		pdfGenerationContent[domain] = formatedJson
-
-		combinedDBReports[domain] = *combinedDBReport
+		println("page:", page, generatedContent, generatedResponseString)
+		pdfGenerationContent[page] = generatedResponseString
 	}
 
 	// TODO save to db, MAKE SURE YOU ARE CHECKING THE DOMAIN NAME CORRECTLY
