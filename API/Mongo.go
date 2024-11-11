@@ -3,22 +3,26 @@ package API
 import (
 	"context"
 	"fmt"
-	"log"
-
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 )
 
 type Subdomain struct {
-	Name  string `bson:"name"`
-	Score string `bson:"score"`
+	Name      string
+	Score     int
+	Intensity string
 }
 
 type Domain struct {
-	Name       string      `bson:"name"`
-	Score      string      `bson:"score"`
-	Subdomains []Subdomain `bson:"subdomains"`
+	Name      string
+	Score     int
+	Subdomain []Subdomain
+	UserId    primitive.ObjectID `json:"userId" bson:"userId"`
+	TestId    primitive.ObjectID `json:"testId" bson:"testId"`
+	Intensity string
 }
 
 func fetchPersonalityData(client *mongo.Client, userID string) ([]Domain, error) {

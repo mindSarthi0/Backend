@@ -2,30 +2,17 @@ package controller
 
 import (
 	"fmt"
-	"github.com/kamva/mgm/v3"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
+	"myproject/API"
 	"myproject/lib"
 	"myproject/models"
 	"sort"
 	"strconv"
+
+	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-type Domain struct {
-	Name      string
-	Score     int
-	Subdomain []Subdomain
-	UserId    primitive.ObjectID `json:"userId" bson:"userId"`
-	TestId    primitive.ObjectID `json:"testId" bson:"testId"`
-	Intensity string
-}
-
-type Subdomain struct {
-	Name      string
-	Score     int
-	Intensity string
-}
 
 type ScoreQuestion struct {
 	UserId     primitive.ObjectID `json:"userId" bson:"userId"`
@@ -77,7 +64,7 @@ func FetchScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error
 	return mergedData, nil
 }
 
-func CalculateProcessedScore(scoreQuestions []ScoreQuestion) []Domain {
+func CalculateProcessedScore(scoreQuestions []ScoreQuestion) []API.Domain {
 	rules := map[string][][]string{
 		"neuroticism": {
 			{"n1", "Anxiety", "1", "N", "2", "N"},
@@ -121,10 +108,10 @@ func CalculateProcessedScore(scoreQuestions []ScoreQuestion) []Domain {
 		},
 	}
 
-	var domains []Domain
+	var domains []API.Domain
 	for domainName, subdomains := range rules {
 		var domainScore int
-		var processedSubdomains []Subdomain
+		var processedSubdomains []API.Subdomain
 		var testId, userId primitive.ObjectID
 
 		for _, rule := range subdomains {
@@ -149,12 +136,12 @@ func CalculateProcessedScore(scoreQuestions []ScoreQuestion) []Domain {
 			score2 := scoreQuestions[cNo2-1]
 
 			_, subdomainScore, intensity := calculateSubdomainScore(subdomainName, score1.RawScore, flow1, score2.RawScore, flow2)
-			processedSubdomains = append(processedSubdomains, Subdomain{subdomainName, subdomainScore, intensity})
+			processedSubdomains = append(processedSubdomains, API.Subdomain{subdomainName, subdomainScore, intensity})
 			domainScore += subdomainScore
 		}
 
 		domainIntensity := calculateDomainIntensity(domainScore)
-		domains = append(domains, Domain{domainName, domainScore, processedSubdomains, userId, testId, domainIntensity})
+		domains = append(domains, API.Domain{domainName, domainScore, processedSubdomains, userId, testId, domainIntensity})
 	}
 
 	return domains
