@@ -1,0 +1,1 @@
+curl -X POST "http://localhost:8080/report" -H "Content-Type: application/json" -d '{ "testId": "672aff0931caafd9fe8ec9dd",}'
