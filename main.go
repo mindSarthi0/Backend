@@ -21,6 +21,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var updatedVersion = "1.0.10"
+
 // Handle test submissions
 func handleSubmission(c *gin.Context) {
 	var submission response.Submit
@@ -286,7 +288,7 @@ func main() {
 	router.GET("/testprompt", getPrompt)
 	// Health check route
 	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{"status": "healthy"})
+		c.JSON(200, gin.H{"status": "healthy v:" + updatedVersion})
 	})
 
 	gin.SetMode(gin.ReleaseMode)
