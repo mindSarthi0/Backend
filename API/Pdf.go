@@ -22,7 +22,7 @@ func GenerateBigFivePDF(contents map[string]string, name string, filename string
 	// fmt.Println(":::::::::Contents:::::::::", contents)
 
 	// Path to the cover image
-	coverImgPath := "./Reports/Template/cover_1.png"
+	coverImgPath := "./Reports/Template/co.png"
 
 	// Define image options for cover
 	coverOpt := gofpdf.ImageOptions{
@@ -33,14 +33,23 @@ func GenerateBigFivePDF(contents map[string]string, name string, filename string
 	// Insert cover image to fit the entire page
 	width, height := 210.0, 297.0 // A4 dimensions
 	pdf.ImageOptions(coverImgPath, 0, 0, width, height, false, coverOpt, 0, "")
+	pdf.SetY(108.5)
+	pdf.SetX(60)
+	pdf.SetFont("Arial", "B", 24)
+	pdf.SetTextColor(17, 45, 78)
+	if name != "" {
+		pdf.Cell(40, 10, name) // Heading in small caps
+		pdf.Ln(8)
+	}
 
-
-	pdf.
 	// Define the domain order for the next pages
 	// Loop through the domains and add each one to a new page
 	for key, value := range constants.BIG_5_Report {
 		// Add a new page for each domain
 		pdf.AddPage()
+		if err := pdf.Error(); err != nil {
+			fmt.Println("failed to add a new page: %w", err)
+		}
 
 		// Construct the correct image path (use forward slashes for Go)
 		imgPath := fmt.Sprintf("./Reports/Template/%s.png", value)
@@ -54,16 +63,22 @@ func GenerateBigFivePDF(contents map[string]string, name string, filename string
 		// Insert the image; for the whole page, set width to 210mm (A4 width) and height to 297mm (A4 height)
 		pdf.ImageOptions(imgPath, 0, 0, width, height, false, opt, 0, "")
 
+		if err := pdf.Error(); err != nil {
+			fmt.Println("failed to add image: %w", err)
+		}
+
 		// Get the content for the current domain
 		content, ok := contents[key]
 
-		println("Content:::::", key, content)
 		if !ok {
 			continue // If the domain doesn't exist in the content map, skip it
 		}
 
 		// Set some Y offset after the image to start the text content
 		pdf.SetY(50) // Adjust based on your needs
+		if err := pdf.Error(); err != nil {
+			fmt.Println("failed to set Y offset: %w", err)
+		}
 
 		// log.Println(content)
 
