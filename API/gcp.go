@@ -271,12 +271,123 @@ func CreatePrompt(page string, score []Domain) string {
 }
 
 func CreatePromptResult(score []Domain) string {
-	prompt := fmt.Sprintf("domain")
+
+	neuroticismDomain := score[0]
+
+	neuroticismScore := neuroticismDomain.Score
+
+	n1 := neuroticismDomain.Subdomain[0].Score
+	n2 := neuroticismDomain.Subdomain[1].Score
+	n3 := neuroticismDomain.Subdomain[2].Score
+	n4 := neuroticismDomain.Subdomain[3].Score
+	n5 := neuroticismDomain.Subdomain[4].Score
+	n6 := neuroticismDomain.Subdomain[5].Score
+
+	extraversionDomain := score[1]
+
+	extraversionScore := extraversionDomain.Score
+
+	e1 := extraversionDomain.Subdomain[0].Score
+	e2 := extraversionDomain.Subdomain[1].Score
+	e3 := extraversionDomain.Subdomain[2].Score
+	e4 := extraversionDomain.Subdomain[3].Score
+	e5 := extraversionDomain.Subdomain[4].Score
+	e6 := extraversionDomain.Subdomain[5].Score
+
+	opennessDomain := score[2]
+
+	opennessScore := opennessDomain.Score
+
+	o1 := opennessDomain.Subdomain[0].Score
+	o2 := opennessDomain.Subdomain[1].Score
+	o3 := opennessDomain.Subdomain[2].Score
+	o4 := opennessDomain.Subdomain[3].Score
+	o5 := opennessDomain.Subdomain[4].Score
+	o6 := opennessDomain.Subdomain[5].Score
+
+	agreeablenessDomain := score[3]
+
+	agreeablenessScore := agreeablenessDomain.Score
+
+	a1 := agreeablenessDomain.Subdomain[0].Score
+	a2 := agreeablenessDomain.Subdomain[1].Score
+	a3 := agreeablenessDomain.Subdomain[2].Score
+	a4 := agreeablenessDomain.Subdomain[3].Score
+	a5 := agreeablenessDomain.Subdomain[4].Score
+	a6 := agreeablenessDomain.Subdomain[5].Score
+
+	conscientiousnessDomain := score[4]
+
+	conscientiousnessScore := conscientiousnessDomain.Score
+
+	c1 := conscientiousnessDomain.Subdomain[0].Score
+	c2 := conscientiousnessDomain.Subdomain[1].Score
+	c3 := conscientiousnessDomain.Subdomain[2].Score
+	c4 := conscientiousnessDomain.Subdomain[3].Score
+	c5 := conscientiousnessDomain.Subdomain[4].Score
+	c6 := conscientiousnessDomain.Subdomain[5].Score
+
+	prompt := fmt.Sprintf("gftyft %s, n1 : %s    %s  ", neuroticismScore, n1)
 
 	return prompt
 }
 
 func CreatePromptCareerAcademic(score []Domain) string {
+
+	neuroticismDomain := score[0]
+
+	neuroticismScore := neuroticismDomain.Score
+
+	n1 := neuroticismDomain.Subdomain[0].Score
+	n2 := neuroticismDomain.Subdomain[1].Score
+	n3 := neuroticismDomain.Subdomain[2].Score
+	n4 := neuroticismDomain.Subdomain[3].Score
+	n5 := neuroticismDomain.Subdomain[4].Score
+	n6 := neuroticismDomain.Subdomain[5].Score
+
+	extraversionDomain := score[1]
+
+	extraversionScore := extraversionDomain.Score
+
+	e1 := extraversionDomain.Subdomain[0].Score
+	e2 := extraversionDomain.Subdomain[1].Score
+	e3 := extraversionDomain.Subdomain[2].Score
+	e4 := extraversionDomain.Subdomain[3].Score
+	e5 := extraversionDomain.Subdomain[4].Score
+	e6 := extraversionDomain.Subdomain[5].Score
+
+	opennessDomain := score[2]
+
+	opennessScore := opennessDomain.Score
+
+	o1 := opennessDomain.Subdomain[0].Score
+	o2 := opennessDomain.Subdomain[1].Score
+	o3 := opennessDomain.Subdomain[2].Score
+	o4 := opennessDomain.Subdomain[3].Score
+	o5 := opennessDomain.Subdomain[4].Score
+	o6 := opennessDomain.Subdomain[5].Score
+
+	agreeablenessDomain := score[3]
+
+	agreeablenessScore := agreeablenessDomain.Score
+
+	a1 := agreeablenessDomain.Subdomain[0].Score
+	a2 := agreeablenessDomain.Subdomain[1].Score
+	a3 := agreeablenessDomain.Subdomain[2].Score
+	a4 := agreeablenessDomain.Subdomain[3].Score
+	a5 := agreeablenessDomain.Subdomain[4].Score
+	a6 := agreeablenessDomain.Subdomain[5].Score
+
+	conscientiousnessDomain := score[4]
+
+	conscientiousnessScore := conscientiousnessDomain.Score
+
+	c1 := conscientiousnessDomain.Subdomain[0].Score
+	c2 := conscientiousnessDomain.Subdomain[1].Score
+	c3 := conscientiousnessDomain.Subdomain[2].Score
+	c4 := conscientiousnessDomain.Subdomain[3].Score
+	c5 := conscientiousnessDomain.Subdomain[4].Score
+	c6 := conscientiousnessDomain.Subdomain[5].Score
 
 	prompt := fmt.Sprintf(``)
 
@@ -285,12 +396,122 @@ func CreatePromptCareerAcademic(score []Domain) string {
 
 func CreatePromptRelationship(score []Domain) string {
 
+	neuroticismDomain := score[0]
+
+	neuroticismScore := neuroticismDomain.Score
+
+	n1 := neuroticismDomain.Subdomain[0].Score
+	n2 := neuroticismDomain.Subdomain[1].Score
+	n3 := neuroticismDomain.Subdomain[2].Score
+	n4 := neuroticismDomain.Subdomain[3].Score
+	n5 := neuroticismDomain.Subdomain[4].Score
+	n6 := neuroticismDomain.Subdomain[5].Score
+
+	extraversionDomain := score[1]
+
+	extraversionScore := extraversionDomain.Score
+
+	e1 := extraversionDomain.Subdomain[0].Score
+	e2 := extraversionDomain.Subdomain[1].Score
+	e3 := extraversionDomain.Subdomain[2].Score
+	e4 := extraversionDomain.Subdomain[3].Score
+	e5 := extraversionDomain.Subdomain[4].Score
+	e6 := extraversionDomain.Subdomain[5].Score
+
+	opennessDomain := score[2]
+
+	opennessScore := opennessDomain.Score
+
+	o1 := opennessDomain.Subdomain[0].Score
+	o2 := opennessDomain.Subdomain[1].Score
+	o3 := opennessDomain.Subdomain[2].Score
+	o4 := opennessDomain.Subdomain[3].Score
+	o5 := opennessDomain.Subdomain[4].Score
+	o6 := opennessDomain.Subdomain[5].Score
+
+	agreeablenessDomain := score[3]
+
+	agreeablenessScore := agreeablenessDomain.Score
+
+	a1 := agreeablenessDomain.Subdomain[0].Score
+	a2 := agreeablenessDomain.Subdomain[1].Score
+	a3 := agreeablenessDomain.Subdomain[2].Score
+	a4 := agreeablenessDomain.Subdomain[3].Score
+	a5 := agreeablenessDomain.Subdomain[4].Score
+	a6 := agreeablenessDomain.Subdomain[5].Score
+
+	conscientiousnessDomain := score[4]
+
+	conscientiousnessScore := conscientiousnessDomain.Score
+
+	c1 := conscientiousnessDomain.Subdomain[0].Score
+	c2 := conscientiousnessDomain.Subdomain[1].Score
+	c3 := conscientiousnessDomain.Subdomain[2].Score
+	c4 := conscientiousnessDomain.Subdomain[3].Score
+	c5 := conscientiousnessDomain.Subdomain[4].Score
+	c6 := conscientiousnessDomain.Subdomain[5].Score
+
 	prompt := fmt.Sprintf(``)
 
 	return prompt
 }
 
 func CreatePromptStrengthWeakness(score []Domain) string {
+
+	neuroticismDomain := score[0]
+
+	neuroticismScore := neuroticismDomain.Score
+
+	n1 := neuroticismDomain.Subdomain[0].Score
+	n2 := neuroticismDomain.Subdomain[1].Score
+	n3 := neuroticismDomain.Subdomain[2].Score
+	n4 := neuroticismDomain.Subdomain[3].Score
+	n5 := neuroticismDomain.Subdomain[4].Score
+	n6 := neuroticismDomain.Subdomain[5].Score
+
+	extraversionDomain := score[1]
+
+	extraversionScore := extraversionDomain.Score
+
+	e1 := extraversionDomain.Subdomain[0].Score
+	e2 := extraversionDomain.Subdomain[1].Score
+	e3 := extraversionDomain.Subdomain[2].Score
+	e4 := extraversionDomain.Subdomain[3].Score
+	e5 := extraversionDomain.Subdomain[4].Score
+	e6 := extraversionDomain.Subdomain[5].Score
+
+	opennessDomain := score[2]
+
+	opennessScore := opennessDomain.Score
+
+	o1 := opennessDomain.Subdomain[0].Score
+	o2 := opennessDomain.Subdomain[1].Score
+	o3 := opennessDomain.Subdomain[2].Score
+	o4 := opennessDomain.Subdomain[3].Score
+	o5 := opennessDomain.Subdomain[4].Score
+	o6 := opennessDomain.Subdomain[5].Score
+
+	agreeablenessDomain := score[3]
+
+	agreeablenessScore := agreeablenessDomain.Score
+
+	a1 := agreeablenessDomain.Subdomain[0].Score
+	a2 := agreeablenessDomain.Subdomain[1].Score
+	a3 := agreeablenessDomain.Subdomain[2].Score
+	a4 := agreeablenessDomain.Subdomain[3].Score
+	a5 := agreeablenessDomain.Subdomain[4].Score
+	a6 := agreeablenessDomain.Subdomain[5].Score
+
+	conscientiousnessDomain := score[4]
+
+	conscientiousnessScore := conscientiousnessDomain.Score
+
+	c1 := conscientiousnessDomain.Subdomain[0].Score
+	c2 := conscientiousnessDomain.Subdomain[1].Score
+	c3 := conscientiousnessDomain.Subdomain[2].Score
+	c4 := conscientiousnessDomain.Subdomain[3].Score
+	c5 := conscientiousnessDomain.Subdomain[4].Score
+	c6 := conscientiousnessDomain.Subdomain[5].Score
 
 	prompt := fmt.Sprintf(``)
 
