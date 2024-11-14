@@ -49,7 +49,7 @@ func FetchScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error
 			UserId:     score.UserId,
 			TestId:     score.TestId,
 			QuestionId: score.QuestionId,
-			RawScore:   score.RawStore,
+			RawScore:   score.RawScore,
 			TestName:   question.TestName,
 			Question:   question.Question,
 			No:         question.No,

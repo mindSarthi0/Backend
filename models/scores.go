@@ -13,14 +13,14 @@ type Score struct {
 	UserId     primitive.ObjectID `json:"userId" bson:"userId"` // Name of the test
 	TestId     primitive.ObjectID `json:"testId" bson:"testId"`
 	QuestionId primitive.ObjectID `json:"questionId" bson:"questionId"` // The actual question text
-	RawStore   string             `json:"rawScore" bson:"rawScore"`
+	RawScore   string             `json:"rawScore" bson:"rawScore"`
 }
 
 func NewScore(userId primitive.ObjectID, questionId primitive.ObjectID, rawScore string, testId primitive.ObjectID) *Score {
 	return &Score{
 		UserId:     userId,
 		QuestionId: questionId,
-		RawStore:   rawScore,
+		RawScore:   rawScore,
 		TestId:     testId,
 	}
 }

@@ -10,6 +10,7 @@ import (
 	// "strconv"
 	"myproject/API"
 	"myproject/constants"
+	"os"
 	"time"
 )
 
@@ -158,5 +159,35 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 	}
 
 	return nil
+
+}
+
+func GeneratePaymentLink(
+	amount int,
+	description string,
+	name string,
+	email string,
+	referenceID string,
+) (map[string]interface{}, error) {
+
+	backendAapiDomain := os.Getenv("BACKEND_API_DOMAIN")
+	callbackPath := os.Getenv("CALLBACK_PATH")
+
+	currency := "INR"
+	acceptPartial := false
+	minPartialAmount := 0
+	expireBy := time.Now().AddDate(0, 0, 7).Unix() // Expire in 7 days
+	customerName := name
+	customerContact := ""
+	customerEmail := email
+	notifySMS := true
+	notifyEmail := true
+	reminderEnable := true
+	policyName := "Standard Policy"
+	callbackURL := backendAapiDomain + callbackPath
+	callbackMethod := "get"
+	upiLink := false
+
+	return API.CreatePaymentLinkData(upiLink, amount, currency, acceptPartial, minPartialAmount, expireBy, referenceID, description, customerName, customerContact, customerEmail, notifySMS, notifyEmail, reminderEnable, policyName, callbackURL, callbackMethod)
 
 }

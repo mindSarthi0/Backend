@@ -327,7 +327,7 @@ func CreatePromptResult(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf("gftyft %s, n1 : %s    %s  ", neuroticismScore, n1)
+	prompt := fmt.Sprintf("gftyft %s, n1 : %s, n2 : %s, n3 : %s, n4 : %s, n5 : %s, n6 : %s, e1 : %s, e2 : %s, e3 : %s, e4 : %s, e5 : %s, e6 : %s, o1 : %s, o2 : %s, o3 : %s, o4 : %s, o5 : %s, o6 : %s, a1 : %s, a2 : %s, a3 : %s, a4 : %s, a5 : %s, a6 : %s, c1 : %s, c2 : %s, c3 : %s, c4 : %s, c5 : %s, c6 : %s", neuroticismScore, n1, n2, n3, n4, n5, n6, extraversionScore, e1, e2, e3, e4, e5, e6, opennessScore, o1, o2, o3, o4, o5, o6, agreeablenessScore, a1, a2, a3, a4, a5, a6, conscientiousnessScore, c1, c2, c3, c4, c5, c6)
 
 	return prompt
 }
@@ -389,7 +389,7 @@ func CreatePromptCareerAcademic(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf(``)
+	prompt := fmt.Sprintf("gftyft %s, n1 : %s, n2 : %s, n3 : %s, n4 : %s, n5 : %s, n6 : %s, e1 : %s, e2 : %s, e3 : %s, e4 : %s, e5 : %s, e6 : %s, o1 : %s, o2 : %s, o3 : %s, o4 : %s, o5 : %s, o6 : %s, a1 : %s, a2 : %s, a3 : %s, a4 : %s, a5 : %s, a6 : %s, c1 : %s, c2 : %s, c3 : %s, c4 : %s, c5 : %s, c6 : %s", neuroticismScore, n1, n2, n3, n4, n5, n6, extraversionScore, e1, e2, e3, e4, e5, e6, opennessScore, o1, o2, o3, o4, o5, o6, agreeablenessScore, a1, a2, a3, a4, a5, a6, conscientiousnessScore, c1, c2, c3, c4, c5, c6)
 
 	return prompt
 }
@@ -451,7 +451,7 @@ func CreatePromptRelationship(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf(``)
+	prompt := fmt.Sprintf("gftyft %s, n1 : %s, n2 : %s, n3 : %s, n4 : %s, n5 : %s, n6 : %s, e1 : %s, e2 : %s, e3 : %s, e4 : %s, e5 : %s, e6 : %s, o1 : %s, o2 : %s, o3 : %s, o4 : %s, o5 : %s, o6 : %s, a1 : %s, a2 : %s, a3 : %s, a4 : %s, a5 : %s, a6 : %s, c1 : %s, c2 : %s, c3 : %s, c4 : %s, c5 : %s, c6 : %s", neuroticismScore, n1, n2, n3, n4, n5, n6, extraversionScore, e1, e2, e3, e4, e5, e6, opennessScore, o1, o2, o3, o4, o5, o6, agreeablenessScore, a1, a2, a3, a4, a5, a6, conscientiousnessScore, c1, c2, c3, c4, c5, c6)
 
 	return prompt
 }
@@ -513,7 +513,7 @@ func CreatePromptStrengthWeakness(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf(``)
+	prompt := fmt.Sprintf("gftyft %s, n1 : %s, n2 : %s, n3 : %s, n4 : %s, n5 : %s, n6 : %s, e1 : %s, e2 : %s, e3 : %s, e4 : %s, e5 : %s, e6 : %s, o1 : %s, o2 : %s, o3 : %s, o4 : %s, o5 : %s, o6 : %s, a1 : %s, a2 : %s, a3 : %s, a4 : %s, a5 : %s, a6 : %s, c1 : %s, c2 : %s, c3 : %s, c4 : %s, c5 : %s, c6 : %s", neuroticismScore, n1, n2, n3, n4, n5, n6, extraversionScore, e1, e2, e3, e4, e5, e6, opennessScore, o1, o2, o3, o4, o5, o6, agreeablenessScore, a1, a2, a3, a4, a5, a6, conscientiousnessScore, c1, c2, c3, c4, c5, c6)
 
 	return prompt
 }

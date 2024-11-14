@@ -5,20 +5,21 @@ import (
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"myproject/API"
 	"myproject/controller"
 	"myproject/models"
 	"myproject/response"
+	"myproject/routers"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
-	// "github.com/joho/godotenv"
-	"github.com/kamva/mgm/v3"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var updatedVersion = "1.0.10"
@@ -31,6 +32,8 @@ func handleSubmission(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid submission format"})
 		return
 	}
+
+	println("::: PMODE :::" + submission.PMode)
 
 	// Find or create the user
 	var existingUsers []models.User
@@ -48,7 +51,47 @@ func handleSubmission(c *gin.Context) {
 	user := existingUsers[0]
 
 	// Create a new test entry
-	newTest := models.NewTest(submission.Name, submission.Age, submission.Gender, "BIG_5", user.ID, "PENDING", "https://google.com")
+
+	var testPaymentStatus string = "PENDING"
+	var testPaymentLink string = ""
+	var paymentLinkId string = ""
+	var testId primitive.ObjectID = primitive.NewObjectID()
+
+	if submission.PMode != "" && submission.PMode == "pass" {
+		// Just Generate New Report
+		testPaymentStatus = "BYPASS_PAYMENT"
+	} else {
+		// Go through payment mode
+		referenceId := "big5_" + testId.Hex()
+		data, err := controller.GeneratePaymentLink(2100, "For BIG 5 report generator", submission.Name, user.Email, referenceId)
+
+		if err != nil {
+			fmt.Println(":: ERROR : " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generated payment link"})
+			return
+		}
+
+		// Type assertion to get the string value from the map
+		shortURL, ok := data["short_url"].(string)
+		if !ok {
+			fmt.Println(":: ERROR : short_url is not a string")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generated payment link"})
+			return
+		}
+
+		id, ok := data["id"].(string)
+		if !ok {
+			fmt.Println(":: ERROR : id is not a string")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generated payment link"})
+			return
+		}
+
+		testPaymentLink = shortURL
+		paymentLinkId = id
+	}
+
+	newTest := models.NewTest(testId, submission.Name, submission.Age, submission.Gender, "BIG_5", user.ID, testPaymentStatus, testPaymentLink, paymentLinkId)
+
 	if err := mgm.Coll(&models.Test{}).Create(newTest); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create test"})
 		return
@@ -77,11 +120,12 @@ func handleSubmission(c *gin.Context) {
 		return
 	}
 
-	// TODO add logger
-	// TODO Make this generic enouch so that it can generate Report for muliple Report
-	go controller.GenerateNewReport(c, *newTest, user)
+	if submission.PMode != "" && submission.PMode == "pass" {
+		// Just Generate New Report
+		go controller.GenerateNewReport(c, *newTest, user)
+	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Submission successful"})
+	c.JSON(http.StatusOK, gin.H{"message": "Submission successful", "paymentLink": testPaymentLink})
 }
 
 // Generate report
@@ -252,14 +296,22 @@ func getPrompt(c *gin.Context) {
 
 func init() {
 
+	fmt.Println("::Environment mode : " + gin.Mode())
+	if gin.Mode() == "debug" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+		fmt.Println("::Environment Variables : loaded from .env")
+	}
 	// Setup the mgm default config
 	err := mgm.SetDefaultConfig(nil, "cognify", options.Client().ApplyURI("mongodb+srv://cognify:dEQGVwIY24QzdUu6@cluster0.cjyqt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"))
 	// Error handling
 	if err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err) // Fatal will log and stop the program
+		log.Fatalf("::DB Connection Error : Failed to connect to MongoDB: %v", err) // Fatal will log and stop the program
 	}
 
-	fmt.Println("Successfully connected to MongoDB!")
+	fmt.Println("::DB Connection Status : Successfully connected to MongoDB!")
 }
 
 func main() {
@@ -279,6 +331,8 @@ func main() {
 	router.GET("/questions", fetchAllQuestions)
 	router.POST("/submit", handleSubmission)
 	router.GET("/report", handleReportGeneration)
+	router.GET("/paymentCallback", routers.HandlePaymentCallback)
+
 	//Pdf test route
 	router.POST("/pdf", creatingPdf)
 	router.POST("/mail", testMail)
@@ -291,7 +345,12 @@ func main() {
 		c.JSON(200, gin.H{"status": "healthy v:" + updatedVersion})
 	})
 
-	gin.SetMode(gin.ReleaseMode)
+	playgroundRouter := os.Getenv("PLAYGROUND_ROUTER")
+
+	if playgroundRouter == "allowed" {
+		router.POST("/paymentLinkCreate", routers.PaymentTest)
+		router.POST("/paymentLinkFetch", routers.PaymentLinkFetch)
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
