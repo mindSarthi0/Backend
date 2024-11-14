@@ -188,6 +188,22 @@ func CreatePromptRough(D1, N1, N2, N3, N4, N5, N6, D2, E1, E2, E3, E4, E5, E6, D
 	return prompt
 }
 
+// func CreatePrompt(d string, ds string, s1 string, s2 string, s3 string, s4 string, s5 string, s6 string) string {
+// 	switch d {
+// 	case "neuroticism":
+// 		return CreatePromptNeuroticism(d, ds, s1, s2, s3, s4, s5, s6)
+// 	case "extraversion":
+// 		return CreatePromptExtraversion(d, ds, s1, s2, s3, s4, s5, s6)
+// 	case "openness":
+// 		return CreatePromptOpenness(d, ds, s1, s2, s3, s4, s5, s6)
+// 	case "agreeableness":
+// 		return CreatePromptAgreeableness(d, ds, s1, s2, s3, s4, s5, s6)
+// 	case "conscientiousness":
+// 		return CreatePromptConscientiousness(d, ds, s1, s2, s3, s4, s5, s6)
+// 	}
+// 	return ""
+// }
+
 func CreatePromptNeuroticism(d string, ds string, s1 string, s2 string, s3 string, s4 string, s5 string, s6 string) string {
 	prompt := fmt.Sprintf(`Domain: Neuroticism: %s
 	Subdomains-
