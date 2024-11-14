@@ -327,7 +327,59 @@ func CreatePromptResult(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf("gftyft %s, n1 : %s    %s  ", neuroticismScore, n1)
+	prompt := fmt.Sprintf("Using the Big 5 score given below, create Sumarry for each domain for the Report\n\n"+
+
+		"Personality Assessment:\n\n"+
+		"Domain: Neuroticism: %s\n"+
+		"  Subdomains-\n"+
+		"    Anxiety: %s\n"+
+		"    Anger: %s\n"+
+		"    Depression: %s\n"+
+		"    Self-consciousness: %s\n"+
+		"    Immoderation: %s\n"+
+		"    Vulnerability: %s\n\n"+
+
+		"Domain: Extraversion: %s\n"+
+		"  Subdomains-\n"+
+		"    Friendliness: %s\n"+
+		"    Gregariousness: %s\n"+
+		"    Assertiveness: %s\n"+
+		"    Activity Level: %s\n"+
+		"    Excitement Seeking: %s\n"+
+		"    Cheerfulness: %s\n\n"+
+
+		"Domain: Openness: %s\n"+
+		"  Subdomains-\n"+
+		"    Imagination: %s\n"+
+		"    Artistic Interests: %s\n"+
+		"    Emotionality: %s\n"+
+		"    Adventurousness: %s\n"+
+		"    Intellect: %s\n"+
+		"    Liberalism: %s\n\n"+
+
+		"Domain: Agreeableness: %s\n"+
+		"  Subdomains-\n"+
+		"    Trust: %s\n"+
+		"    Morality: %s\n"+
+		"    Altruism: %s\n"+
+		"    Cooperation: %s\n"+
+		"    Modesty: %s\n"+
+		"    Sympathy: %s\n\n"+
+
+		"Domain: Conscientiousness: %s\n"+
+		"  Subdomains-\n"+
+		"    Self Efficacy: %s\n"+
+		"    Orderliness: %s\n"+
+		"    Dutifulness: %s\n"+
+		"    Achievement Striving: %s\n"+
+		"    Self Discipline: %s\n"+
+		"    Cautiousness: %s\n",
+
+		neuroticismScore, n1, n2, n3, n4, n5, n6,
+		extraversionScore, e1, e2, e3, e4, e5, e6,
+		opennessScore, o1, o2, o3, o4, o5, o6,
+		agreeablenessScore, a1, a2, a3, a4, a5, a6,
+		conscientiousnessScore, c1, c2, c3, c4, c5, c6)
 
 	return prompt
 }
@@ -389,7 +441,59 @@ func CreatePromptCareerAcademic(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf(``)
+	prompt := fmt.Sprintf("Using the Big 5 score given below, create Career & Academia Page for the Report\n\n"+
+
+		"Personality Assessment:\n\n"+
+		"Domain: Neuroticism: %s\n"+
+		"  Subdomains-\n"+
+		"    Anxiety: %s\n"+
+		"    Anger: %s\n"+
+		"    Depression: %s\n"+
+		"    Self-consciousness: %s\n"+
+		"    Immoderation: %s\n"+
+		"    Vulnerability: %s\n\n"+
+
+		"Domain: Extraversion: %s\n"+
+		"  Subdomains-\n"+
+		"    Friendliness: %s\n"+
+		"    Gregariousness: %s\n"+
+		"    Assertiveness: %s\n"+
+		"    Activity Level: %s\n"+
+		"    Excitement Seeking: %s\n"+
+		"    Cheerfulness: %s\n\n"+
+
+		"Domain: Openness: %s\n"+
+		"  Subdomains-\n"+
+		"    Imagination: %s\n"+
+		"    Artistic Interests: %s\n"+
+		"    Emotionality: %s\n"+
+		"    Adventurousness: %s\n"+
+		"    Intellect: %s\n"+
+		"    Liberalism: %s\n\n"+
+
+		"Domain: Agreeableness: %s\n"+
+		"  Subdomains-\n"+
+		"    Trust: %s\n"+
+		"    Morality: %s\n"+
+		"    Altruism: %s\n"+
+		"    Cooperation: %s\n"+
+		"    Modesty: %s\n"+
+		"    Sympathy: %s\n\n"+
+
+		"Domain: Conscientiousness: %s\n"+
+		"  Subdomains-\n"+
+		"    Self Efficacy: %s\n"+
+		"    Orderliness: %s\n"+
+		"    Dutifulness: %s\n"+
+		"    Achievement Striving: %s\n"+
+		"    Self Discipline: %s\n"+
+		"    Cautiousness: %s\n",
+
+		neuroticismScore, n1, n2, n3, n4, n5, n6,
+		extraversionScore, e1, e2, e3, e4, e5, e6,
+		opennessScore, o1, o2, o3, o4, o5, o6,
+		agreeablenessScore, a1, a2, a3, a4, a5, a6,
+		conscientiousnessScore, c1, c2, c3, c4, c5, c6)
 
 	return prompt
 }
@@ -451,7 +555,60 @@ func CreatePromptRelationship(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf(``)
+	prompt := fmt.Sprintf("Using the Big 5 score given below, create Relationship page for the Report\n\n"+
+
+		"Personality Assessment:\n\n"+
+		"Domain: Neuroticism: %s\n"+
+		"Domain: Neuroticism: %s\n"+
+		"  Subdomains-\n"+
+		"    Anxiety: %s\n"+
+		"    Anger: %s\n"+
+		"    Depression: %s\n"+
+		"    Self-consciousness: %s\n"+
+		"    Immoderation: %s\n"+
+		"    Vulnerability: %s\n\n"+
+
+		"Domain: Extraversion: %s\n"+
+		"  Subdomains-\n"+
+		"    Friendliness: %s\n"+
+		"    Gregariousness: %s\n"+
+		"    Assertiveness: %s\n"+
+		"    Activity Level: %s\n"+
+		"    Excitement Seeking: %s\n"+
+		"    Cheerfulness: %s\n\n"+
+
+		"Domain: Openness: %s\n"+
+		"  Subdomains-\n"+
+		"    Imagination: %s\n"+
+		"    Artistic Interests: %s\n"+
+		"    Emotionality: %s\n"+
+		"    Adventurousness: %s\n"+
+		"    Intellect: %s\n"+
+		"    Liberalism: %s\n\n"+
+
+		"Domain: Agreeableness: %s\n"+
+		"  Subdomains-\n"+
+		"    Trust: %s\n"+
+		"    Morality: %s\n"+
+		"    Altruism: %s\n"+
+		"    Cooperation: %s\n"+
+		"    Modesty: %s\n"+
+		"    Sympathy: %s\n\n"+
+
+		"Domain: Conscientiousness: %s\n"+
+		"  Subdomains-\n"+
+		"    Self Efficacy: %s\n"+
+		"    Orderliness: %s\n"+
+		"    Dutifulness: %s\n"+
+		"    Achievement Striving: %s\n"+
+		"    Self Discipline: %s\n"+
+		"    Cautiousness: %s\n",
+
+		neuroticismScore, n1, n2, n3, n4, n5, n6,
+		extraversionScore, e1, e2, e3, e4, e5, e6,
+		opennessScore, o1, o2, o3, o4, o5, o6,
+		agreeablenessScore, a1, a2, a3, a4, a5, a6,
+		conscientiousnessScore, c1, c2, c3, c4, c5, c6)
 
 	return prompt
 }
@@ -513,7 +670,59 @@ func CreatePromptStrengthWeakness(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf(``)
+	prompt := fmt.Sprintf("Using the Big 5 score given below, create Strength & Weakness for the Report\n\n"+
+
+		"Personality Assessment:\n\n"+
+		"Domain: Neuroticism: %s\n"+
+		"  Subdomains-\n"+
+		"    Anxiety: %s\n"+
+		"    Anger: %s\n"+
+		"    Depression: %s\n"+
+		"    Self-consciousness: %s\n"+
+		"    Immoderation: %s\n"+
+		"    Vulnerability: %s\n\n"+
+
+		"Domain: Extraversion: %s\n"+
+		"  Subdomains-\n"+
+		"    Friendliness: %s\n"+
+		"    Gregariousness: %s\n"+
+		"    Assertiveness: %s\n"+
+		"    Activity Level: %s\n"+
+		"    Excitement Seeking: %s\n"+
+		"    Cheerfulness: %s\n\n"+
+
+		"Domain: Openness: %s\n"+
+		"  Subdomains-\n"+
+		"    Imagination: %s\n"+
+		"    Artistic Interests: %s\n"+
+		"    Emotionality: %s\n"+
+		"    Adventurousness: %s\n"+
+		"    Intellect: %s\n"+
+		"    Liberalism: %s\n\n"+
+
+		"Domain: Agreeableness: %s\n"+
+		"  Subdomains-\n"+
+		"    Trust: %s\n"+
+		"    Morality: %s\n"+
+		"    Altruism: %s\n"+
+		"    Cooperation: %s\n"+
+		"    Modesty: %s\n"+
+		"    Sympathy: %s\n\n"+
+
+		"Domain: Conscientiousness: %s\n"+
+		"  Subdomains-\n"+
+		"    Self Efficacy: %s\n"+
+		"    Orderliness: %s\n"+
+		"    Dutifulness: %s\n"+
+		"    Achievement Striving: %s\n"+
+		"    Self Discipline: %s\n"+
+		"    Cautiousness: %s\n",
+
+		neuroticismScore, n1, n2, n3, n4, n5, n6,
+		extraversionScore, e1, e2, e3, e4, e5, e6,
+		opennessScore, o1, o2, o3, o4, o5, o6,
+		agreeablenessScore, a1, a2, a3, a4, a5, a6,
+		conscientiousnessScore, c1, c2, c3, c4, c5, c6)
 
 	return prompt
 }
