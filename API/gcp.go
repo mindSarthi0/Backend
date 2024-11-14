@@ -327,53 +327,58 @@ func CreatePromptResult(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf("Using the Big 5 score given below, create Sumarry for each domain for the Report\n\n"+
+	prompt := fmt.Sprintf("
+		Using the Big 5 score given below, create Sumarry for each domain for the Report
+		
+			Score to Intensity map { [0 - 20] : 'Low', [20 - 60]: 'Average',[60 - 100]: 'high'}
+
+		"+
 
 		"Personality Assessment:\n\n"+
-		"Domain: Neuroticism: %s\n"+
+		"Domain: Neuroticism Score: %s\n"+
 		"  Subdomains-\n"+
-		"    Anxiety: %s\n"+
-		"    Anger: %s\n"+
-		"    Depression: %s\n"+
-		"    Self-consciousness: %s\n"+
-		"    Immoderation: %s\n"+
-		"    Vulnerability: %s\n\n"+
+		"    Anxiety Score: %s\n"+
+		"    Anger Score: %s\n"+
+		"    Depression Score: %s\n"+
+		"    Self-consciousness Score: %s\n"+
+		"    Immoderation Score: %s\n"+
+		"    Vulnerability Score: %s\n\n"+
 
-		"Domain: Extraversion: %s\n"+
+		"Domain: Extraversion Score: %s\n"+
 		"  Subdomains-\n"+
-		"    Friendliness: %s\n"+
-		"    Gregariousness: %s\n"+
-		"    Assertiveness: %s\n"+
-		"    Activity Level: %s\n"+
-		"    Excitement Seeking: %s\n"+
-		"    Cheerfulness: %s\n\n"+
+		"    Friendliness Score: %s\n"+
+		"    Gregariousness Score: %s\n"+
+		"    Assertiveness Score: %s\n"+
+		"    Activity Level Score: %s\n"+
+		"    Excitement Seeking Score: %s\n"+
+		"    Cheerfulness Score: %s\n\n"+
 
 		"Domain: Openness: %s\n"+
 		"  Subdomains-\n"+
-		"    Imagination: %s\n"+
-		"    Artistic Interests: %s\n"+
-		"    Emotionality: %s\n"+
-		"    Adventurousness: %s\n"+
-		"    Intellect: %s\n"+
-		"    Liberalism: %s\n\n"+
+		"    Imagination Score: %s\n"+
+		"    Artistic Interests Score: %s\n"+
+		"    Emotionality Score: %s\n"+
+		"    Adventurousness Score: %s\n"+
+		"    Intellect Score: %s\n"+
+		"    Liberalism Score: %s\n\n"+
 
 		"Domain: Agreeableness: %s\n"+
 		"  Subdomains-\n"+
-		"    Trust: %s\n"+
-		"    Morality: %s\n"+
-		"    Altruism: %s\n"+
-		"    Cooperation: %s\n"+
-		"    Modesty: %s\n"+
-		"    Sympathy: %s\n\n"+
+		"    Trust Score: %s\n"+
+		"    Morality Score: %s\n"+
+		"    Altruism Score: %s\n"+
+		"    Cooperation Score: %s\n"+
+		"    Modesty Score: %s\n"+
+		"    Sympathy Score: %s\n\n"+
 
 		"Domain: Conscientiousness: %s\n"+
 		"  Subdomains-\n"+
-		"    Self Efficacy: %s\n"+
-		"    Orderliness: %s\n"+
-		"    Dutifulness: %s\n"+
-		"    Achievement Striving: %s\n"+
-		"    Self Discipline: %s\n"+
-		"    Cautiousness: %s\n",
+		"    Self Efficacy Score: %s\n"+
+		"    Orderliness Score: %s\n"+
+		"    Dutifulness Score: %s\n"+
+		"    Achievement Striving Score: %s\n"+
+		"    Self Discipline Score: %s\n"+
+		"    Cautiousness Score: %s\n",
 
 		neuroticismScore, n1, n2, n3, n4, n5, n6,
 		extraversionScore, e1, e2, e3, e4, e5, e6,
@@ -558,7 +563,7 @@ func CreatePromptRelationship(score []Domain) string {
 	prompt := fmt.Sprintf("Using the Big 5 score given below, create Relationship page for the Report\n\n"+
 
 		"Personality Assessment:\n\n"+
-		"Domain: Neuroticism: %s\n"+
+		"Domain: Neuroticism: %v\n"+
 		"Domain: Neuroticism: %s\n"+
 		"  Subdomains-\n"+
 		"    Anxiety: %s\n"+
