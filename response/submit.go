@@ -13,4 +13,5 @@ type Submit struct {
 	Age     int       `json:"age"`    // Assuming age is an integer
 	Gender  string    `json:"gender"` // Assuming gender is a string
 	Answers []Answers `json:"answers"`
+	PMode   string    `json:"pMode"`
 }
