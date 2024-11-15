@@ -327,12 +327,10 @@ func CreatePromptResult(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf("
-		Using the Big 5 score given below, create Sumarry for each domain for the Report
-		
-			Score to Intensity map { [0 - 20] : 'Low', [20 - 60]: 'Average',[60 - 100]: 'high'}
+	prompt := fmt.Sprintf("Using the Big 5 score given below, create Sumarry for each domain for the Report"+
 
-		"+
+		"Domain Score to Intensity map { [0 - 30] : 'Low', [31 - 39]: 'Average',[40 - 60]: 'high'}"+
+		"Subdomain Score to Intensity map { [0 - 4] : 'Low', [5 - 7]: 'Average',[8 - 10]: 'high'}"+
 
 		"Personality Assessment:\n\n"+
 		"Domain: Neuroticism Score: %s\n"+
@@ -447,6 +445,8 @@ func CreatePromptCareerAcademic(score []Domain) string {
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
 	prompt := fmt.Sprintf("Using the Big 5 score given below, create Career & Academia Page for the Report\n\n"+
+		"Domain Score to Intensity map { [0 - 30] : 'Low', [31 - 39]: 'Average',[40 - 60]: 'high'}"+
+		"Subdomain Score to Intensity map { [0 - 4] : 'Low', [5 - 7]: 'Average',[8 - 10]: 'high'}"+
 
 		"Personality Assessment:\n\n"+
 		"Domain: Neuroticism: %s\n"+
@@ -562,6 +562,9 @@ func CreatePromptRelationship(score []Domain) string {
 
 	prompt := fmt.Sprintf("Using the Big 5 score given below, create Relationship page for the Report\n\n"+
 
+		"Domain Score to Intensity map { [0 - 30] : 'Low', [31 - 39]: 'Average',[40 - 60]: 'high'}"+
+		"Subdomain Score to Intensity map { [0 - 4] : 'Low', [5 - 7]: 'Average',[8 - 10]: 'high'}"+
+
 		"Personality Assessment:\n\n"+
 		"Domain: Neuroticism: %v\n"+
 		"Domain: Neuroticism: %s\n"+
@@ -676,6 +679,9 @@ func CreatePromptStrengthWeakness(score []Domain) string {
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
 	prompt := fmt.Sprintf("Using the Big 5 score given below, create Strength & Weakness for the Report\n\n"+
+
+		"Domain Score to Intensity map { [0 - 30] : 'Low', [31 - 39]: 'Average',[40 - 60]: 'high'}"+
+		"Subdomain Score to Intensity map { [0 - 4] : 'Low', [5 - 7]: 'Average',[8 - 10]: 'high'}"+
 
 		"Personality Assessment:\n\n"+
 		"Domain: Neuroticism: %s\n"+
