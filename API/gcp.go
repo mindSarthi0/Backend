@@ -327,12 +327,7 @@ func CreatePromptResult(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf("
-		Using the Big 5 score given below, create Sumarry for each domain for the Report
-		
-			Score to Intensity map { [0 - 20] : 'Low', [20 - 60]: 'Average',[60 - 100]: 'high'}
-
-		"+
+	prompt := fmt.Sprintf("Using the Big 5 score given below, create Sumarry for each domain for the Report Score to Intensity map { [0 - 20] : 'Low', [20 - 60]: 'Average',[60 - 100]: 'high'}"+
 
 		"Personality Assessment:\n\n"+
 		"Domain: Neuroticism Score: %s\n"+
