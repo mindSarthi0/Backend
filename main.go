@@ -22,7 +22,7 @@ import (
 	"time"
 )
 
-var updatedVersion = "1.0.10"
+var updatedVersion = "1.0.20"
 
 // Handle test submissions
 func handleSubmission(c *gin.Context) {
