@@ -72,38 +72,99 @@ func ParseMarkdownCode(markdown string) (string, error) {
 }
 
 // Function to make the POST request to Google API (REST-based approach)
+// func GenerateContentFromTextGCP(prompt string) (string, error) {
+// 	// Define the URL for the Google API endpoint (generative language model)
+// 	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent"
+
+// 	// Prepare the request payload in JSON format with the prompt content
+// 	requestBody, err := json.Marshal(map[string]interface{}{
+// 		"contents": []map[string]interface{}{
+// 			{
+// 				"parts": []map[string]string{
+// 					{"text": prompt},
+// 				},
+// 			},
+// 		},
+// 	})
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to marshal request body: %v", err)
+// 	}
+
+// 	// Retrieve the API key from the environment variable 'API_KEY'
+// 	apiKey := os.Getenv("API_KEY")
+// 	if apiKey == "" {
+// 		return "", fmt.Errorf("API key is not set. Please ensure the environment variable 'API_KEY' is set")
+// 	}
+
+// 	// Create a new HTTP POST request with the request body and API key
+// 	req, err := http.NewRequest("POST", url+"?key="+apiKey, bytes.NewBuffer(requestBody))
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to create request: %v", err)
+// 	}
+
+// 	// Set appropriate headers for the request
+// 	req.Header.Set("Content-Type", "application/json")
+
+// 	// Send the HTTP request using an HTTP client
+// 	client := &http.Client{}
+// 	resp, err := client.Do(req)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to send request: %v", err)
+// 	}
+// 	defer resp.Body.Close() // Ensure the response body is closed
+
+// 	// Read and parse the response body
+// 	body, err := io.ReadAll(resp.Body)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to read response body: %v", err)
+// 	}
+
+// 	// Check if the response status is not 200 (OK), and handle the error accordingly
+// 	if resp.StatusCode != http.StatusOK {
+// 		return "", fmt.Errorf("non-200 response status: %d, body: %s", resp.StatusCode, string(body))
+// 	}
+
+// 	// Parse the JSON response into the struct
+// 	var contentResponse ContentResponse
+// 	err = json.Unmarshal(body, &contentResponse)
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to unmarshal response body: %v", err)
+// 	}
+
+// 	// Return the response body as a string
+// 	return string(body), nil
+// }
+
 func GenerateContentFromTextGCP(prompt string) (string, error) {
-	// Define the URL for the Google API endpoint (generative language model)
-	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent"
+	// Define the URL for the OpenAI API endpoint
+	url := "https://api.openai.com/v1/chat/completions"
 
 	// Prepare the request payload in JSON format with the prompt content
 	requestBody, err := json.Marshal(map[string]interface{}{
-		"contents": []map[string]interface{}{
-			{
-				"parts": []map[string]string{
-					{"text": prompt},
-				},
-			},
+		"model": "gpt-4o", // Specify the OpenAI model
+		"messages": []map[string]string{
+			{"role": "user", "content": prompt},
 		},
 	})
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal request body: %v", err)
 	}
 
-	// Retrieve the API key from the environment variable 'API_KEY'
+	// Retrieve the API key from the environment variable 'OPENAI_API_KEY'
 	apiKey := os.Getenv("API_KEY")
 	if apiKey == "" {
-		return "", fmt.Errorf("API key is not set. Please ensure the environment variable 'API_KEY' is set")
+		return "", fmt.Errorf("API key is not set. Please ensure the environment variable 'OPENAI_API_KEY' is set")
 	}
 
 	// Create a new HTTP POST request with the request body and API key
-	req, err := http.NewRequest("POST", url+"?key="+apiKey, bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %v", err)
 	}
 
 	// Set appropriate headers for the request
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+apiKey)
 
 	// Send the HTTP request using an HTTP client
 	client := &http.Client{}
@@ -125,14 +186,23 @@ func GenerateContentFromTextGCP(prompt string) (string, error) {
 	}
 
 	// Parse the JSON response into the struct
-	var contentResponse ContentResponse
+	var contentResponse struct {
+		Choices []struct {
+			Message struct {
+				Content string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
+	}
 	err = json.Unmarshal(body, &contentResponse)
 	if err != nil {
 		return "", fmt.Errorf("failed to unmarshal response body: %v", err)
 	}
 
-	// Return the response body as a string
-	return string(body), nil
+	// Extract the response content from the first choice
+	if len(contentResponse.Choices) == 0 {
+		return "", fmt.Errorf("no choices found in the response")
+	}
+	return contentResponse.Choices[0].Message.Content, nil
 }
 
 func GenerateContentFromTextGOAPIJSON(promt string) (*genai.GenerateContentResponse, error) {
