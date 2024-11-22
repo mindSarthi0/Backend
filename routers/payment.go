@@ -9,8 +9,8 @@ import (
 	"myproject/controller"
 	"myproject/models"
 	"net/http"
+	"os"
 	"strings"
-	// "os"
 	// "time"
 )
 
@@ -26,7 +26,9 @@ func ExtractTestId(referenceId string) (string, error) {
 }
 
 func HandlePaymentCallback(c *gin.Context) {
-	// print all the query param, handle error as well
+
+	webappDomain := os.Getenv("WEBAPP_DOMAIN")
+	webappPaymentStatusPath := webappDomain + os.Getenv("WEBAPP_PAYMENT_STATUS_PATH")
 
 	// Get all the query parameters
 	queryParams := c.Request.URL.Query()
@@ -38,83 +40,77 @@ func HandlePaymentCallback(c *gin.Context) {
 		}
 	}
 
-	referenceId := queryParams["razorpay_payment_link_reference_id"][0]
-	paymentLintStatus := queryParams["razorpay_payment_link_status"][0]
+	// Extract required query parameters
+	referenceId := queryParams.Get("razorpay_payment_link_reference_id")
+	paymentLinkStatus := queryParams.Get("razorpay_payment_link_status")
+	paymentLinkId := queryParams.Get("razorpay_payment_link_id")
+	razorpayPaymentId := queryParams.Get("razorpay_payment_id")
+	signature := queryParams.Get("razorpay_signature")
 
-	params := map[string]interface{}{
-		"payment_link_id":           queryParams["razorpay_payment_link_id"][0],
-		"razorpay_payment_id":       queryParams["razorpay_payment_id"][0],
-		"payment_link_reference_id": referenceId,
-		"payment_link_status":       paymentLintStatus,
+	// Check if all required parameters are present
+	if referenceId == "" || paymentLinkStatus == "" || paymentLinkId == "" || razorpayPaymentId == "" || signature == "" {
+		c.Redirect(http.StatusFound, webappPaymentStatusPath+"?status=failed")
+		return
 	}
 
-	signature := queryParams["razorpay_signature"][0]
-	if API.VerifyPaymentLink(params, signature) {
+	params := map[string]interface{}{
+		"payment_link_id":           paymentLinkId,
+		"razorpay_payment_id":       razorpayPaymentId,
+		"payment_link_reference_id": referenceId,
+		"payment_link_status":       paymentLinkStatus,
+	}
 
-		// Payment verification successfull
-		// Mark payment status of test to successfull
+	// Verify the payment link
+	if API.VerifyPaymentLink(params, signature) {
+		// Payment verification successful
+		// Mark payment status of test as successful
 
 		testIdString, err := ExtractTestId(referenceId)
-
 		if err != nil {
 			log.Println(":: Error : " + err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to parse reference Id",
-			})
+			c.Redirect(http.StatusFound, webappPaymentStatusPath+"?status=pending&message=Your payment is being processed")
 			return
 		}
 
 		log.Println(testIdString)
 		testId, err := primitive.ObjectIDFromHex(testIdString)
-
 		if err != nil {
 			log.Println(":: Error : " + err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to convert the given test in hex",
-			})
+			c.Redirect(http.StatusFound, webappPaymentStatusPath+"?status=pending&message=Your payment is being processed")
 			return
 		}
 
-		var test *models.Test
-		var user models.User
-
-		test, err = models.UpdateTestPaymentStatus(testId, paymentLintStatus)
-
+		test, err := models.FetchTestById(testId)
 		if err != nil {
 			log.Println(":: Error : " + err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to fetch test with id " + testIdString,
-			})
+			c.Redirect(http.StatusFound, webappPaymentStatusPath+"?status=pending&message=Your payment is being processed")
 			return
 		}
 
-		log.Println(test.TestGiver)
-		user = models.FetchUserUsingId(test.UserId)
-		// Now generate report
+		if test.PaymentStatus == "paid" {
+			c.Redirect(http.StatusFound, webappPaymentStatusPath+"?status=success&message=Already marked paid")
+			return
+		}
 
-		if paymentLintStatus == "paid" {
+		updatedTest, err := models.UpdateTestPaymentStatus(testId, paymentLinkStatus)
+		if err != nil {
+			log.Println(":: Error : " + err.Error())
+			c.Redirect(http.StatusFound, webappPaymentStatusPath+"?status=pending&message=Your payment is being processed")
+			return
+		}
+
+		log.Println(updatedTest.TestGiver)
+		user := models.FetchUserUsingId(updatedTest.UserId)
+
+		// Generate report if the payment status is "paid"
+		if paymentLinkStatus == "paid" {
 			go controller.GenerateNewReport(c, *test, user)
 		}
 
-		// Fetch user
-		c.JSON(http.StatusOK, gin.H{
-			"status": "success",
-		})
+		c.Redirect(http.StatusFound, webappPaymentStatusPath+"?status=success&message=Thank you for your purchase. Your response is being analyzed by our scientific algorithm and will be sent to you within 5 minutes. We appreciate your interest in understanding yourself better!")
 		return
 	}
-	// Handle any specific errors or respond with a status
-	// For demonstration, we'll just check if a specific required parameter is present
-	// requiredParam := "transaction_id"
-	// if _, ok := queryParams[requiredParam]; !ok {
-	// 	// If the required parameter is missing, respond with an error
-	// 	c.JSON(http.StatusBadRequest, gin.H{
-	// 		"error": fmt.Sprintf("Missing required query parameter: %s", requiredParam),
-	// 	})
-	// 	return
-	// }
 
-	// If everything is fine, respond with a success message
-	c.JSON(http.StatusOK, gin.H{
-		"status": "failed",
-	})
+	// In case of failed signature
+	c.Redirect(http.StatusFound, webappPaymentStatusPath+"?status=failed&message=Sorry! Please try again")
 }
