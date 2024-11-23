@@ -121,7 +121,7 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 
 	startTime = time.Second
 	reportPdfFilename := "report_" + test.ID.Hex()
-	errInPdfGeneration := API.GenerateBigFivePDF(pdfGenerationContent, user.Name, reportPdfFilename)
+	errInPdfGeneration := API.GenerateBigFivePDF(pdfGenerationContent, test.TestGiver, reportPdfFilename)
 
 	if errInPdfGeneration != nil {
 		// Add logger
