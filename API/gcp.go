@@ -353,6 +353,13 @@ func CreatePromptResult(score []Domain) string {
 	n5 := neuroticismDomain.Subdomain[4].Score
 	n6 := neuroticismDomain.Subdomain[5].Score
 
+	n1I := neuroticismDomain.Subdomain[0].Intensity
+	n2I := neuroticismDomain.Subdomain[1].Intensity
+	n3I := neuroticismDomain.Subdomain[2].Intensity
+	n4I := neuroticismDomain.Subdomain[3].Intensity
+	n5I := neuroticismDomain.Subdomain[4].Intensity
+	n6I := neuroticismDomain.Subdomain[5].Intensity
+
 	extraversionDomain := score[1]
 
 	extraversionScore := extraversionDomain.Score
@@ -363,6 +370,13 @@ func CreatePromptResult(score []Domain) string {
 	e4 := extraversionDomain.Subdomain[3].Score
 	e5 := extraversionDomain.Subdomain[4].Score
 	e6 := extraversionDomain.Subdomain[5].Score
+
+	e1I := extraversionDomain.Subdomain[0].Intensity
+	e2I := extraversionDomain.Subdomain[1].Intensity
+	e3I := extraversionDomain.Subdomain[2].Intensity
+	e4I := extraversionDomain.Subdomain[3].Intensity
+	e5I := extraversionDomain.Subdomain[4].Intensity
+	e6I := extraversionDomain.Subdomain[5].Intensity
 
 	opennessDomain := score[2]
 
@@ -375,6 +389,13 @@ func CreatePromptResult(score []Domain) string {
 	o5 := opennessDomain.Subdomain[4].Score
 	o6 := opennessDomain.Subdomain[5].Score
 
+	o1I := opennessDomain.Subdomain[0].Intensity
+	o2I := opennessDomain.Subdomain[1].Intensity
+	o3I := opennessDomain.Subdomain[2].Intensity
+	o4I := opennessDomain.Subdomain[3].Intensity
+	o5I := opennessDomain.Subdomain[4].Intensity
+	o6I := opennessDomain.Subdomain[5].Intensity
+
 	agreeablenessDomain := score[3]
 
 	agreeablenessScore := agreeablenessDomain.Score
@@ -385,6 +406,13 @@ func CreatePromptResult(score []Domain) string {
 	a4 := agreeablenessDomain.Subdomain[3].Score
 	a5 := agreeablenessDomain.Subdomain[4].Score
 	a6 := agreeablenessDomain.Subdomain[5].Score
+
+	a1I := agreeablenessDomain.Subdomain[0].Intensity
+	a2I := agreeablenessDomain.Subdomain[1].Intensity
+	a3I := agreeablenessDomain.Subdomain[2].Intensity
+	a4I := agreeablenessDomain.Subdomain[3].Intensity
+	a5I := agreeablenessDomain.Subdomain[4].Intensity
+	a6I := agreeablenessDomain.Subdomain[5].Intensity
 
 	conscientiousnessDomain := score[4]
 
@@ -397,10 +425,17 @@ func CreatePromptResult(score []Domain) string {
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
 
-	prompt := fmt.Sprintf("Using the Big 5 score given below, create Sumarry  for each domain under 300 words in total for the Report"+
+	c1I := conscientiousnessDomain.Subdomain[0].Intensity
+	c2I := conscientiousnessDomain.Subdomain[1].Intensity
+	c3I := conscientiousnessDomain.Subdomain[2].Intensity
+	c4I := conscientiousnessDomain.Subdomain[3].Intensity
+	c5I := conscientiousnessDomain.Subdomain[4].Intensity
+	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
-		"Domain Score to Intensity map { [0 - 30] : 'Low', [31 - 39]: 'Average',[40 - 60]: 'high'}"+
-		"Subdomain Score to Intensity map { [0 - 4] : 'Low', [5 - 7]: 'Average',[8 - 10]: 'high'}"+
+	prompt := fmt.Sprintf("Using the Big 5 score given below, create Summary for each domain under 300 words in total for the Report by STRICTLY FOLLOWING INTENSITY MAP "+
+
+		"Domain Score INTENSITY MAP { [0 - 30] : 'Low', [31 - 39]: 'Average',[40 - 60]: 'high'}"+
+		"Subdomain Score INTENSITY MAP { [0 - 4] : 'Low', [5 - 7]: 'Average',[8 - 10]: 'high'}"+
 		"Structure the document for fpdf"+
 
 		"Personality Assessment:\n\n"+
@@ -471,6 +506,13 @@ func CreatePromptCareerAcademic(score []Domain) string {
 	n5 := neuroticismDomain.Subdomain[4].Score
 	n6 := neuroticismDomain.Subdomain[5].Score
 
+	n1I := neuroticismDomain.Subdomain[0].Intensity
+	n2I := neuroticismDomain.Subdomain[1].Intensity
+	n3I := neuroticismDomain.Subdomain[2].Intensity
+	n4I := neuroticismDomain.Subdomain[3].Intensity
+	n5I := neuroticismDomain.Subdomain[4].Intensity
+	n6I := neuroticismDomain.Subdomain[5].Intensity
+
 	extraversionDomain := score[1]
 
 	extraversionScore := extraversionDomain.Score
@@ -481,6 +523,13 @@ func CreatePromptCareerAcademic(score []Domain) string {
 	e4 := extraversionDomain.Subdomain[3].Score
 	e5 := extraversionDomain.Subdomain[4].Score
 	e6 := extraversionDomain.Subdomain[5].Score
+
+	e1I := extraversionDomain.Subdomain[0].Intensity
+	e2I := extraversionDomain.Subdomain[1].Intensity
+	e3I := extraversionDomain.Subdomain[2].Intensity
+	e4I := extraversionDomain.Subdomain[3].Intensity
+	e5I := extraversionDomain.Subdomain[4].Intensity
+	e6I := extraversionDomain.Subdomain[5].Intensity
 
 	opennessDomain := score[2]
 
@@ -493,6 +542,13 @@ func CreatePromptCareerAcademic(score []Domain) string {
 	o5 := opennessDomain.Subdomain[4].Score
 	o6 := opennessDomain.Subdomain[5].Score
 
+	o1I := opennessDomain.Subdomain[0].Intensity
+	o2I := opennessDomain.Subdomain[1].Intensity
+	o3I := opennessDomain.Subdomain[2].Intensity
+	o4I := opennessDomain.Subdomain[3].Intensity
+	o5I := opennessDomain.Subdomain[4].Intensity
+	o6I := opennessDomain.Subdomain[5].Intensity
+
 	agreeablenessDomain := score[3]
 
 	agreeablenessScore := agreeablenessDomain.Score
@@ -504,6 +560,13 @@ func CreatePromptCareerAcademic(score []Domain) string {
 	a5 := agreeablenessDomain.Subdomain[4].Score
 	a6 := agreeablenessDomain.Subdomain[5].Score
 
+	a1I := agreeablenessDomain.Subdomain[0].Intensity
+	a2I := agreeablenessDomain.Subdomain[1].Intensity
+	a3I := agreeablenessDomain.Subdomain[2].Intensity
+	a4I := agreeablenessDomain.Subdomain[3].Intensity
+	a5I := agreeablenessDomain.Subdomain[4].Intensity
+	a6I := agreeablenessDomain.Subdomain[5].Intensity
+
 	conscientiousnessDomain := score[4]
 
 	conscientiousnessScore := conscientiousnessDomain.Score
@@ -514,6 +577,13 @@ func CreatePromptCareerAcademic(score []Domain) string {
 	c4 := conscientiousnessDomain.Subdomain[3].Score
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
+
+	c1I := conscientiousnessDomain.Subdomain[0].Intensity
+	c2I := conscientiousnessDomain.Subdomain[1].Intensity
+	c3I := conscientiousnessDomain.Subdomain[2].Intensity
+	c4I := conscientiousnessDomain.Subdomain[3].Intensity
+	c5I := conscientiousnessDomain.Subdomain[4].Intensity
+	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
 	prompt := fmt.Sprintf("Using the Big 5 score given below, create Career & Academia Page under 300 words for the Report\n\n"+
 		"Domain Score to Intensity map { [0 - 30] : 'Low', [31 - 39]: 'Average',[40 - 60]: 'high'}"+
@@ -588,6 +658,13 @@ func CreatePromptRelationship(score []Domain) string {
 	n5 := neuroticismDomain.Subdomain[4].Score
 	n6 := neuroticismDomain.Subdomain[5].Score
 
+	n1I := neuroticismDomain.Subdomain[0].Intensity
+	n2I := neuroticismDomain.Subdomain[1].Intensity
+	n3I := neuroticismDomain.Subdomain[2].Intensity
+	n4I := neuroticismDomain.Subdomain[3].Intensity
+	n5I := neuroticismDomain.Subdomain[4].Intensity
+	n6I := neuroticismDomain.Subdomain[5].Intensity
+
 	extraversionDomain := score[1]
 
 	extraversionScore := extraversionDomain.Score
@@ -598,6 +675,13 @@ func CreatePromptRelationship(score []Domain) string {
 	e4 := extraversionDomain.Subdomain[3].Score
 	e5 := extraversionDomain.Subdomain[4].Score
 	e6 := extraversionDomain.Subdomain[5].Score
+
+	e1I := extraversionDomain.Subdomain[0].Intensity
+	e2I := extraversionDomain.Subdomain[1].Intensity
+	e3I := extraversionDomain.Subdomain[2].Intensity
+	e4I := extraversionDomain.Subdomain[3].Intensity
+	e5I := extraversionDomain.Subdomain[4].Intensity
+	e6I := extraversionDomain.Subdomain[5].Intensity
 
 	opennessDomain := score[2]
 
@@ -610,6 +694,13 @@ func CreatePromptRelationship(score []Domain) string {
 	o5 := opennessDomain.Subdomain[4].Score
 	o6 := opennessDomain.Subdomain[5].Score
 
+	o1I := opennessDomain.Subdomain[0].Intensity
+	o2I := opennessDomain.Subdomain[1].Intensity
+	o3I := opennessDomain.Subdomain[2].Intensity
+	o4I := opennessDomain.Subdomain[3].Intensity
+	o5I := opennessDomain.Subdomain[4].Intensity
+	o6I := opennessDomain.Subdomain[5].Intensity
+
 	agreeablenessDomain := score[3]
 
 	agreeablenessScore := agreeablenessDomain.Score
@@ -621,6 +712,13 @@ func CreatePromptRelationship(score []Domain) string {
 	a5 := agreeablenessDomain.Subdomain[4].Score
 	a6 := agreeablenessDomain.Subdomain[5].Score
 
+	a1I := agreeablenessDomain.Subdomain[0].Intensity
+	a2I := agreeablenessDomain.Subdomain[1].Intensity
+	a3I := agreeablenessDomain.Subdomain[2].Intensity
+	a4I := agreeablenessDomain.Subdomain[3].Intensity
+	a5I := agreeablenessDomain.Subdomain[4].Intensity
+	a6I := agreeablenessDomain.Subdomain[5].Intensity
+
 	conscientiousnessDomain := score[4]
 
 	conscientiousnessScore := conscientiousnessDomain.Score
@@ -631,6 +729,13 @@ func CreatePromptRelationship(score []Domain) string {
 	c4 := conscientiousnessDomain.Subdomain[3].Score
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
+
+	c1I := conscientiousnessDomain.Subdomain[0].Intensity
+	c2I := conscientiousnessDomain.Subdomain[1].Intensity
+	c3I := conscientiousnessDomain.Subdomain[2].Intensity
+	c4I := conscientiousnessDomain.Subdomain[3].Intensity
+	c5I := conscientiousnessDomain.Subdomain[4].Intensity
+	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
 	prompt := fmt.Sprintf("Using the Big 5 score given below, create Relationship page under 300 words for the Report\n\n"+
 
@@ -707,6 +812,13 @@ func CreatePromptStrengthWeakness(score []Domain) string {
 	n5 := neuroticismDomain.Subdomain[4].Score
 	n6 := neuroticismDomain.Subdomain[5].Score
 
+	n1I := neuroticismDomain.Subdomain[0].Intensity
+	n2I := neuroticismDomain.Subdomain[1].Intensity
+	n3I := neuroticismDomain.Subdomain[2].Intensity
+	n4I := neuroticismDomain.Subdomain[3].Intensity
+	n5I := neuroticismDomain.Subdomain[4].Intensity
+	n6I := neuroticismDomain.Subdomain[5].Intensity
+
 	extraversionDomain := score[1]
 
 	extraversionScore := extraversionDomain.Score
@@ -717,6 +829,13 @@ func CreatePromptStrengthWeakness(score []Domain) string {
 	e4 := extraversionDomain.Subdomain[3].Score
 	e5 := extraversionDomain.Subdomain[4].Score
 	e6 := extraversionDomain.Subdomain[5].Score
+
+	e1I := extraversionDomain.Subdomain[0].Intensity
+	e2I := extraversionDomain.Subdomain[1].Intensity
+	e3I := extraversionDomain.Subdomain[2].Intensity
+	e4I := extraversionDomain.Subdomain[3].Intensity
+	e5I := extraversionDomain.Subdomain[4].Intensity
+	e6I := extraversionDomain.Subdomain[5].Intensity
 
 	opennessDomain := score[2]
 
@@ -729,6 +848,13 @@ func CreatePromptStrengthWeakness(score []Domain) string {
 	o5 := opennessDomain.Subdomain[4].Score
 	o6 := opennessDomain.Subdomain[5].Score
 
+	o1I := opennessDomain.Subdomain[0].Intensity
+	o2I := opennessDomain.Subdomain[1].Intensity
+	o3I := opennessDomain.Subdomain[2].Intensity
+	o4I := opennessDomain.Subdomain[3].Intensity
+	o5I := opennessDomain.Subdomain[4].Intensity
+	o6I := opennessDomain.Subdomain[5].Intensity
+
 	agreeablenessDomain := score[3]
 
 	agreeablenessScore := agreeablenessDomain.Score
@@ -740,6 +866,13 @@ func CreatePromptStrengthWeakness(score []Domain) string {
 	a5 := agreeablenessDomain.Subdomain[4].Score
 	a6 := agreeablenessDomain.Subdomain[5].Score
 
+	a1I := agreeablenessDomain.Subdomain[0].Intensity
+	a2I := agreeablenessDomain.Subdomain[1].Intensity
+	a3I := agreeablenessDomain.Subdomain[2].Intensity
+	a4I := agreeablenessDomain.Subdomain[3].Intensity
+	a5I := agreeablenessDomain.Subdomain[4].Intensity
+	a6I := agreeablenessDomain.Subdomain[5].Intensity
+
 	conscientiousnessDomain := score[4]
 
 	conscientiousnessScore := conscientiousnessDomain.Score
@@ -750,6 +883,13 @@ func CreatePromptStrengthWeakness(score []Domain) string {
 	c4 := conscientiousnessDomain.Subdomain[3].Score
 	c5 := conscientiousnessDomain.Subdomain[4].Score
 	c6 := conscientiousnessDomain.Subdomain[5].Score
+
+	c1I := conscientiousnessDomain.Subdomain[0].Intensity
+	c2I := conscientiousnessDomain.Subdomain[1].Intensity
+	c3I := conscientiousnessDomain.Subdomain[2].Intensity
+	c4I := conscientiousnessDomain.Subdomain[3].Intensity
+	c5I := conscientiousnessDomain.Subdomain[4].Intensity
+	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
 	prompt := fmt.Sprintf("Using the Big 5 score given below, create Strength & Weakness under 300 words for the Report\n\n"+
 
