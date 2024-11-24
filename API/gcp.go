@@ -8,10 +8,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
-type GeminiPromptRequest struct {
-	ID       string         `json:"id"`       // Adjusted field name capitalization
+type PromptRequest struct {
+	Id       string         `json:"id"`       // Adjusted field name capitalization
 	Response OpenAIResponse `json:"response"` // Updated to OpenAI-specific response
 }
 
@@ -711,13 +712,13 @@ func CreatePromptStrengthWeakness(score []Domain) string {
 	return prompt
 }
 
-func WorkerOpenAIGPT(id string, prompt string, channel chan GeminiPromptRequest) {
+func WorkerOpenAIGPT(id string, prompt string, channel chan PromptRequest) {
 	// Call the OpenAI API
 	result, err := GenerateContentFromTextGCP(prompt)
 	if err != nil {
 		log.Printf("Error generating content from OpenAI for ID %s: %v", id, err)
-		channel <- GeminiPromptRequest{
-			ID: id,
+		channel <- PromptRequest{
+			Id: id,
 			Response: OpenAIResponse{
 				Choices: []struct {
 					Message struct {
@@ -744,9 +745,9 @@ func WorkerOpenAIGPT(id string, prompt string, channel chan GeminiPromptRequest)
 		return
 	}
 
-	// Construct the GeminiPromptRequest
-	response := GeminiPromptRequest{
-		ID: id,
+	// Construct the PromptRequest
+	response := PromptRequest{
+		Id: id,
 		Response: OpenAIResponse{
 			Choices: []struct {
 				Message struct {

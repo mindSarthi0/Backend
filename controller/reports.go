@@ -2,11 +2,14 @@ package controller
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/kamva/mgm/v3"
 	"log"
+	"myproject/lib"
 	"myproject/models"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/kamva/mgm/v3"
+
 	// "strconv"
 	"myproject/API"
 	"myproject/constants"
@@ -79,10 +82,10 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 
 	startTime = time.Millisecond
 	// Now prompt generation starts
-	channel := make(chan API.GeminiPromptRequest)
+	channel := make(chan API.PromptRequest)
 
 	for page, prompt := range prompts {
-		go API.WorkerGCPGemini(page, prompt, channel)
+		go API.WorkerOpenAIGPT(page, prompt, channel)
 	}
 
 	results := map[string]string{}
@@ -92,7 +95,7 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 		// TODO add failure case
 		// TODO added generated result to db
 		// results[result] = result.Candidates[0].Content.Parts[0].Text
-		results[result.Id] = result.Response.Candidates[0].Content.Parts[0].Text
+		results[result.Id] = result.Response.Choices[0].Message.Content
 	}
 
 	fmt.Println("Time taken by GCP Worker to generate response from gemini", time.Millisecond-startTime)
@@ -103,7 +106,7 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 
 	for page, _ := range prompts {
 		generatedResponseString := results[page]
-		generatedContent, err := API.ParseMarkdownCode(generatedResponseString)
+		generatedContent, err := lib.ParseMarkdownCode(generatedResponseString)
 
 		if err != nil {
 			// Respond with an error message if content generation failed

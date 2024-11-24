@@ -13,3 +13,7 @@ func ConvertToInt(s string) (int, error) {
 	}
 	return convertedInt, nil
 }
+
+func ParseMarkdownCode(s string) (string, error) {
+	return s, nil
+}

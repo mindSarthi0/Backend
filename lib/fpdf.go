@@ -1,9 +1,9 @@
 package lib
 
 import (
-	"github.com/go-pdf/fpdf"
-
 	"log"
+
+	"github.com/go-pdf/fpdf"
 )
 
 // CreatePdf creates a simple PDF with "Hello, world"
