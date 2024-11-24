@@ -2,10 +2,11 @@ package API
 
 import (
 	"fmt"
-	"gopkg.in/mail.v2" // Sending email
 	"log"
 	"net"
 	"time"
+
+	"gopkg.in/mail.v2" // Sending email
 )
 
 func sendEmail(to string, subject string, body string, attachmentPath string) {
@@ -23,9 +24,7 @@ func sendEmail(to string, subject string, body string, attachmentPath string) {
 	// Configure Zoho SMTP settings
 	d := mail.NewDialer("smtp.zoho.in", 587, "report@mindsarthi.com", "rXNfpN8Aa1q8") //
 
-	sendEmailWithRetry(m, 3, d)
-
-	log.Println("Email sent successfully!")
+	sendEmailWithRetry(m, 5, d)
 }
 
 func sendEmailWithRetry(m *mail.Message, retries int, d *mail.Dialer) {
@@ -39,11 +38,14 @@ func sendEmailWithRetry(m *mail.Message, retries int, d *mail.Dialer) {
 		log.Printf("Attempt %d: Error sending email: %v", attempt, err)
 		if netErr, ok := err.(net.Error); ok && netErr.Temporary() {
 			log.Println("Temporary error, retrying...")
-			time.Sleep(2 * time.Second)
+			time.Sleep(4 * time.Second)
 			continue
 		}
+
 		logDetailedError(err)
-		return
+		if attempt < retries {
+			time.Sleep(2 * time.Second) // Wait before retrying
+		}
 	}
 	log.Println("Failed to send email after retries")
 }

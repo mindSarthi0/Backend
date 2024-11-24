@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -25,10 +26,22 @@ type Test struct {
 	PaymentStatus     string             `json:"paymentStatus" bson:"paymentStatus"`
 	PaymentLink       string             `json:"paymentLink" bson:"paymentLink"`
 	ExternalPaymentId string             `json:"externalPaymentId" bson:"externalPaymentId"`
+	ReportSent        string             `json:"reportSent" bson:"reportSent"`
 }
 
 // NewQuestion creates a new instance of the Question model
-func NewTest(testId primitive.ObjectID, testGiver string, testGiverAge int, testGiverGender string, testName string, userId primitive.ObjectID, paymentStatus string, paymentLink string, externalPaymentId string) *Test {
+func NewTest(
+	testId primitive.ObjectID,
+	testGiver string,
+	testGiverAge int,
+	testGiverGender string,
+	testName string,
+	userId primitive.ObjectID,
+	paymentStatus string,
+	paymentLink string,
+	externalPaymentId string,
+	reportSent string,
+) *Test {
 	return &Test{
 		ID:                testId,
 		TestGiverAge:      testGiverAge,
@@ -39,6 +52,7 @@ func NewTest(testId primitive.ObjectID, testGiver string, testGiverAge int, test
 		PaymentStatus:     paymentStatus,
 		PaymentLink:       paymentLink,
 		ExternalPaymentId: externalPaymentId,
+		ReportSent:        reportSent,
 	}
 }
 
@@ -65,6 +79,34 @@ func UpdateTestPaymentStatus(testId primitive.ObjectID, status string) (*Test, e
 	update := bson.M{
 		"$set": bson.M{
 			"paymentStatus": status,
+		},
+	}
+
+	// Find one document and update it, returning the updated document
+	err := mgm.Coll(&Test{}).FindOneAndUpdate(
+		context.TODO(),
+		bson.M{"_id": testId},
+		update,
+		options.FindOneAndUpdate().SetReturnDocument(options.After),
+	).Decode(&test)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("no document found with the given ID")
+		}
+		return nil, err
+	}
+
+	return &test, nil
+}
+
+func UpdateTestReportSent(testId primitive.ObjectID, reportSent string) (*Test, error) {
+	var test Test
+
+	// Define the update document
+	update := bson.M{
+		"$set": bson.M{
+			"reportSent": reportSent,
 		},
 	}
 

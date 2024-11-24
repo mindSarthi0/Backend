@@ -32,57 +32,80 @@ type OpenAIResponse struct {
 	} `json:"usage"`
 }
 
+const promptTextTone = "Summary Generation Tone : Generated text should be hightly dopamin producing and produce satisfaction"
+
 func GenerateContentFromTextGCP(prompt string) (string, error) {
 	url := "https://api.openai.com/v1/chat/completions"
 
+	// Create the request body
 	requestBody, err := json.Marshal(map[string]interface{}{
-		"model": "gpt-4", // Replace with the correct model name
+		"model": "gpt-4o-mini", // Replace with the correct model name
 		"messages": []map[string]string{
-			{"role": "user", "content": prompt},
+			{
+				"role":    "user",
+				"content": prompt,
+			},
 		},
 	})
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal request body: %v", err)
 	}
 
-	apiKey := os.Getenv("OPENAI_API_KEY") // Ensure the variable name matches
+	apiKey := os.Getenv("API_KEY") // Ensure the variable name matches
 	if apiKey == "" {
 		return "", fmt.Errorf("API key is not set")
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
-	if err != nil {
-		return "", fmt.Errorf("failed to create request: %v", err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
-
 	client := &http.Client{
-		Timeout: 10 * time.Second, // Add a timeout for better control
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("failed to send request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body) // Read body even on errors
-		return "", fmt.Errorf("non-200 status code: %d, response: %s", resp.StatusCode, string(body))
+		Timeout: 30 * time.Second, // Increase timeout to 30 seconds
 	}
 
 	var response OpenAIResponse
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return "", fmt.Errorf("failed to decode response: %v", err)
+	retries := 3
+
+	// Retry mechanism
+	for i := 0; i < retries; i++ {
+		// Create the HTTP request
+		req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+		if err != nil {
+			return "", fmt.Errorf("failed to create request: %v", err)
+		}
+
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+apiKey)
+
+		// Send the request
+		resp, err := client.Do(req)
+		if err != nil {
+			if i == retries-1 {
+				return "", fmt.Errorf("failed to send request after %d attempts: %v", retries, err)
+			}
+			time.Sleep(2 * time.Second) // Wait before retrying
+			continue
+		}
+		defer resp.Body.Close()
+
+		// Check if the response status code is OK
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			return "", fmt.Errorf("non-200 status code: %d, response: %s", resp.StatusCode, string(body))
+		}
+
+		// Decode the response body
+		if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+			return "", fmt.Errorf("failed to decode response: %v", err)
+		}
+
+		// Check if the response contains choices
+		if len(response.Choices) == 0 {
+			return "", fmt.Errorf("no choices in response")
+		}
+
+		// Return the content of the first choice
+		return response.Choices[0].Message.Content, nil
 	}
 
-	if len(response.Choices) == 0 {
-		return "", fmt.Errorf("no choices in response")
-	}
-
-	return response.Choices[0].Message.Content, nil
+	return "", fmt.Errorf("failed to get a valid response after %d attempts", retries)
 }
 
 func CreatePrompt(page string, score []Domain) string {
@@ -197,7 +220,7 @@ func CreatePromptResult(score []Domain) string {
 	c5I := conscientiousnessDomain.Subdomain[4].Intensity
 	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
-	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Summary for each domain in around 300-400 words in total"+
+	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Summary for each domain in around 300-400 words in total. "+promptTextTone+". "+
 
 		"Domain: Neuroticism Score: %s/60 (%s)\n"+
 		"  Subdomains of Neuroticism-\n"+
@@ -350,7 +373,7 @@ func CreatePromptCareerAcademic(score []Domain) string {
 	c5I := conscientiousnessDomain.Subdomain[4].Intensity
 	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
-	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Career & Academia Page under 200 words for the Report\n\n"+
+	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Career & Academia Page under 200 words for the Report\n\n"+promptTextTone+". "+
 
 		"Domain: Neuroticism Score: %s/60 (%s)\n"+
 		"  Subdomains of Neuroticism-\n"+
@@ -503,7 +526,7 @@ func CreatePromptRelationship(score []Domain) string {
 	c5I := conscientiousnessDomain.Subdomain[4].Intensity
 	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
-	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Relationship page under 200 words for the Report\n\n"+
+	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Relationship page under 200 words for the Report\n\n"+promptTextTone+". "+
 
 		"Domain: Neuroticism Score: %s/60 (%s)\n"+
 		"  Subdomains of Neuroticism-\n"+
@@ -656,7 +679,7 @@ func CreatePromptStrengthWeakness(score []Domain) string {
 	c5I := conscientiousnessDomain.Subdomain[4].Intensity
 	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
-	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Strength & Weakness page under 200 words for the Report\n\n"+
+	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Strength & Weakness page under 200 words for the Report\n\n"+promptTextTone+". "+
 
 		"Domain: Neuroticism Score: %s/60 (%s)\n"+
 		"  Subdomains of Neuroticism-\n"+

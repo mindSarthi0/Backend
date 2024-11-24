@@ -3,13 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"github.com/kamva/mgm/v3"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"myproject/API"
 	"myproject/controller"
@@ -20,6 +13,14 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var updatedVersion = "1.0.20"
@@ -90,7 +91,7 @@ func handleSubmission(c *gin.Context) {
 		paymentLinkId = id
 	}
 
-	newTest := models.NewTest(testId, submission.Name, submission.Age, submission.Gender, "BIG_5", user.ID, testPaymentStatus, testPaymentLink, paymentLinkId)
+	newTest := models.NewTest(testId, submission.Name, submission.Age, submission.Gender, "BIG_5", user.ID, testPaymentStatus, testPaymentLink, paymentLinkId, "PENDING")
 
 	if err := mgm.Coll(&models.Test{}).Create(newTest); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create test"})
@@ -181,6 +182,13 @@ func handleReportGeneration(c *gin.Context) {
 
 	if errFromRequest != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get count of already generated reports"})
+		return
+	}
+
+	_, err = models.UpdateTestReportSent(test.ID, "DONE")
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
 
