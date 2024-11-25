@@ -1,5 +1,5 @@
 package API
-..
+
 import (
 	"bytes"
 	"encoding/json"
