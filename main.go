@@ -4,23 +4,22 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"myproject/middlewares"
 	"myproject/routers"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var updatedVersion = "1.0.20"
+var updatedVersion = "1.0.25"
 
 func init() {
-
 	fmt.Println("::Environment mode : " + gin.Mode())
 	if gin.Mode() == "debug" {
 		err := godotenv.Load()
@@ -29,11 +28,10 @@ func init() {
 		}
 		fmt.Println("::Environment Variables : loaded from .env")
 	}
-	// Setup the mgm default config
-	err := mgm.SetDefaultConfig(nil, "cognify", options.Client().ApplyURI("mongodb+srv://cognify:dEQGVwIY24QzdUu6@cluster0.cjyqt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"))
-	// Error handling
+
+	err := mgm.SetDefaultConfig(nil, "cognify", options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
 	if err != nil {
-		log.Fatalf("::DB Connection Error : Failed to connect to MongoDB: %v", err) // Fatal will log and stop the program
+		log.Fatalf("::DB Connection Error : Failed to connect to MongoDB: %v", err)
 	}
 
 	fmt.Println("::DB Connection Status : Successfully connected to MongoDB!")
@@ -42,14 +40,13 @@ func init() {
 func main() {
 	router := gin.Default()
 
-	// Configure CORS
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type"},
-		ExposeHeaders:    []string{"Content-Length", "Content-Type"},
-		AllowCredentials: true,
-	}))
+	// Apply Middlewares
+	router.Use(gin.Recovery())
+	router.Use(middlewares.RateLimitingMiddleware())
+	router.Use(middlewares.CORSMiddleware())
+	router.Use(middlewares.JWTAuthMiddleware())
+	router.Use(middlewares.ErrorHandlingMiddleware())
+	router.Use(middlewares.InputValidationMiddleware())
 
 	// Routes
 	router.POST("/questions", routers.SubmitQuestions)
@@ -64,7 +61,6 @@ func main() {
 	})
 
 	playgroundRouter := os.Getenv("PLAYGROUND_ROUTER")
-
 	if playgroundRouter == "allowed" {
 		//Pdf test route
 		router.POST("/pdf", routers.CreatingPdf)

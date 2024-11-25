@@ -9,4 +9,5 @@ use (
 	./controllers
 	./constants
 	./routers
+	./middlewares
 )
