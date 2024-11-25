@@ -17,7 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var updatedVersion = "1.0.25"
+var updatedVersion = "1.0.26"
 
 func init() {
 	fmt.Println("::Environment mode : " + gin.Mode())
@@ -49,6 +49,7 @@ func main() {
 	router.Use(middlewares.InputValidationMiddleware())
 
 	// Routes
+	router.POST("/auth", routers.Authenticate)
 	router.POST("/questions", routers.SubmitQuestions)
 	router.GET("/questions", routers.FetchAllQuestions)
 	router.POST("/submit", routers.HandleSubmission)
