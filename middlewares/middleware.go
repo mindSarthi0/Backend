@@ -55,9 +55,27 @@ func CORSMiddleware() gin.HandlerFunc {
 func JWTAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check if the request is for /auth or /health with POST method
-		if (strings.Contains(c.Request.URL.Path, "/auth") || strings.Contains(c.Request.URL.Path, "/health")) && c.Request.Method == "POST" {
-			c.Next()
-		} else {
+
+		excludedPaths := os.Getenv("EXCLUDED_PATHS")
+		if excludedPaths == "" {
+			// Default paths if not set in .env
+			excludedPaths = "/auth,/health"
+		}
+
+		// Split the comma-separated excluded paths into a slice
+		excludedPathsSlice := strings.Split(excludedPaths, ",")
+
+		// Check if the request path is in the excluded paths
+		var excludedPath = false
+		for _, path := range excludedPathsSlice {
+			if strings.Contains(c.Request.URL.Path, path) {
+				c.Next() // Proceed with the request if the path is excluded
+				excludedPath = true
+				return
+			}
+		}
+
+		if !excludedPath {
 			// Retrieve Authorization header
 			authHeader := c.GetHeader("Authorization")
 
