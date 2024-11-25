@@ -1,11 +1,12 @@
 package routers
 
 import (
-	"github.com/gin-gonic/gin"
-	"myproject/API"
+	apis "myproject/apis"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func PaymentTest(c *gin.Context) {
@@ -33,7 +34,7 @@ func PaymentTest(c *gin.Context) {
 
 	println(callbackURL)
 
-	data, _ := API.CreatePaymentLinkData(upiLink, amount, currency, acceptPartial, minPartialAmount, expireBy, referenceID, description, customerName, customerContact, customerEmail, notifySMS, notifyEmail, reminderEnable, policyName, callbackURL, callbackMethod)
+	data, _ := apis.CreatePaymentLinkData(upiLink, amount, currency, acceptPartial, minPartialAmount, expireBy, referenceID, description, customerName, customerContact, customerEmail, notifySMS, notifyEmail, reminderEnable, policyName, callbackURL, callbackMethod)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Payment Link created successfully", "data": data})
 }
@@ -51,7 +52,26 @@ func PaymentLinkFetch(c *gin.Context) {
 		return
 	}
 
-	data, _ := API.GetPaymentLink(paymentLinkFetchRequest.PaymentLinkId)
+	data, _ := apis.GetPaymentLink(paymentLinkFetchRequest.PaymentLinkId)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Payment Link fetched successfully", "data": data})
+}
+
+func CreatingPdf(c *gin.Context) {
+	apis.CreatePDF()
+}
+
+func TestMail(c *gin.Context) {
+	apis.Mail()
+}
+
+func Generatepdf(c *gin.Context) {
+	testContent := map[string]string{
+		"strength_weakness": "Abcd efgh",
+		"result":            "result vsdc sdsdcs csdcdsc svd",
+		"relationship":      "relationship adsad cdacsa",
+		"career_academic":   "career_academic vdfv dfvdfv",
+	}
+
+	apis.GenerateBigFivePDF(testContent, "user_name_ppp", "report")
 }

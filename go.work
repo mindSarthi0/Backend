@@ -3,10 +3,10 @@ go 1.23
 use (
 	.
 	./models
-	./API
+	./apis
 	./response
-	./lib
-	./controller
+	./libs
+	./controllers
 	./constants
 	./routers
 )

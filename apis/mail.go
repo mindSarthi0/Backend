@@ -9,7 +9,7 @@ import (
 	"gopkg.in/mail.v2" // Sending email
 )
 
-func sendEmail(to string, subject string, body string, attachmentPath string) {
+func sendEmail(to string, subject string, body string, attachmentPath string) error {
 	m := mail.NewMessage()
 
 	// Set email sender, receiver, subject, and body
@@ -24,15 +24,17 @@ func sendEmail(to string, subject string, body string, attachmentPath string) {
 	// Configure Zoho SMTP settings
 	d := mail.NewDialer("smtp.zoho.in", 587, "report@mindsarthi.com", "rXNfpN8Aa1q8") //
 
-	sendEmailWithRetry(m, 5, d)
+	err := sendEmailWithRetry(m, 5, d)
+
+	return err
 }
 
-func sendEmailWithRetry(m *mail.Message, retries int, d *mail.Dialer) {
+func sendEmailWithRetry(m *mail.Message, retries int, d *mail.Dialer) error {
 	for attempt := 1; attempt <= retries; attempt++ {
 		err := d.DialAndSend(m)
 		if err == nil {
 			log.Printf("Email sent successfully on attempt %d", attempt)
-			return
+			return nil
 		}
 
 		log.Printf("Attempt %d: Error sending email: %v", attempt, err)
@@ -48,6 +50,8 @@ func sendEmailWithRetry(m *mail.Message, retries int, d *mail.Dialer) {
 		}
 	}
 	log.Println("Failed to send email after retries")
+
+	return fmt.Errorf("Failed to send email after retries")
 }
 
 func logDetailedError(err error) {
@@ -60,7 +64,7 @@ func logDetailedError(err error) {
 	}
 }
 
-func SendBIG5Report(to string, name string, attachmentPath string) {
+func SendBIG5Report(to string, name string, attachmentPath string) error {
 
 	htmlBody := fmt.Sprintf(`
       <p style="color: black;">Dear %s,</p>
@@ -77,7 +81,9 @@ func SendBIG5Report(to string, name string, attachmentPath string) {
       <p style="color: black;">Best regards,<br>Nitish</p>
     `, name)
 
-	sendEmail(to, "Insights Unlocked: Your BIG 5 Personality Assessment Report is Ready!", htmlBody, attachmentPath)
+	err := sendEmail(to, "Insights Unlocked: Your BIG 5 Personality Assessment Report is Ready!", htmlBody, attachmentPath)
+
+	return err
 }
 
 func Mail() {

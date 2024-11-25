@@ -3,7 +3,7 @@ package controller
 import (
 	"fmt"
 	"log"
-	"myproject/lib"
+	libs "myproject/libs"
 	"myproject/models"
 	"net/http"
 
@@ -11,7 +11,7 @@ import (
 	"github.com/kamva/mgm/v3"
 
 	// "strconv"
-	"myproject/API"
+	apis "myproject/apis"
 	"myproject/constants"
 	"os"
 	"time"
@@ -35,7 +35,7 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 			Message: "Failed to fetch scores and questions",
 		}
 	}
-	fmt.Println("Time taken by Fetch Scores with Questions API calls:", time.Since(startTime))
+	fmt.Println("Time taken by Fetch Scores with Questions apis calls:", time.Since(startTime))
 
 	// Process Scores
 	processedScores := CalculateProcessedScore(scoresAndQuestions)
@@ -62,15 +62,15 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 
 	// Generate Prompts for AI Model
 	for page := range constants.BIG_5_Report {
-		prompt := API.CreatePrompt(constants.BIG_5_Report[page], processedScores)
+		prompt := apis.CreatePrompt(constants.BIG_5_Report[page], processedScores)
 		prompts[constants.BIG_5_Report[page]] = prompt
 	}
 
-	// Concurrent API Calls for AI Responses
+	// Concurrent apis Calls for AI Responses
 	startTime = time.Now()
-	channel := make(chan API.PromptRequest)
+	channel := make(chan apis.PromptRequest)
 	for page, prompt := range prompts {
-		go API.WorkerOpenAIGPT(page, prompt, channel)
+		go apis.WorkerOpenAIGPT(page, prompt, channel)
 	}
 
 	results := map[string]string{}
@@ -84,7 +84,7 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 	pdfGenerationContent := map[string]string{}
 	for page, _ := range prompts {
 		generatedResponseString := results[page]
-		generatedContent, err := lib.ParseMarkdownCode(generatedResponseString)
+		generatedContent, err := libs.ParseMarkdownCode(generatedResponseString)
 		if err != nil {
 			// Respond with an error message if content generation failed
 		}
@@ -98,7 +98,7 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 	log.Println("Tester Name: " + test.TestGiver)
 
 	// Generate PDF
-	errInPdfGeneration := API.GenerateBigFivePDF(pdfGenerationContent, test.TestGiver, reportPdfFilename)
+	errInPdfGeneration := apis.GenerateBigFivePDF(pdfGenerationContent, test.TestGiver, reportPdfFilename)
 	if errInPdfGeneration != nil {
 		return &MyError{
 			Code:    http.StatusInternalServerError,
@@ -110,7 +110,16 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 	// Send Report via Email
 	startTime = time.Now()
 	log.Println("Sending Report via Email to user")
-	API.SendBIG5Report(user.Email, test.TestGiver, "./"+reportPdfFilename+".pdf")
+
+	err = apis.SendBIG5Report(user.Email, test.TestGiver, "./"+reportPdfFilename+".pdf")
+
+	if err != nil {
+		return &MyError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
 	fmt.Println("Time taken to send email:", time.Since(startTime))
 
 	// Save Report to Database
@@ -157,6 +166,6 @@ func GeneratePaymentLink(
 	callbackMethod := "get"
 	upiLink := false
 
-	return API.CreatePaymentLinkData(upiLink, amount, currency, acceptPartial, minPartialAmount, expireBy, referenceID, description, customerName, customerContact, customerEmail, notifySMS, notifyEmail, reminderEnable, policyName, callbackURL, callbackMethod)
+	return apis.CreatePaymentLinkData(upiLink, amount, currency, acceptPartial, minPartialAmount, expireBy, referenceID, description, customerName, customerContact, customerEmail, notifySMS, notifyEmail, reminderEnable, policyName, callbackURL, callbackMethod)
 
 }

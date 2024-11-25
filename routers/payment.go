@@ -2,15 +2,16 @@ package routers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
-	"myproject/API"
+	apis "myproject/apis"
 	"myproject/controller"
 	"myproject/models"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	// "time"
 )
 
@@ -61,7 +62,7 @@ func HandlePaymentCallback(c *gin.Context) {
 	}
 
 	// Verify the payment link
-	if API.VerifyPaymentLink(params, signature) {
+	if apis.VerifyPaymentLink(params, signature) {
 		// Payment verification successful
 		// Mark payment status of test as successful
 

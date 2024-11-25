@@ -33,13 +33,15 @@ type OpenAIResponse struct {
 }
 
 const promptTextTone = "Summary Generation Tone : Generated text should be hightly dopamin producing and produce satisfaction"
+const extraPrompt = promptTextTone + ".Do not include sub domain key names in quotos. Make the summary free from any ambigious words that normal users does't understands."
 
 func GenerateContentFromTextGCP(prompt string) (string, error) {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	// Create the request body
 	requestBody, err := json.Marshal(map[string]interface{}{
-		"model": "gpt-4o-mini", // Replace with the correct model name
+		// "model": "gpt-4o-mini", // Replace with the correct model name
+		"model": "o1-mini",
 		"messages": []map[string]string{
 			{
 				"role":    "user",
@@ -220,7 +222,7 @@ func CreatePromptResult(score []Domain) string {
 	c5I := conscientiousnessDomain.Subdomain[4].Intensity
 	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
-	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Summary for each domain in around 300-400 words in total. "+promptTextTone+". "+
+	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create a Summary by combining all domain in around 300-400 words in total. "+extraPrompt+". "+
 
 		"Domain: Neuroticism Score: %s/60 (%s)\n"+
 		"  Subdomains of Neuroticism-\n"+
@@ -373,7 +375,7 @@ func CreatePromptCareerAcademic(score []Domain) string {
 	c5I := conscientiousnessDomain.Subdomain[4].Intensity
 	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
-	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Career & Academia Page under 200 words for the Report\n\n"+promptTextTone+". "+
+	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Career & Academia Page under 200 words for the Report\n\n"+extraPrompt+". "+
 
 		"Domain: Neuroticism Score: %s/60 (%s)\n"+
 		"  Subdomains of Neuroticism-\n"+
@@ -526,7 +528,7 @@ func CreatePromptRelationship(score []Domain) string {
 	c5I := conscientiousnessDomain.Subdomain[4].Intensity
 	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
-	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Relationship page under 200 words for the Report\n\n"+promptTextTone+". "+
+	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Relationship page under 200 words for the Report\n\n"+extraPrompt+". "+
 
 		"Domain: Neuroticism Score: %s/60 (%s)\n"+
 		"  Subdomains of Neuroticism-\n"+
@@ -679,7 +681,7 @@ func CreatePromptStrengthWeakness(score []Domain) string {
 	c5I := conscientiousnessDomain.Subdomain[4].Intensity
 	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
-	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Strength & Weakness page under 200 words for the Report\n\n"+promptTextTone+". "+
+	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create Strength & Weakness page under 200 words for the Report\n\n"+extraPrompt+". "+
 
 		"Domain: Neuroticism Score: %s/60 (%s)\n"+
 		"  Subdomains of Neuroticism-\n"+

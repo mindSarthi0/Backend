@@ -3,8 +3,8 @@ package controller
 import (
 	"fmt"
 	"log"
-	"myproject/API"
-	"myproject/lib"
+	apis "myproject/apis"
+	libs "myproject/libs"
 	"myproject/models"
 	"sort"
 	"strconv"
@@ -64,7 +64,7 @@ func FetchScoresWithQuestions(testId primitive.ObjectID) ([]ScoreQuestion, error
 	return mergedData, nil
 }
 
-func CalculateProcessedScore(scoreQuestions []ScoreQuestion) []API.Domain {
+func CalculateProcessedScore(scoreQuestions []ScoreQuestion) []apis.Domain {
 	rules := map[string][][]string{
 		"neuroticism": {
 			{"n1", "Anxiety", "1", "N", "2", "N"},
@@ -108,16 +108,16 @@ func CalculateProcessedScore(scoreQuestions []ScoreQuestion) []API.Domain {
 		},
 	}
 
-	var domains []API.Domain
+	var domains []apis.Domain
 	for domainName, subdomains := range rules {
 		var domainScore int
-		var processedSubdomains []API.Subdomain
+		var processedSubdomains []apis.Subdomain
 		var testId, userId primitive.ObjectID
 
 		for _, rule := range subdomains {
 			subdomainName := rule[1]
 			no1, flow1 := rule[2], rule[3]
-			cNo1, err1 := lib.ConvertToInt(no1)
+			cNo1, err1 := libs.ConvertToInt(no1)
 			if err1 != nil {
 				log.Printf("Error converting question number: %v", err1)
 				continue
@@ -128,7 +128,7 @@ func CalculateProcessedScore(scoreQuestions []ScoreQuestion) []API.Domain {
 			userId = score1.UserId
 
 			no2, flow2 := rule[4], rule[5]
-			cNo2, err2 := lib.ConvertToInt(no2)
+			cNo2, err2 := libs.ConvertToInt(no2)
 			if err2 != nil {
 				log.Printf("Error converting question number: %v", err2)
 				continue
@@ -136,12 +136,12 @@ func CalculateProcessedScore(scoreQuestions []ScoreQuestion) []API.Domain {
 			score2 := scoreQuestions[cNo2-1]
 
 			_, subdomainScore, intensity := calculateSubdomainScore(subdomainName, score1.RawScore, flow1, score2.RawScore, flow2)
-			processedSubdomains = append(processedSubdomains, API.Subdomain{subdomainName, subdomainScore, intensity})
+			processedSubdomains = append(processedSubdomains, apis.Subdomain{subdomainName, subdomainScore, intensity})
 			domainScore += subdomainScore
 		}
 
 		domainIntensity := calculateDomainIntensity(domainScore)
-		domains = append(domains, API.Domain{domainName, domainScore, processedSubdomains, userId, testId, domainIntensity})
+		domains = append(domains, apis.Domain{domainName, domainScore, processedSubdomains, userId, testId, domainIntensity})
 	}
 
 	return domains
