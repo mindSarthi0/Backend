@@ -56,20 +56,36 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check if the request is for /auth or /health with POST method
 
+		// Get excluded paths from environment variable
 		excludedPaths := os.Getenv("EXCLUDED_PATHS")
 		if excludedPaths == "" {
 			// Default paths if not set in .env
-			excludedPaths = "/auth,/health"
+			excludedPaths = ""
 		}
 
 		// Split the comma-separated excluded paths into a slice
 		excludedPathsSlice := strings.Split(excludedPaths, ",")
 
-		// Check if the request path is in the excluded paths
+		// Check if the request path and method are in the excluded paths
+		requestMethod := c.Request.Method
+		requestPath := c.Request.URL.Path
+
 		var excludedPath = false
 		for _, path := range excludedPathsSlice {
-			if strings.Contains(c.Request.URL.Path, path) {
-				c.Next() // Proceed with the request if the path is excluded
+			// Split the path into method and path components
+			parts := strings.SplitN(path, " ", 2)
+
+			// If there are not exactly two parts (method and path), skip this entry
+			if len(parts) != 2 {
+				continue
+			}
+
+			method := parts[0]
+			path := parts[1]
+
+			// If the request method and path match the excluded ones, proceed with the request
+			if strings.EqualFold(requestMethod, method) && strings.Contains(requestPath, path) {
+				c.Next() // Skip further checks and process the request
 				excludedPath = true
 				return
 			}
