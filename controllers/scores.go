@@ -149,13 +149,13 @@ func CalculateProcessedScore(scoreQuestions []ScoreQuestion) []apis.Domain {
 
 func calculateDomainIntensity(domainscore int) string {
 	var domainIntensity string
-	if domainscore >= 50 {
+	if domainscore >= 48 {
 		domainIntensity = "High"
-	} else if domainscore >= 40 {
+	} else if domainscore >= 36 {
 		domainIntensity = "Above Average"
-	} else if domainscore >= 30 {
+	} else if domainscore >= 34 {
 		domainIntensity = "Average"
-	} else if domainscore >= 20 {
+	} else if domainscore >= 22 {
 		domainIntensity = "Below Average"
 	} else if domainscore >= 10 {
 		domainIntensity = "Low"
@@ -194,14 +194,14 @@ func calculateSubdomainScore(subdomain, score1, flow1, score2, flow2 string) (st
 	// Determine the intensity based on subdomain score
 	var intensity string
 
-	if subdomainScore > 8 {
+	if subdomainScore >= 8 {
 		intensity = "High"
-	} else if subdomainScore > 6 {
-		intensity = "Above Average"
-	} else if subdomainScore > 4 {
+		// } else if subdomainScore >= 6 {
+		// 	intensity = "Above Average"
+	} else if subdomainScore >= 5 {
 		intensity = "Average"
-	} else if subdomainScore > 3 {
-		intensity = "Below Average"
+		// } else if subdomainScore >= 3 {
+		// 	intensity = "Below Average"
 	} else {
 		intensity = "Low"
 	}

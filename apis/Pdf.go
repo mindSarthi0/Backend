@@ -110,7 +110,6 @@ func addContentSection(pdf *gofpdf.Fpdf, title, content string, fontSize int) {
 		pdf.Ln(8)
 	}
 
-	// Set the body font to Calibri 16 pt and add space before the content
 	pdf.SetFont("Arial", "", 12)
 	pdf.SetTextColor(17, 45, 78)
 	pdf.MultiCell(190, 10, content, "", "", false)
