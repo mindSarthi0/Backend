@@ -32,7 +32,7 @@ func HandleSubmission(c *gin.Context) {
 	mgm.Coll(&models.User{}).SimpleFind(&existingUsers, bson.M{"email": submission.Email})
 
 	if len(existingUsers) == 0 {
-		newUser := models.NewUser(submission.Name, submission.Email, submission.Gender, submission.Age)
+		newUser := models.NewUser(submission.Name, submission.Email, submission.Gender, submission.Age, "", "USER", "ACTIVE", "PENDING")
 		if err := mgm.Coll(newUser).Create(newUser); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 			return

@@ -31,14 +31,20 @@ func RateLimitingMiddleware() gin.HandlerFunc {
 
 // CORSMiddleware sets up CORS configuration
 func CORSMiddleware() gin.HandlerFunc {
-	// Get allowed origins from environment variable or use default
-	allowOrigins := os.Getenv("WEBAPP_DOMAIN")
-	if allowOrigins == "" {
-		allowOrigins = "http://localhost:3000" // Default value if not set in the environment
-	}
+	var allowOriginsSlice []string
 
-	// Split the comma-separated allowed origins into a slice
-	allowOriginsSlice := strings.Split(allowOrigins, ",")
+	if gin.Mode() == gin.DebugMode {
+		// Allow all origins in development mode
+		allowOriginsSlice = []string{"*"}
+	} else {
+		// Get allowed origins from environment variable or use default
+		allowOrigins := os.Getenv("WEBAPP_DOMAIN")
+		if allowOrigins == "" {
+			allowOrigins = "http://localhost:3000" // Default value if not set in the environment
+		}
+		// Split the comma-separated allowed origins into a slice
+		allowOriginsSlice = strings.Split(allowOrigins, ",")
+	}
 
 	// Return CORS configuration using the gin-cors middleware
 	return cors.New(cors.Config{
@@ -55,7 +61,7 @@ func CORSMiddleware() gin.HandlerFunc {
 func JWTAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check if the request is for /auth or /health with POST method
-
+		println("JWTAuthMiddleware")
 		// Get excluded paths from environment variable
 		excludedPaths := os.Getenv("EXCLUDED_PATHS")
 		if excludedPaths == "" {
