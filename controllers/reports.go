@@ -151,6 +151,8 @@ func GeneratePaymentLink(
 	backendAapiDomain := os.Getenv("BACKEND_API_DOMAIN")
 	callbackPath := os.Getenv("CALLBACK_PATH")
 
+	disableEmailSending := os.Getenv("DISABLE_EMAIL_SENDING")
+
 	currency := "INR"
 	acceptPartial := false
 	minPartialAmount := 0
@@ -160,6 +162,9 @@ func GeneratePaymentLink(
 	customerEmail := email
 	notifySMS := true
 	notifyEmail := true
+	if disableEmailSending == "true" {
+		notifyEmail = false
+	}
 	reminderEnable := true
 	policyName := "Standard Policy"
 	callbackURL := backendAapiDomain + callbackPath
