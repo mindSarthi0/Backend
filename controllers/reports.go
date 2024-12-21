@@ -5,6 +5,7 @@ import (
 	"log"
 	libs "myproject/libs"
 	"myproject/models"
+
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -61,16 +62,16 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 	}
 
 	// Generate Prompts for AI Model
-	for page := range constants.BIG_5_Report {
-		prompt := apis.CreatePrompt(constants.BIG_5_Report[page], processedScores)
-		prompts[constants.BIG_5_Report[page]] = prompt
+	for sections := range constants.BIG_5_Report {
+		prompt := apis.CreatePrompt(constants.BIG_5_Report[sections], processedScores)
+		prompts[constants.BIG_5_Report[sections]] = prompt
 	}
 
 	// Concurrent apis Calls for AI Responses
 	startTime = time.Now()
 	channel := make(chan apis.PromptRequest)
-	for page, prompt := range prompts {
-		go apis.WorkerOpenAIGPT(page, prompt, channel)
+	for section, prompt := range prompts {
+		go apis.WorkerOpenAIGPT(section, prompt, channel)
 	}
 
 	results := map[string]string{}
@@ -82,9 +83,11 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 
 	// Generate PDF Content
 	pdfGenerationContent := map[string]string{}
+
 	for page, _ := range prompts {
 		generatedResponseString := results[page]
 		generatedContent, err := libs.ParseMarkdownCode(generatedResponseString)
+
 		if err != nil {
 			// Respond with an error message if content generation failed
 		}
@@ -92,26 +95,40 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 		pdfGenerationContent[page] = generatedResponseString
 	}
 
-	log.Println("Generating PDF")
-	startTime = time.Now()
-	reportPdfFilename := "report_" + test.ID.Hex()
-	log.Println("Tester Name: " + test.TestGiver)
+	disablePdfGeneration := os.Getenv("DISABLE_PDF_GENERATION")
 
-	// Generate PDF
-	errInPdfGeneration := apis.GenerateBigFivePDF(pdfGenerationContent, test.TestGiver, reportPdfFilename)
-	if errInPdfGeneration != nil {
-		return &MyError{
-			Code:    http.StatusInternalServerError,
-			Message: "Failed to generate pdf",
+	if disablePdfGeneration == "false" {
+		log.Println("Generating PDF")
+		startTime = time.Now()
+		reportPdfFilename := "report_" + test.ID.Hex()
+		log.Println("Tester Name: " + test.TestGiver)
+
+		// Generate PDF
+		errInPdfGeneration := apis.GenerateBigFivePDF(pdfGenerationContent, test.TestGiver, reportPdfFilename)
+		if errInPdfGeneration != nil {
+			return &MyError{
+				Code:    http.StatusInternalServerError,
+				Message: "Failed to generate pdf",
+			}
 		}
+		fmt.Println("Time taken to generate PDF:", time.Since(startTime))
+
+		// Send Report via Email
+		startTime = time.Now()
+		log.Println("Sending Report via Email to user")
+
+		err = apis.SendBIG5Report(user.Email, test.TestGiver, "./"+reportPdfFilename+".pdf")
+	} else {
+		pdfGenerationContentInterface := make(map[string]interface{})
+		for key, value := range pdfGenerationContent {
+			pdfGenerationContentInterface[key] = value
+		}
+
+		finalReport := models.NewFinalReport(test.UserId, test.ID, pdfGenerationContentInterface)
+
+		// Save t db
+		mgm.Coll(&models.FinalReport{}).InsertOne(c, finalReport)
 	}
-	fmt.Println("Time taken to generate PDF:", time.Since(startTime))
-
-	// Send Report via Email
-	startTime = time.Now()
-	log.Println("Sending Report via Email to user")
-
-	err = apis.SendBIG5Report(user.Email, test.TestGiver, "./"+reportPdfFilename+".pdf")
 
 	if err != nil {
 		return &MyError{
@@ -125,6 +142,7 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 	// Save Report to Database
 	startTime = time.Now()
 	var docs []interface{}
+
 	for _, q := range newDbReports {
 		docs = append(docs, q)
 	}
