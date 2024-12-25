@@ -55,6 +55,7 @@ func main() {
 	router.POST("/submit", routers.HandleSubmission)
 	router.GET("/report", routers.HandleReportGeneration)
 	router.GET("/paymentCallback", routers.HandlePaymentCallback)
+	router.GET("/report/:testId", routers.HandleBig5Report)
 
 	// Health check route
 	router.GET("/health", func(c *gin.Context) {
