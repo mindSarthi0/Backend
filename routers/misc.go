@@ -9,6 +9,8 @@ import (
 	"myproject/controller"
 
 	"context"
+	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/kamva/mgm/v3"
@@ -55,7 +57,15 @@ func HandleSubmission(c *gin.Context) {
 	} else {
 		// Go through payment mode
 		referenceId := "big5_" + testId.Hex()
-		data, err := controller.GeneratePaymentLink(2100, "For BIG 5 report generator", submission.Name, user.Email, referenceId)
+		amount := os.Getenv("BIG_5_REPORT_PRICE")
+
+		amountInt, err := strconv.Atoi(amount)
+		if err != nil {
+			fmt.Println(":: ERROR : " + err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generated payment link"})
+			return
+		}
+		data, err := controller.GeneratePaymentLink(amountInt, "For BIG 5 report generator", submission.Name, user.Email, referenceId)
 
 		if err != nil {
 			fmt.Println(":: ERROR : " + err.Error())
