@@ -86,6 +86,29 @@ func SendBIG5Report(to string, name string, attachmentPath string) error {
 	return err
 }
 
+func SendBIG5ReportWithLink(to string, name string, link string) error {
+
+	htmlBody := fmt.Sprintf(`
+      <p style="color: black;">Dear %s,</p>
+      <p style="color: black;">We hope this email finds you well. Thank you for completing the Big 5 Personality Test! We have attached your personalized report, which provides detailed insights into your personality.</p>
+      <p style="color: black;"><strong>What’s inside your report:</strong></p>
+      <ul style="color: black;">
+        <li>A breakdown of your scores for each of the five personality traits</li>
+        <li>Personalized insights based on your responses</li>
+        <li>Practical tips for personal growth and development</li>
+      </ul>
+      <p style="color: black;">You can access your report <a href="%s">here</a>.</p>
+      <p style="color: black;">By understanding your personality, you can gain valuable insights that can enhance your personal and professional life.</p>
+      <p style="color: black;">Thank you for choosing <strong>Mind Sarthi</strong>. We wish you the best in your journey of self-discovery!</p>
+	  <p style="color: black;">We would love to hear your feedback on your experience. Please feel free to reply to this email and share your thoughts with us.</p>
+      <p style="color: black;">Best regards,<br>Nitish</p>
+    `, name, link)
+
+	err := sendEmail(to, "Insights Unlocked: Your BIG 5 Personality Assessment Report is Ready!", htmlBody, attachmentPath)
+
+	return err
+}
+
 func Mail() {
 
 	pdfFile := "report.pdf"

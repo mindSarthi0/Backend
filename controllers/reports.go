@@ -16,7 +16,15 @@ import (
 	"myproject/constants"
 	"os"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+type ReportResponse struct {
+	Report   []models.Report      `json:"report"`
+	AiReport []models.FinalReport `json:"aiReport"`
+}
 
 type MyError struct {
 	Code    int
@@ -123,7 +131,8 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 		for key, value := range pdfGenerationContent {
 			pdfGenerationContentInterface[key] = value
 		}
-
+		link := os.Getenv("BACKEND_API_DOMAIN") + os.Getenv("REPORT_PATH") + test.ID.Hex()
+		err = apis.SendBIG5ReportWithLink(user.Email, test.TestGiver, link)
 		finalReport := models.NewFinalReport(test.UserId, test.ID, pdfGenerationContentInterface)
 
 		// Save t db
@@ -191,4 +200,24 @@ func GeneratePaymentLink(
 
 	return apis.CreatePaymentLinkData(upiLink, amount, currency, acceptPartial, minPartialAmount, expireBy, referenceID, description, customerName, customerContact, customerEmail, notifySMS, notifyEmail, reminderEnable, policyName, callbackURL, callbackMethod)
 
+}
+
+// Start Generation Here
+func GetCompleteReportByTestId(testId string) (ReportResponse, error) {
+	oid, err := primitive.ObjectIDFromHex(testId)
+	if err != nil {
+		return ReportResponse{}, err
+	}
+
+	var reports []models.Report
+	if err := mgm.Coll(&models.Report{}).SimpleFind(&reports, bson.M{"testId": oid}); err != nil {
+		return ReportResponse{}, err
+	}
+
+	var finalReports []models.FinalReport
+	if err := mgm.Coll(&models.FinalReport{}).SimpleFind(&finalReports, bson.M{"testId": oid}); err != nil {
+		return ReportResponse{}, err
+	}
+
+	return ReportResponse{Report: reports, AiReport: finalReports}, nil
 }
