@@ -18,8 +18,10 @@ func sendEmail(to string, subject string, body string, attachmentPath string) er
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", body)
 
-	// Attach the PDF file
-	m.Attach(attachmentPath)
+	if attachmentPath != "" {
+		// Attach the PDF file
+		m.Attach(attachmentPath)
+	}
 
 	// Configure Zoho SMTP settings
 	d := mail.NewDialer("smtp.zoho.in", 587, "report@mindsarthi.com", "rXNfpN8Aa1q8") //
@@ -104,7 +106,7 @@ func SendBIG5ReportWithLink(to string, name string, link string) error {
       <p style="color: black;">Best regards,<br>Nitish</p>
     `, name, link)
 
-	err := sendEmail(to, "Insights Unlocked: Your BIG 5 Personality Assessment Report is Ready!", htmlBody, attachmentPath)
+	err := sendEmail(to, "Insights Unlocked: Your BIG 5 Personality Assessment Report is Ready!", htmlBody, "")
 
 	return err
 }

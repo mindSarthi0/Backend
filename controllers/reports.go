@@ -131,7 +131,7 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 		for key, value := range pdfGenerationContent {
 			pdfGenerationContentInterface[key] = value
 		}
-		link := os.Getenv("BACKEND_API_DOMAIN") + os.Getenv("REPORT_PATH") + test.ID.Hex()
+		link := os.Getenv("WEBAPP_DOMAIN") + os.Getenv("REPORT_PATH") + test.ID.Hex()
 		err = apis.SendBIG5ReportWithLink(user.Email, test.TestGiver, link)
 		finalReport := models.NewFinalReport(test.UserId, test.ID, pdfGenerationContentInterface)
 
