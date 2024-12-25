@@ -38,10 +38,14 @@ const extraPrompt = promptTextTone + ""
 func GenerateContentFromTextGCP(prompt string) (string, error) {
 	url := "https://api.openai.com/v1/chat/completions"
 
+	model := os.Getenv("AI_MODEL")
+	if model == "" {
+		model = "gpt-4o-mini"
+	}
 	// Create the request body
 	requestBody, err := json.Marshal(map[string]interface{}{
 		// "model": "gpt-4o-mini", // Replace with the correct model name
-		"model": "o1-mini",
+		"model": model,
 		"messages": []map[string]string{
 			{
 				"role":    "user",
@@ -49,6 +53,7 @@ func GenerateContentFromTextGCP(prompt string) (string, error) {
 			},
 		},
 	})
+
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal request body: %v", err)
 	}
