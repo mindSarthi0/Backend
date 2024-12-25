@@ -10,9 +10,10 @@ import (
 	"os"
 	"strings"
 
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	// "time"
 )
 
 func ExtractTestId(referenceId string) (string, error) {
@@ -107,8 +108,10 @@ func HandlePaymentCallback(c *gin.Context) {
 		if paymentLinkStatus == "paid" {
 			go controller.GenerateNewReport(c, *test, user)
 		}
-
-		c.Redirect(http.StatusFound, webappPaymentStatusPath+"?status=success&message=Thank you for your purchase. Your response is being analyzed by our scientific algorithm and will be sent to you within 5 minutes. We appreciate your interest in understanding yourself better!")
+		link := os.Getenv("WEBAPP_DOMAIN") + os.Getenv("REPORT_PATH") + test.ID.Hex()
+		time.Sleep(2 * time.Second)
+		c.Redirect(http.StatusFound, link)
+		// c.Redirect(http.StatusFound, webappPaymentStatusPath+"?status=success&message=Thank you for your purchase. Your response is being analyzed by our scientific algorithm and will be sent to you within 5 minutes. We appreciate your interest in understanding yourself better!&link="+link)
 		return
 	}
 

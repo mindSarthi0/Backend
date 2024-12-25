@@ -9,12 +9,12 @@ type FinalReport struct {
 	// DefaultModel includes the MongoDB ID (_id), createdAt, and updatedAt fields.
 	mgm.DefaultModel `bson:",inline"`
 
-	UserId           primitive.ObjectID     `json:"userId" bson:"userId"`
-	TestId           primitive.ObjectID     `json:"testId" bson:"testId"`
-	GeneratedContent map[string]interface{} `json:"generatedContent" bson:"generatedContent"`
+	UserId           primitive.ObjectID `json:"userId" bson:"userId"`
+	TestId           primitive.ObjectID `json:"testId" bson:"testId"`
+	GeneratedContent string             `json:"generatedContent" bson:"generatedContent"`
 }
 
-func NewFinalReport(userId primitive.ObjectID, testId primitive.ObjectID, generatedContent map[string]interface{}) *FinalReport {
+func NewFinalReport(userId primitive.ObjectID, testId primitive.ObjectID, generatedContent string) *FinalReport {
 	return &FinalReport{
 		UserId:           userId,
 		TestId:           testId,

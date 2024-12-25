@@ -14,6 +14,7 @@ func ConvertToInt(s string) (int, error) {
 	return convertedInt, nil
 }
 
-func ParseMarkdownCode(s string) (string, error) {
-	return s, nil
+func ParseMarkdownCode(s string) (map[string]interface{}, error) {
+	// s ```josn sdfdsf  ````
+	return nil, nil
 }
