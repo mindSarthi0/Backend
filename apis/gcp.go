@@ -203,7 +203,11 @@ func CreatePromptResultV2(score []Domain) string {
 	c5I := conscientiousnessDomain.Subdomain[4].Intensity
 	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
-	prompt := fmt.Sprintf("Using the Big 5 Assessment score given below, create a Summary in the give 'OUTPUT JSON FORMAT' format. "+extraPrompt+". "+
+	prompt := fmt.Sprintf("Using the Big 5 Assessment scores provided below, create a summary in the given **'OUTPUT JSON FORMAT'**. Ensure that the summary reflects the individual's scores and provides personalized, insightful content based on their results."+
+		"Tone and Style-\n"+
+		"1)Use a positive and empowering tone to highlight strengths and opportunities.\n"+
+		"2)Provide constructive insights for areas of growth.\n"+
+		"3)Ensure the language is clear, professional, and engaging.\n"+
 
 		"Domain: Neuroticism Score: %s/60 (%s)\n"+
 		"  Subdomains of Neuroticism-\n"+
