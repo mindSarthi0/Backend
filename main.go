@@ -44,7 +44,7 @@ func main() {
 	router.Use(gin.Recovery())
 	router.Use(middlewares.RateLimitingMiddleware())
 	router.Use(middlewares.CORSMiddleware())
-	router.Use(middlewares.JWTAuthMiddleware())
+	//router.Use(middlewares.JWTAuthMiddleware())
 	router.Use(middlewares.ErrorHandlingMiddleware())
 	router.Use(middlewares.InputValidationMiddleware())
 
