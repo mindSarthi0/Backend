@@ -91,22 +91,32 @@ func SendBIG5Report(to string, name string, attachmentPath string) error {
 func SendBIG5ReportWithLink(to string, name string, link string) error {
 
 	htmlBody := fmt.Sprintf(`
-      <p style="color: black;">Dear %s,</p>
-      <p style="color: black;">We hope this email finds you well. Thank you for completing the Big 5 Personality Test! We have attached your personalized report, which provides detailed insights into your personality.</p>
-      <p style="color: black;"><strong>What’s inside your report:</strong></p>
-      <ul style="color: black;">
-        <li>A breakdown of your scores for each of the five personality traits</li>
-        <li>Personalized insights based on your responses</li>
-        <li>Practical tips for personal growth and development</li>
+      <p style="color: black; font-family: Arial, sans-serif;">Hi %s,</p>
+      <p style="color: black; font-family: Arial, sans-serif;">
+        Thank you for completing the Big 5 Personality Test! Your personalized report is now ready, offering unique insights into your personality traits and how they shape your life.
+      </p>
+      <p style="color: black; font-family: Arial, sans-serif;">
+        <strong>What’s inside your report:</strong>
+      </p>
+      <ul style="color: black; font-family: Arial, sans-serif;">
+        <li>A detailed breakdown of your Big 5 personality scores</li>
+        <li>Actionable tips tailored to your strengths</li>
+        <li>Personalized insights to help you thrive</li>
       </ul>
-      <p style="color: black;">You can access your report <a href="%s">here</a>.</p>
-      <p style="color: black;">By understanding your personality, you can gain valuable insights that can enhance your personal and professional life.</p>
-      <p style="color: black;">Thank you for choosing <strong>Mind Sarthi</strong>. We wish you the best in your journey of self-discovery!</p>
-	  <p style="color: black;">We would love to hear your feedback on your experience. Please feel free to reply to this email and share your thoughts with us.</p>
-      <p style="color: black;">Best regards,<br>Nitish</p>
+      <p style="color: black; font-family: Arial, sans-serif;">
+        Access your report here: 
+        <a href="%s" style="color: #007BFF; text-decoration: none;">View My Report</a>
+      </p>
+      <p style="color: black; font-family: Arial, sans-serif;">
+        We hope this report helps you gain a deeper understanding of yourself and unlocks new opportunities for growth.
+      </p>
+      <p style="color: black; font-family: Arial, sans-serif;">
+        If you have any feedback or questions, simply reply to this email. We’d love to hear from you!
+      </p>
+      <p style="color: black; font-family: Arial, sans-serif;">Warm regards,<br><strong>Nitish</strong><br> Mind Sarthi</p>
     `, name, link)
 
-	err := sendEmail(to, "Insights Unlocked: Your BIG 5 Personality Assessment Report is Ready!", htmlBody, "")
+	err := sendEmail(to, "Your Big 5 Personality Report is Ready!", htmlBody, "")
 
 	return err
 }
