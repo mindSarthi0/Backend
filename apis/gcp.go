@@ -45,7 +45,7 @@ func GenerateContentFromTextGCP(prompt string) (string, error) {
 
 	systemPrompt := os.Getenv("SYSTEM_PROMPT")
 	if systemPrompt == "" {
-		systemPrompt = "You are a expert psycologies with speciality in career counselling, relationship counselling, academic counselling, and life counselling who generates summaries based on the Big 5 Personality Assessment."
+		systemPrompt = "You are a expert psycologist with speciality in career counselling, relationship counselling, academic counselling, and life counselling who generates summaries based on the Big 5 Personality Assessment."
 	}
 
 	// Create the request body
@@ -213,6 +213,47 @@ func CreatePromptResultV2(score []Domain) string {
 	c5I := conscientiousnessDomain.Subdomain[4].Intensity
 	c6I := conscientiousnessDomain.Subdomain[5].Intensity
 
+	outputJsonFormat := os.Getenv("OUTPUT_JSON_FORMAT")
+	if outputJsonFormat == "" {
+		outputJsonFormat = `{
+  "Career Pathways": {
+    "description": "Gain insights into your professional strengths, opportunities, and potential for growth.",
+    "sections": {
+      "Ideal Roles for You": "Identify roles that align seamlessly with your personality traits and inherent strengths.",
+      "Your Perfect Work Environment": "Describe workplace settings where your unique qualities and preferences can thrive.",
+      "Unlocking Professional Growth": "Explore strategies to maximize strengths and address challenges for career advancement.",
+      "Tailored Career Recommendations": "Offer a curated list of careers that best match your profile and aspirations."
+    }
+  },
+  "Academic Pathways": {
+    "description": "Discover your unique strengths and strategies for learning and academic achievement.",
+    "sections": {
+      "Your Learning Style Decoded": "Analyze preferred methods of learning and knowledge retention.",
+      "Academic Strengths to Leverage": "Highlight areas where you naturally excel in academics.",
+      "Optimizing Your Study Habits": "Provide actionable strategies and tools to enhance your study effectiveness.",
+      "Recommended Fields of Study": "Suggest academic disciplines that align with your strengths and interests."
+    }
+  },
+  "Relationship Blueprint": {
+    "description": "Understand how your personality shapes your connections and interactions with others.",
+    "sections": {
+      "Your Unique Communication Style": "Detail how you naturally express yourself and connect with others.",
+      "Navigating Conflicts with Ease": "Offer insights into your conflict-resolution style and approaches to harmony.",
+      "Building Meaningful Connections": "Explore tendencies in social settings and provide tips to deepen bonds.",
+      "Patterns in Your Relationships": "Identify recurring themes in your personal and interpersonal dynamics."
+    }
+  },
+  "Path to Fulfillment": {
+    "description": "Discover a personalized guide for achieving growth, balance, and long-term satisfaction.",
+    "sections": {
+      "Your Core Strengths": "Highlight your most defining strengths and how to harness them effectively.",
+      "Areas for Growth": "Gently identify areas where growth is possible, paired with actionable guidance.",
+      "Steps Toward Fulfillment": "Craft a holistic, actionable vision for achieving balance and happiness in life, without listing steps."
+    }
+  }
+}`
+	}
+
 	prompt := fmt.Sprintf("Using the Big 5 Assessment scores provided below, create a summary in the given **'OUTPUT JSON FORMAT'**. Ensure that the summary reflects the individual's scores and provides personalized, insightful content based on their results."+
 		"Tone and Style-\n"+
 		"1)Use a positive and empowering tone to highlight strengths and opportunities.\n"+
@@ -263,50 +304,14 @@ func CreatePromptResultV2(score []Domain) string {
 		"    Achievement Striving Score: %s\n"+
 		"    Self Discipline Score: %s\n"+
 		"    Cautiousness Score: %s\n"+
-		`'OUTPUT JSON FORMAT':
-{
-  "Career Pathways": {
-    "description": "Gain insights into your professional strengths, opportunities, and potential for growth.",
-    "sections": {
-      "Ideal Roles for You": "Identify roles that align seamlessly with your personality traits and inherent strengths.",
-      "Your Perfect Work Environment": "Describe workplace settings where your unique qualities and preferences can thrive.",
-      "Unlocking Professional Growth": "Explore strategies to maximize strengths and address challenges for career advancement.",
-      "Tailored Career Recommendations": "Offer a curated list of careers that best match your profile and aspirations."
-    }
-  },
-  "Academic Pathways": {
-    "description": "Discover your unique strengths and strategies for learning and academic achievement.",
-    "sections": {
-      "Your Learning Style Decoded": "Analyze preferred methods of learning and knowledge retention.",
-      "Academic Strengths to Leverage": "Highlight areas where you naturally excel in academics.",
-      "Optimizing Your Study Habits": "Provide actionable strategies and tools to enhance your study effectiveness.",
-      "Recommended Fields of Study": "Suggest academic disciplines that align with your strengths and interests."
-    }
-  },
-  "Relationship Blueprint": {
-    "description": "Understand how your personality shapes your connections and interactions with others.",
-    "sections": {
-      "Your Unique Communication Style": "Detail how you naturally express yourself and connect with others.",
-      "Navigating Conflicts with Ease": "Offer insights into your conflict-resolution style and approaches to harmony.",
-      "Building Meaningful Connections": "Explore tendencies in social settings and provide tips to deepen bonds.",
-      "Patterns in Your Relationships": "Identify recurring themes in your personal and interpersonal dynamics."
-    }
-  },
-  "Path to Fulfillment": {
-    "description": "Discover a personalized guide for achieving growth, balance, and long-term satisfaction.",
-    "sections": {
-      "Your Core Strengths": "Highlight your most defining strengths and how to harness them effectively.",
-      "Areas for Growth": "Gently identify areas where growth is possible, paired with actionable guidance.",
-      "Steps Toward Fulfillment": "Craft a holistic, actionable vision for achieving balance and happiness in life, without listing steps."
-    }
-  }
-}`,
+		`'OUTPUT JSON FORMAT': %s`,
 
 		neuroticismScore, neuroticismIntensity, n1I, n2I, n3I, n4I, n5I, n6I,
 		extraversionScore, extraversionIntensity, e1I, e2I, e3I, e4I, e5I, e6I,
 		opennessScore, opennessIntensity, o1I, o2I, o3I, o4I, o5I, o6I,
 		agreeablenessScore, agreeablenessIntensity, a1I, a2I, a3I, a4I, a5I, a6I,
-		conscientiousnessScore, conscientiousnessIntensity, c1I, c2I, c3I, c4I, c5I, c6I)
+		conscientiousnessScore, conscientiousnessIntensity, c1I, c2I, c3I, c4I, c5I, c6I,
+		outputJsonFormat)
 
 	return prompt
 }
