@@ -17,7 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var updatedVersion = "1.0.30"
+var updatedVersion = "1.0.31"
 
 func init() {
 	fmt.Println("::Environment mode : " + gin.Mode())

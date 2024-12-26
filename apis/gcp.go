@@ -42,11 +42,21 @@ func GenerateContentFromTextGCP(prompt string) (string, error) {
 	if model == "" {
 		model = "gpt-4o-mini"
 	}
+
+	systemPrompt := os.Getenv("SYSTEM_PROMPT")
+	if systemPrompt == "" {
+		systemPrompt = "You are a expert psycologies with speciality in career counselling, relationship counselling, academic counselling, and life counselling who generates summaries based on the Big 5 Personality Assessment."
+	}
+
 	// Create the request body
 	requestBody, err := json.Marshal(map[string]interface{}{
 		// "model": "gpt-4o-mini", // Replace with the correct model name
 		"model": model,
 		"messages": []map[string]string{
+			{
+				"role":    "system",
+				"content": systemPrompt,
+			},
 			{
 				"role":    "user",
 				"content": prompt,
