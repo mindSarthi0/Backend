@@ -290,8 +290,7 @@ func CreatePromptResultV2(score []Domain) string {
       "Steps Toward Fulfillment": "Craft a holistic, actionable vision for achieving balance and happiness in life, without listing steps."
     }
   }
-}
-
+}`,
 
 		neuroticismScore, neuroticismIntensity, n1I, n2I, n3I, n4I, n5I, n6I,
 		extraversionScore, extraversionIntensity, e1I, e2I, e3I, e4I, e5I, e6I,
