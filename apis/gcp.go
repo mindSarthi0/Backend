@@ -45,7 +45,7 @@ func GenerateContentFromTextGCP(prompt string) (string, error) {
 
 	systemPrompt := os.Getenv("SYSTEM_PROMPT")
 	if systemPrompt == "" {
-		systemPrompt = "You are a expert psycologies with speciality in career counselling, relationship counselling, academic counselling, and life counselling who generates summaries based on the Big 5 Personality Assessment."
+		systemPrompt = "You are an expert psychologist specializing in career, relationship, academic, and life counseling. Your role is to generate insightful, personalized summaries based on the Big Five Personality Assessment, offering practical and empowering guidance tailored to the individual’s unique traits and potential."
 	}
 
 	// Create the request body
