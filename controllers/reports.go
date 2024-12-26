@@ -70,7 +70,10 @@ func GenerateNewReport(c *gin.Context, test models.Test, user models.User) *MyEr
 	// Concurrent apis Calls for AI Responses
 	startTime = time.Now()
 
+	fmt.Println("Prompt:", finalPrompt)
 	content, err := apis.GenerateContentFromTextGCP(finalPrompt)
+
+	fmt.Println("Generated Content:", content)
 
 	fmt.Println("Time taken by GCP Worker to generate response from gemini:", time.Since(startTime))
 
