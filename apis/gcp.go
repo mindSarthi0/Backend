@@ -43,20 +43,11 @@ func GenerateContentFromTextGCP(prompt string) (string, error) {
 		model = "gpt-4o-mini"
 	}
 
-	systemPrompt := os.Getenv("SYSTEM_PROMPT")
-	if systemPrompt == "" {
-		systemPrompt = "You are an expert psychologist specializing in career, relationship, academic, and life counseling. Your role is to generate insightful, personalized summaries based on the Big Five Personality Assessment, offering practical and empowering guidance tailored to the individual’s unique traits and potential."
-	}
-
 	// Create the request body
 	requestBody, err := json.Marshal(map[string]interface{}{
 		// "model": "gpt-4o-mini", // Replace with the correct model name
 		"model": model,
 		"messages": []map[string]string{
-			{
-				"role":    "system",
-				"content": systemPrompt,
-			},
 			{
 				"role":    "user",
 				"content": prompt,
@@ -254,12 +245,16 @@ func CreatePromptResultV2(score []Domain) string {
 }`
 	}
 
-	prompt := fmt.Sprintf("Using the Big 5 Assessment scores provided below, create a summary in the given **'OUTPUT JSON FORMAT'**. Ensure that the summary reflects the individual's scores and provides personalized, insightful content based on their results."+
-		"Tone and Style-\n"+
-		"1)Use a positive and empowering tone to highlight strengths and opportunities.\n"+
-		"2)Provide constructive insights for areas of growth.\n"+
-		"3)Ensure the language is clear, professional, and engaging.\n"+
+	systemPrompt := os.Getenv("SYSTEM_PROMPT")
+	if systemPrompt == "" {
+		systemPrompt = "Using the Big 5 Assessment scores provided below, create a summary in the given **'OUTPUT JSON FORMAT'**. Ensure that the summary reflects the individual's scores and provides personalized, insightful content based on their results." +
+			"Tone and Style-\n" +
+			"1)Use a positive and empowering tone to highlight strengths and opportunities.\n" +
+			"2)Provide constructive insights for areas of growth.\n" +
+			"3)Ensure the language is clear, professional, and engaging.\n"
+	}
 
+	prompt := fmt.Sprintf("%s\n\n"+
 		"Domain: Neuroticism Score: %s/60 (%s)\n"+
 		"  Subdomains of Neuroticism-\n"+
 		"    Anxiety Score : %s\n"+
@@ -305,7 +300,7 @@ func CreatePromptResultV2(score []Domain) string {
 		"    Self Discipline Score: %s\n"+
 		"    Cautiousness Score: %s\n"+
 		`'OUTPUT JSON FORMAT': %s`,
-
+		systemPrompt,
 		neuroticismScore, neuroticismIntensity, n1I, n2I, n3I, n4I, n5I, n6I,
 		extraversionScore, extraversionIntensity, e1I, e2I, e3I, e4I, e5I, e6I,
 		opennessScore, opennessIntensity, o1I, o2I, o3I, o4I, o5I, o6I,
