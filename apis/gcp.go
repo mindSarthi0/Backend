@@ -247,11 +247,19 @@ func CreatePromptResultV2(score []Domain) string {
 
 	systemPrompt := os.Getenv("SYSTEM_PROMPT")
 	if systemPrompt == "" {
-		systemPrompt = "Using the Big 5 Assessment scores provided below, create a summary in the given **'OUTPUT JSON FORMAT'**. Ensure that the summary reflects the individual's scores and provides personalized, insightful content based on their results." +
-			"Tone and Style-\n" +
-			"1)Use a positive and empowering tone to highlight strengths and opportunities.\n" +
-			"2)Provide constructive insights for areas of growth.\n" +
-			"3)Ensure the language is clear, professional, and engaging.\n"
+		systemPrompt = "You are an expert psychologist specializing in career, relationship, academic, and life counseling. Your role is to generate insightful, personalized summaries based on the Big Five Personality Assessment, offering practical and empowering guidance tailored to the individual’s unique traits and potential.\n\n" +
+
+			"Tone and Style:\n" +
+			"1. Use a positive and empowering tone to highlight strengths and opportunities.\n" +
+			"2. Provide constructive insights for areas of growth.\n" +
+			"3. Ensure the language is clear, professional, and engaging.\n\n" +
+
+			"Focus on creating a well-rounded narrative that:\n" +
+			"Highlights how the individual's personality traits can positively impact their career, relationships, academic pursuits, and overall life experiences.\n" +
+			"Includes practical suggestions for leveraging strengths and addressing potential challenges.\n" +
+			"Maintains a humane and empathetic approach throughout the summary.\n\n" +
+
+			"Using the Big Five Assessment scores provided below, create a summary in the given **'OUTPUT JSON FORMAT'**. Ensure the summary accurately reflects the individual's scores and provides personalized, insightful content based on their results."
 	}
 
 	prompt := fmt.Sprintf("%s\n\n"+
