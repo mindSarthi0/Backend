@@ -210,34 +210,34 @@ func CreatePromptResultV2(score []Domain) string {
   "Career Pathways": {
     "description": "Gain insights into your professional strengths, opportunities, and potential for growth.",
     "sections": {
-      "Ideal Roles for You": "Identify roles that align seamlessly with your personality traits and inherent strengths.",
-      "Your Perfect Work Environment": "Describe workplace settings where your unique qualities and preferences can thrive.",
+      "Ideal Roles for You": "Identify roles that align seamlessly with client's personality traits and inherent strengths.",
+      "Your Perfect Work Environment": "Describe workplace settings where client's unique qualities and preferences can thrive.",
       "Unlocking Professional Growth": "Explore strategies to maximize strengths and address challenges for career advancement.",
-      "Tailored Career Recommendations": "Offer a curated list of careers that best match your profile and aspirations."
+      "Tailored Career Recommendations": "List of career path in India that best match with client's profile."
     }
   },
   "Academic Pathways": {
     "description": "Discover your unique strengths and strategies for learning and academic achievement.",
     "sections": {
-      "Your Learning Style Decoded": "Analyze preferred methods of learning and knowledge retention.",
-      "Academic Strengths to Leverage": "Highlight areas where you naturally excel in academics.",
-      "Optimizing Your Study Habits": "Provide actionable strategies and tools to enhance your study effectiveness.",
-      "Recommended Fields of Study": "Suggest academic disciplines that align with your strengths and interests."
+      "Your Learning Style Decoded": "Suggest methods of learning and knowledge retention based on client's profile",
+      "Academic Strengths to Leverage": "Highlight areas where the client can naturally excel in academics.",
+      "Optimizing Your Study Habits": "Provide actionable strategies and tools to enhance client's study effectiveness.",
+      "Recommended Fields of Study": "List academic disciplines in India that align with client's profile"
     }
   },
   "Relationship Blueprint": {
     "description": "Understand how your personality shapes your connections and interactions with others.",
     "sections": {
-      "Your Unique Communication Style": "Detail how you naturally express yourself and connect with others.",
-      "Navigating Conflicts with Ease": "Offer insights into your conflict-resolution style and approaches to harmony.",
+      "Your Unique Communication Style": "Detail how client naturally express themselelf and connect with others.",
+      "Navigating Conflicts with Ease": "Offer insights into client's conflict-resolution style and approaches to harmony.",
       "Building Meaningful Connections": "Explore tendencies in social settings and provide tips to deepen bonds.",
-      "Patterns in Your Relationships": "Identify recurring themes in your personal and interpersonal dynamics."
+     
     }
   },
   "Path to Fulfillment": {
     "description": "Discover a personalized guide for achieving growth, balance, and long-term satisfaction.",
     "sections": {
-      "Your Core Strengths": "Highlight your most defining strengths and how to harness them effectively.",
+      "Your Core Strengths": "Highlight client's most defining strengths and how to harness them effectively.",
       "Areas for Growth": "Gently identify areas where growth is possible, paired with actionable guidance.",
       "Steps Toward Fulfillment": "Craft a holistic, actionable vision for achieving balance and happiness in life, without listing steps."
     }
